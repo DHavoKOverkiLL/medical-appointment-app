@@ -1,0 +1,101 @@
+.appointment-audit-page {
+  padding: clamp(1rem, 2vw, 1.5rem);
+}
+
+.audit-hero {
+  border: 1px solid #d8e6f2;
+  border-radius: 1rem;
+  padding: clamp(1rem, 2vw, 1.3rem);
+  background:
+    radial-gradient(circle at 88% 16%, rgba(43, 124, 216, 0.18), transparent 35%),
+    radial-gradient(circle at 12% 84%, rgba(15, 140, 163, 0.14), transparent 42%),
+    #f4fbff;
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #4c6580;
+  font-weight: 700;
+}
+
+.audit-hero h1 {
+  margin: 0.42rem 0 0.3rem;
+  line-height: 1.2;
+  font-size: clamp(1.3rem, 2vw, 1.85rem);
+}
+
+.audit-hero p {
+  margin: 0 0 0.65rem;
+  color: #58718a;
+}
+
+.audit-hero a[mat-stroked-button] {
+  border-color: #bad4e8;
+  color: #1f567d;
+}
+
+.audit-list {
+  margin-top: 0.9rem;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.audit-card {
+  border: 1px solid #dce8f3;
+  box-shadow: 0 10px 18px rgba(13, 44, 71, 0.06);
+}
+
+.audit-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.audit-card__head strong {
+  color: #1c4f73;
+}
+
+.audit-card__head span {
+  color: #607993;
+  font-size: 0.82rem;
+}
+
+.audit-card__details {
+  margin: 0.55rem 0 0;
+  color: #46647d;
+}
+
+.audit-card__actor {
+  margin: 0.45rem 0 0;
+  color: #5b7891;
+  font-size: 0.82rem;
+}
+
+.state,
+.error,
+.empty-state {
+  margin-top: 0.82rem;
+  border-radius: 0.65rem;
+  padding: 0.75rem 0.9rem;
+}
+
+.state {
+  background: #ebf5ff;
+  color: #355c80;
+}
+
+.error {
+  background: #fff4f7;
+  color: #bc3e5a;
+}
+
+.empty-state {
+  border: 1px dashed #c8dcec;
+  background: #f8fcff;
+  color: #476780;
+}

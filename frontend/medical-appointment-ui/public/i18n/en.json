@@ -1,0 +1,783 @@
+{
+  "language": {
+    "switch": "Switch language",
+    "romanian": "RO",
+    "english": "EN"
+  },
+  "errors": {
+    "apiUnavailable": "Cannot reach API. Start backend and ensure Jwt:Key is configured."
+  },
+  "roles": {
+    "admin": "Admin",
+    "doctor": "Doctor",
+    "patient": "Patient",
+    "user": "User"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "calendar": "Calendar",
+    "availability": "Availability",
+    "book": "Book",
+    "profile": "Profile",
+    "settings": "Settings",
+    "users": "Users",
+    "clinics": "Clinics",
+    "appointments": "Appointments",
+    "notifications": "Notifications",
+    "consults": "Consults",
+    "myAppointments": "My appointments",
+    "accountSettings": "Account settings",
+    "workspaceHome": "Workspace home"
+  },
+  "actions": {
+    "bookAppointment": "Book appointment",
+    "openCalendar": "Open calendar",
+    "openConsults": "Open consults",
+    "reviewConsultQueue": "Review consult queue",
+    "requestPostpone": "Request postpone",
+    "sendRequest": "Send request",
+    "acceptCounterProposal": "Accept counter proposal",
+    "rejectCounterProposal": "Reject counter proposal",
+    "approve": "Approve",
+    "reject": "Reject",
+    "counterPropose": "Counter propose",
+    "cancelAppointment": "Cancel appointment",
+    "markCompleted": "Mark completed",
+    "markNoShow": "Mark no-show",
+    "confirmRejection": "Confirm rejection",
+    "sendCounterProposal": "Send counter proposal",
+    "confirmBooking": "Confirm booking",
+    "saveProfile": "Save profile",
+    "saveAccountSettings": "Save account settings",
+    "saveRole": "Save role",
+    "saveChanges": "Save changes",
+    "createUser": "Create user",
+    "addUser": "Add user",
+    "manageUsers": "Manage users",
+    "manageClinics": "Manage clinics",
+    "manageAvailability": "Manage availability",
+    "viewAppointments": "View appointments",
+    "exportCsv": "Export CSV",
+    "applyFilters": "Apply filters",
+    "clearFilters": "Clear filters",
+    "viewAudit": "View audit",
+    "markAsRead": "Mark as read",
+    "markAllAsRead": "Mark all as read",
+    "testAlert": "Test alert",
+    "backToAppointments": "Back to appointments",
+    "addClinic": "Add clinic",
+    "createClinic": "Create clinic",
+    "saveClinic": "Save clinic",
+    "backToDashboard": "Back to dashboard"
+  },
+  "header": {
+    "workspaceTitle": "{{role}} Workspace",
+    "mainNavigation": "Main navigation",
+    "signedInAs": "Signed in as"
+  },
+  "home": {
+    "loadingDashboard": "Loading dashboard...",
+    "redirectingWorkspace": "Redirecting {{role}} workspace.",
+    "resolvingRole": "Resolving user role."
+  },
+  "state": {
+    "working": "Working...",
+    "loadingDashboard": "Loading dashboard...",
+    "loadingDashboardData": "Loading dashboard data...",
+    "loadingProfile": "Loading profile...",
+    "loadingAccountSettings": "Loading account settings...",
+    "loadingAppointments": "Loading appointments...",
+    "loadingConsults": "Loading consults...",
+    "notScheduled": "Not scheduled",
+    "noneScheduled": "None scheduled"
+  },
+  "metrics": {
+    "clinics": "Clinics",
+    "users": "Users",
+    "doctors": "Doctors",
+    "patients": "Patients",
+    "admins": "Admins",
+    "appointmentsToday": "Appointments today",
+    "upcomingAppointments": "Upcoming appointments",
+    "upcoming": "Upcoming",
+    "nextAppointment": "Next appointment",
+    "doctorsInClinic": "Doctors in clinic",
+    "patientsInQueue": "Patients in queue",
+    "throughput": "Throughput",
+    "pendingRequests": "Pending requests",
+    "counterProposals": "Counter proposals",
+    "upcomingConsults": "Upcoming consults",
+    "awaitingPatientReply": "Awaiting patient reply",
+    "totalLoaded": "Total loaded",
+    "today": "Today",
+    "totalClinics": "Total clinics",
+    "mappedUsers": "Mapped users",
+    "totalUsers": "Total users",
+    "displayed": "Displayed"
+  },
+  "statuses": {
+    "active": "Active",
+    "inactive": "Inactive",
+    "open": "Open",
+    "closed": "Closed",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "noShow": "No-show",
+    "upcoming": "Upcoming",
+    "onSchedule": "On schedule",
+    "pendingDoctorReview": "Pending doctor review",
+    "counterProposedByDoctor": "Counter proposed by doctor",
+    "rejectedByDoctor": "Rejected by doctor",
+    "postponePending": "Postpone pending",
+    "postponeApproved": "Postpone approved",
+    "postponeRejected": "Postpone rejected",
+    "doctorCounterProposed": "Doctor counter proposed",
+    "requestPending": "Request pending",
+    "counterProposalSent": "Counter proposal sent",
+    "requestApproved": "Request approved",
+    "requestRejected": "Request rejected",
+    "counterProposed": "Counter proposed",
+    "inNetwork": "In-network",
+    "outOfNetwork": "Out-of-network"
+  },
+  "common": {
+    "add": "Add",
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close",
+    "edit": "Edit",
+    "remove": "Remove",
+    "next": "Next",
+    "previous": "Previous",
+    "yes": "Yes",
+    "no": "No",
+    "status": "Status",
+    "role": "Role",
+    "clinic": "Clinic",
+    "allClinics": "All clinics",
+    "allStatuses": "All statuses",
+    "code": "Code",
+    "username": "Username",
+    "email": "Email",
+    "password": "Password",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "birthDate": "Birth date",
+    "address": "Address",
+    "personalIdentifier": "Personal identifier",
+    "personalIdentifierShort": "PID",
+    "date": "Date",
+    "day": "Day",
+    "dayUnknown": "Unknown day",
+    "doctor": "Doctor",
+    "patient": "Patient",
+    "reason": "Reason",
+    "cancelReason": "Cancellation reason",
+    "note": "Note",
+    "noteOptional": "Note (optional)",
+    "proposed": "Proposed",
+    "proposedDate": "Proposed date",
+    "proposedTimeSlot": "Proposed time slot (30 min)",
+    "timeSlot30": "Time slot (30 min)",
+    "doctorNote": "Doctor note",
+    "signOut": "Sign out",
+    "with": "with",
+    "city": "City",
+    "postalCode": "Postal code",
+    "fax": "Fax",
+    "daysShort": {
+      "mon": "Mon",
+      "tue": "Tue",
+      "wed": "Wed",
+      "thu": "Thu",
+      "fri": "Fri",
+      "sat": "Sat",
+      "sun": "Sun"
+    },
+    "days": {
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday",
+      "saturday": "Saturday",
+      "sunday": "Sunday"
+    }
+  },
+  "filters": {
+    "dateFrom": "Date from",
+    "dateTo": "Date to"
+  },
+  "auth": {
+    "login": {
+      "heroAria": "Medical platform overview",
+      "heroTitle": "Professional care coordination, built for speed and trust.",
+      "heroCopy": "Access consult schedules, patient appointments, and clinical workflows in one secure workspace.",
+      "highlights": {
+        "uptime": "Portal uptime",
+        "bookingTime": "Average booking time",
+        "secureAccess": "Secure access"
+      },
+      "formAria": "Sign in form",
+      "kicker": "Welcome back",
+      "heading": "Sign in to your medical workspace",
+      "subtitle": "Use your staff or patient account credentials.",
+      "submit": "Sign in securely",
+      "signingIn": "Signing in...",
+      "needAccount": "Need an account?",
+      "createAccount": "Create one here",
+      "errors": {
+        "invalidCredentials": "Invalid email or password.",
+        "failed": "Login failed. Please try again."
+      }
+    },
+    "register": {
+      "heroAria": "Account benefits",
+      "heroTitle": "Create your secure account and start managing care instantly.",
+      "heroCopy": "Public sign-up creates a patient account with secure access to scheduling and appointment tracking.",
+      "highlights": {
+        "roleBasedMetric": "Role-based",
+        "accessPermissions": "Access permissions",
+        "encryptedMetric": "Encrypted",
+        "authFlow": "Authentication flow",
+        "unifiedMetric": "Unified",
+        "workflows": "Medical workflows"
+      },
+      "formAria": "Registration form",
+      "kicker": "Get started",
+      "heading": "Create your Medio account",
+      "subtitle": "Complete your profile details to activate access.",
+      "roleNote": "New accounts are created as Patient.",
+      "submit": "Create account",
+      "alreadyRegistered": "Already registered?",
+      "signInHere": "Sign in here",
+      "errors": {
+        "loadClinics": "Unable to load clinics. Please try again in a moment.",
+        "conflict": "An account with this email, username, or personal identifier already exists.",
+        "failed": "Registration failed. Please review your details and try again."
+      }
+    }
+  },
+  "profile": {
+    "eyebrow": "{{role}} Profile",
+    "title": "Personal details and identity data",
+    "subtitle": "Keep your profile up to date so appointment and clinic records remain accurate.",
+    "accountRole": "{{role}} account",
+    "editTitle": "Edit profile",
+    "editSubtitle": "Only your personal details are editable in this section.",
+    "messages": {
+      "updated": "Profile updated successfully."
+    },
+    "errors": {
+      "loadFailed": "Unable to load profile.",
+      "updateFailed": "Unable to update profile."
+    }
+  },
+  "accountSettings": {
+    "eyebrow": "{{role}} Account Settings",
+    "title": "Security controls and login credentials",
+    "subtitle": "Manage sign-in identity, rotate password, and keep account security current.",
+    "securityTitle": "Security checklist",
+    "securitySubtitle": "Use this section whenever your account details change.",
+    "security": {
+      "identityTitle": "Identity",
+      "identityCopy": "Username and email should stay unique and up to date.",
+      "passwordTitle": "Password update",
+      "passwordCopy": "Use current password confirmation to prevent unauthorized changes.",
+      "credentialsTitle": "Strong credentials",
+      "credentialsCopy": "Use at least 8 characters, with mixed symbols and letters."
+    },
+    "editTitle": "Edit account settings",
+    "editSubtitle": "Current password is required for any account update.",
+    "currentPassword": "Current password",
+    "newPasswordOptional": "New password (optional)",
+    "confirmNewPassword": "Confirm new password",
+    "passwordMismatch": "New password and confirmation must match.",
+    "messages": {
+      "updated": "Account settings updated."
+    },
+    "errors": {
+      "loadFailed": "Unable to load account settings.",
+      "updateFailed": "Unable to update account settings."
+    }
+  },
+  "patientDashboard": {
+    "eyebrow": "Patient Workspace",
+    "title": "Appointments and care planning in one calendar",
+    "subtitle": "Track scheduled visits, request postponements for your doctor, and manage your profile securely.",
+    "daySubtitle": "Appointments and request actions for the selected day.",
+    "emptySelectedDay": "No appointments on this day.",
+    "postponeStatus": "Postpone status",
+    "reviewCounterProposal": "Review this counter proposal in",
+    "postponeRequestTitle": "Postpone appointment request",
+    "postponeRequestSubtitle": "Propose a new date and explain why. Your doctor will review this request.",
+    "messages": {
+      "postponeSent": "Postpone request sent to your doctor.",
+      "loadingSlots": "Loading available slots...",
+      "noSlots": "No available slots for the selected date.",
+      "slotsTimezone": "Times shown in {{timezone}}."
+    },
+    "errors": {
+      "loadDashboard": "Unable to load patient dashboard.",
+      "refreshAppointments": "Unable to refresh appointments.",
+      "postponeFailed": "Failed to send postpone request.",
+      "loadSlots": "Unable to load available slots right now.",
+      "timeUnavailable": "Selected time slot is no longer available. Please choose another slot."
+    }
+  },
+  "doctorDashboard": {
+    "eyebrow": "Doctor Workspace",
+    "title": "Consult readiness and schedule control",
+    "subtitle": "Monitor your daily caseload, upcoming visits, and patient flow in {{clinic}}.",
+    "yourClinic": "your clinic",
+    "snapshotTitle": "Operational snapshot",
+    "snapshotSubtitle": "Keep consult throughput balanced and prioritize follow-up requests before the next session block.",
+    "snapshot": {
+      "today": "{{count}} today",
+      "scheduledAhead": "{{count}} scheduled ahead",
+      "uniquePatients": "{{count}} unique patients"
+    },
+    "nextConsultTitle": "Next consult focus",
+    "nextConsultAt": "Next patient starts at {{date}}.",
+    "noNextConsult": "No next consult is scheduled yet. Open consults to review your queue.",
+    "throughput": {
+      "stable": "Stable",
+      "high": "High",
+      "moderate": "Moderate",
+      "low": "Low"
+    },
+    "errors": {
+      "loadDashboard": "Unable to load doctor dashboard."
+    }
+  },
+  "appointmentsMy": {
+    "eyebrow": "Appointments",
+    "title": "Your care timeline",
+    "subtitle": "Review upcoming consults, postpone-request status, and completed visits.",
+    "empty": "No appointments found yet. Use Book appointment to schedule your first consult.",
+    "messages": {
+      "counterAccepted": "Counter proposal accepted. Appointment updated.",
+      "counterRejected": "Counter proposal rejected.",
+      "cancelled": "Appointment cancelled."
+    },
+    "errors": {
+      "loadAppointments": "Unable to load appointments right now.",
+      "counterResponseFailed": "Unable to process counter proposal response.",
+      "cancelFailed": "Unable to cancel appointment."
+    }
+  },
+  "appointmentsDoctor": {
+    "eyebrow": "Consults",
+    "title": "Doctor consult queue",
+    "subtitle": "Track patient sessions, spot postpone requests, and keep your schedule balanced.",
+    "empty": "No consults scheduled yet.",
+    "pendingRequestsTitle": "Pending postpone requests",
+    "awaitingCounterResponseTitle": "Counter proposals awaiting patient response",
+    "timelineTitle": "Consult timeline",
+    "currentSlot": "Current slot",
+    "proposedSlot": "Proposed slot",
+    "counterProposedSlot": "Counter-proposed slot",
+    "rejectModalTitle": "Reject postpone request",
+    "rejectReason": "Reject reason",
+    "counterModalTitle": "Send counter proposal",
+    "messages": {
+      "counterSent": "Counter proposal sent to patient.",
+      "requestApproved": "Postpone request approved.",
+      "requestRejected": "Postpone request rejected with reason.",
+      "appointmentCancelled": "Appointment cancelled.",
+      "markedCompleted": "Appointment marked as completed.",
+      "markedNoShow": "Appointment marked as no-show.",
+      "loadingSlots": "Loading available slots...",
+      "noSlots": "No available slots for the selected date.",
+      "slotsTimezone": "Times shown in {{timezone}}."
+    },
+    "errors": {
+      "loadConsults": "Failed to load consults.",
+      "counterSendFailed": "Failed to send counter proposal.",
+      "approveFailed": "Unable to process postpone response.",
+      "rejectFailed": "Unable to reject postpone request.",
+      "cancelFailed": "Unable to cancel appointment.",
+      "markAttendanceFailed": "Unable to update appointment attendance.",
+      "loadSlots": "Unable to load available slots right now.",
+      "timeUnavailable": "Selected time slot is no longer available. Please choose another slot."
+    }
+  },
+  "availability": {
+    "eyebrow": "Availability",
+    "title": "Doctor availability management",
+    "subtitleDoctor": "Define your weekly windows, breaks, and one-off exceptions used for appointment slot generation.",
+    "subtitleAdmin": "Configure any doctor's availability template and date overrides across the clinic.",
+    "sections": {
+      "weeklyAvailability": "Weekly availability windows",
+      "weeklyBreaks": "Weekly recurring breaks",
+      "dateOverrides": "Date overrides"
+    },
+    "fields": {
+      "selectDoctor": "Doctor",
+      "filterClinic": "Clinic filter",
+      "searchDoctor": "Search doctor",
+      "timezone": "Clinic timezone: {{timezone}}",
+      "startTime": "Start time",
+      "endTime": "End time",
+      "overrideType": "Override type"
+    },
+    "override": {
+      "available": "Available window",
+      "unavailable": "Unavailable block/day"
+    },
+    "actions": {
+      "addAvailabilityWindow": "Add availability window",
+      "addBreak": "Add break",
+      "addOverride": "Add override"
+    },
+    "hints": {
+      "weeklyAvailability": "If empty, the doctor can be booked during clinic operating hours.",
+      "emptyWeeklyAvailability": "No explicit windows configured. Add windows only if this doctor needs custom hours.",
+      "weeklyBreaks": "Breaks are subtracted from weekly availability before slots are generated.",
+      "dateOverrides": "Unavailable overrides can block a full day or a partial time range."
+    },
+    "messages": {
+      "loading": "Loading availability...",
+      "saved": "Availability settings saved."
+    },
+    "errors": {
+      "invalidForm": "Please complete all required availability fields.",
+      "invalidRangeOrder": "Each start time must be earlier than its end time.",
+      "overlapInAvailability": "Weekly availability windows overlap on the same day.",
+      "overlapInBreaks": "Weekly breaks overlap on the same day.",
+      "breakOutsideAvailability": "Each weekly break must fit inside an availability window for that day.",
+      "overridePartialTime": "Override start and end times must both be filled or both left empty.",
+      "availableOverrideMissingTime": "Available overrides require both start and end time.",
+      "overrideRangeOrder": "Override start time must be earlier than end time.",
+      "duplicateOverride": "Duplicate override entries are not allowed.",
+      "overrideOverlapAvailable": "Available overrides overlap on the same date.",
+      "overrideOverlapUnavailable": "Unavailable overrides overlap on the same date.",
+      "selectDoctor": "Select a doctor first.",
+      "noDoctors": "No doctors are available to configure.",
+      "noMatchingDoctors": "No doctors match the current clinic/search filters.",
+      "loadDoctorsFailed": "Unable to load doctors.",
+      "loadFailed": "Unable to load doctor availability.",
+      "saveFailed": "Unable to save doctor availability."
+    }
+  },
+  "appointmentsAdmin": {
+    "title": "Cross-clinic appointments",
+    "subtitle": "Monitor bookings, postpone requests, and consult load across the clinic network.",
+    "filterScopeTitle": "Filter scope",
+    "filterScopeSubtitle": "Showing appointments for {{clinic}}.",
+    "empty": "No appointments found for the selected clinic scope.",
+    "messages": {
+      "exported": "Appointment report exported."
+    },
+    "errors": {
+      "loadClinics": "Failed to load clinics.",
+      "loadAppointments": "Failed to load appointments.",
+      "exportFailed": "Failed to export appointment report."
+    }
+  },
+  "notifications": {
+    "title": "Inbox notifications",
+    "subtitle": "Track postpone and cancellation updates that need your attention.",
+    "inbox": "Notification inbox",
+    "unreadSummary": "{{count}} unread notification(s)",
+    "loading": "Loading notifications...",
+    "empty": "No notifications yet.",
+    "read": "Read",
+    "unread": "Unread",
+    "preferences": {
+      "title": "Alert preferences",
+      "hint": "Both are disabled by default. Enable only what you want.",
+      "sound": "Play sound for new notifications",
+      "vibration": "Vibrate on new notifications"
+    },
+    "messages": {
+      "markAllSuccess": "All notifications marked as read.",
+      "alreadyRead": "All notifications were already read.",
+      "testAlertPlayed": "Test alert triggered."
+    },
+    "errors": {
+      "loadFailed": "Unable to load notifications.",
+      "markReadFailed": "Unable to mark notification as read.",
+      "markAllFailed": "Unable to mark all notifications as read."
+    }
+  },
+  "appointmentAudit": {
+    "eyebrow": "Appointment audit",
+    "title": "Action timeline",
+    "subtitle": "Audit trail for appointment {{appointmentId}}.",
+    "actor": "Actor",
+    "loading": "Loading audit events...",
+    "empty": "No audit events recorded for this appointment.",
+    "eventTypes": {
+      "created": "Appointment created",
+      "postponeRequested": "Postpone requested",
+      "postponeApproved": "Postpone approved by doctor",
+      "postponeRejected": "Postpone rejected by doctor",
+      "counterProposed": "Counter proposed by doctor",
+      "counterAccepted": "Counter accepted by patient",
+      "counterRejected": "Counter rejected by patient",
+      "cancelled": "Appointment cancelled",
+      "attendanceCompleted": "Attendance marked completed",
+      "attendanceNoShow": "Attendance marked no-show"
+    },
+    "errors": {
+      "invalidAppointment": "Appointment id is missing.",
+      "loadFailed": "Unable to load appointment audit trail."
+    }
+  },
+  "adminDashboard": {
+    "eyebrow": "Administrator Control Center",
+    "title": "Clinic network overview and access governance",
+    "subtitle": "Monitor platform load, maintain user access, and manage clinic structure from one workspace.",
+    "clinicLoadTitle": "Clinic load",
+    "errors": {
+      "loadFailed": "Unable to load admin dashboard data."
+    }
+  },
+  "userManagement": {
+    "title": "Users and role governance",
+    "subtitle": "Provision accounts, maintain profile accuracy, and enforce role-based access by clinic.",
+    "modalsTitle": "Account Modals",
+    "modalsSubtitle": "Create and edit records in a modern tabbed dialog instead of inline forms.",
+    "directoryTitle": "User directory",
+    "directorySubtitle": "Showing {{count}} user(s) in {{clinic}}.",
+    "filterByClinic": "Filter by clinic",
+    "empty": "No users match this clinic filter.",
+    "messages": {
+      "roleUpdated": "Role updated for {{email}}.",
+      "userCreated": "User created successfully.",
+      "userUpdated": "User profile updated."
+    },
+    "errors": {
+      "dataRequiredForCreate": "Roles and clinics must be loaded before creating a user.",
+      "dataRequiredForEdit": "Roles and clinics must be loaded before editing a user.",
+      "loadDataFailed": "Unable to load user management data.",
+      "roleUpdateFailed": "Failed to update role.",
+      "createFailed": "Failed to create user.",
+      "updateFailed": "Failed to update user."
+    }
+  },
+  "userEditor": {
+    "dialogTitleCreate": "Add user",
+    "dialogTitleEdit": "Edit user",
+    "dialogSubtitle": "Use tabs to manage account, profile, and clinic assignment.",
+    "tabs": {
+      "account": "Account",
+      "profile": "Profile",
+      "review": "Review"
+    },
+    "currentRole": "Current role",
+    "currentRoleHint": "Role changes still use the inline control on each user card.",
+    "review": {
+      "identity": "Identity",
+      "account": "Account",
+      "noPersonalIdentifier": "No personal identifier yet",
+      "noEmail": "No email yet"
+    },
+    "noClinicSelected": "No clinic selected"
+  },
+  "clinicManagement": {
+    "title": "Clinic tenancy management",
+    "subtitle": "Control clinic boundaries, activation status, and user distribution across the network.",
+    "modalsTitle": "Clinic Modals",
+    "modalsSubtitle": "Open a tabbed modal to create or edit full clinic profiles with structured data.",
+    "directoryTitle": "Clinic directory",
+    "directorySubtitle": "Current clinics and tenancy load.",
+    "usersCount": "{{count}} users",
+    "empty": "No clinics found.",
+    "messages": {
+      "created": "Clinic created.",
+      "updated": "Clinic updated."
+    },
+    "errors": {
+      "loadClinics": "Unable to load clinics.",
+      "loadOperations": "Unable to load service operations.",
+      "loadAccreditations": "Unable to load accreditation types.",
+      "loadClinicTypes": "Unable to load clinic types.",
+      "loadOwnershipTypes": "Unable to load ownership types.",
+      "loadSourceSystems": "Unable to load source systems.",
+      "loadSystemInfo": "Unable to load system lookup data.",
+      "operationsUnavailable": "Service operations are unavailable. Refresh and try again.",
+      "accreditationsUnavailable": "Accreditation types are unavailable. Refresh and try again.",
+      "clinicTypesUnavailable": "Clinic types are unavailable. Refresh and try again.",
+      "ownershipTypesUnavailable": "Ownership types are unavailable. Refresh and try again.",
+      "sourceSystemsUnavailable": "Source systems are unavailable. Refresh and try again.",
+      "createFailed": "Failed to create clinic.",
+      "updateFailed": "Failed to update clinic."
+    }
+  },
+  "clinicEditor": {
+    "dialogTitleCreate": "Add clinic",
+    "dialogTitleEdit": "Edit clinic",
+    "dialogSubtitle": "Tabbed clinic editor for profile, operations, and compliance.",
+    "tabs": {
+      "identity": "Identity",
+      "locationContact": "Location & Contact",
+      "operations": "Operations",
+      "networkCompliance": "Network & Compliance"
+    },
+    "fields": {
+      "clinicName": "Clinic name",
+      "clinicCode": "Clinic code",
+      "legalName": "Legal name",
+      "clinicType": "Clinic type",
+      "ownershipType": "Ownership type",
+      "foundedOn": "Founded on",
+      "sourceSystem": "Source system",
+      "addressLine1": "Address line 1",
+      "addressLine2": "Address line 2",
+      "stateRegion": "State / Region",
+      "countryCode": "Country code",
+      "timezone": "Timezone",
+      "mainPhone": "Main phone",
+      "mainEmail": "Main email",
+      "websiteUrl": "Website URL",
+      "patientPortalUrl": "Patient portal URL",
+      "bookingMethods": "Booking methods (comma separated)",
+      "avgWaitDays": "Avg new patient wait (days)",
+      "sameDayAvailability": "Same day availability",
+      "npiOrganization": "NPI organization",
+      "ein": "EIN",
+      "taxonomyCode": "Taxonomy code",
+      "stateLicenseFacility": "State license facility",
+      "cliaNumber": "CLIA number",
+      "hipaaNoticeVersion": "HIPAA notice version",
+      "lastSecurityRiskAssessment": "Last security risk assessment",
+      "openTime": "Open time",
+      "closeTime": "Close time",
+      "serviceOperation": "Service operation",
+      "telehealth": "Telehealth",
+      "payerName": "Payer name",
+      "planName": "Plan name",
+      "network": "Network",
+      "accreditationType": "Accreditation type",
+      "effectiveOn": "Effective on",
+      "expiresOn": "Expires on"
+    },
+    "placeholders": {
+      "clinicType": "primary_care",
+      "ownershipType": "physician_owned",
+      "bookingMethods": "phone, portal"
+    },
+    "collections": {
+      "operatingHours": "Operating hours",
+      "services": "Services",
+      "insurancePlans": "Insurance plans",
+      "accreditations": "Accreditations"
+    },
+    "empty": {
+      "operatingHours": "No operating hours added yet.",
+      "services": "No services added yet.",
+      "noOperationsConfigured": "No service operations are configured yet.",
+      "insurancePlans": "No insurance plans added yet.",
+      "accreditations": "No accreditations added yet.",
+      "noAccreditationsConfigured": "No accreditation types are configured yet."
+    },
+    "editorTitles": {
+      "addOperatingHour": "Add operating hour",
+      "editOperatingHourDay": "Edit {{day}}",
+      "addService": "Add service",
+      "editService": "Edit service",
+      "addInsurancePlan": "Add insurance plan",
+      "editInsurancePlan": "Edit insurance plan",
+      "addAccreditation": "Add accreditation",
+      "editAccreditation": "Edit accreditation"
+    },
+    "hints": {
+      "insurancePlans": "Tip: Keep one row per payer-plan contract, then update network status as needed.",
+      "insurancePlansEmpty": "Use + Add to create the first plan entry.",
+      "accreditations": "Tip: Track effective and expiry dates so renewals are visible at a glance.",
+      "accreditationsEmpty": "Use + Add to create the first accreditation entry."
+    },
+    "tooltips": {
+      "addInsurancePlan": "Add a payer and plan combination.",
+      "addAccreditation": "Add accreditation type and validity dates."
+    },
+    "telehealthAvailable": "Telehealth available",
+    "inPersonOnly": "In-person only",
+    "accreditationEffectiveOnly": "Effective: {{date}}",
+    "accreditationExpiresOnly": "Expires: {{date}}",
+    "noValidityWindow": "No validity window",
+    "errors": {
+      "operatingHourFormat": "Operating hour times must use HH:mm.",
+      "operatingHourOrder": "Operating hour open time must be earlier than close time.",
+      "operatingHourDuplicate": "Day '{{day}}' already has an operating hours record.",
+      "invalidServiceOperation": "Select a valid service operation.",
+      "serviceDuplicate": "Service '{{service}}' is already added.",
+      "insuranceRequired": "Payer and plan names are required.",
+      "insuranceDuplicate": "Insurance plan '{{payer}} - {{plan}}' already exists.",
+      "invalidAccreditation": "Select a valid accreditation type.",
+      "accreditationDateOrder": "Accreditation '{{accreditation}}' has EffectiveOn after ExpiresOn.",
+      "accreditationDuplicate": "Accreditation '{{accreditation}}' already exists."
+    }
+  },
+  "sys": {
+    "operations": {
+      "1": "Annual wellness visit",
+      "2": "Primary care follow-up",
+      "3": "Chronic care management",
+      "4": "Preventive screening",
+      "5": "Vaccination",
+      "6": "Urgent care visit",
+      "7": "Telehealth consultation",
+      "8": "Lab testing",
+      "9": "Minor procedure",
+      "10": "Behavioral health consultation"
+    },
+    "accreditations": {
+      "1": "Joint Commission Ambulatory Care",
+      "2": "NCQA Patient-Centered Medical Home",
+      "3": "AAAHC Ambulatory Health Care",
+      "4": "URAC Telehealth Accreditation",
+      "5": "CAP Laboratory Accreditation",
+      "6": "CARF Health Program Accreditation",
+      "7": "ACR Imaging Accreditation",
+      "8": "COLA Laboratory Accreditation",
+      "9": "ACHC Ambulatory Care Accreditation",
+      "10": "ISO 15189 Medical Laboratory"
+    },
+    "clinicTypes": {
+      "1": "Primary Care",
+      "2": "Specialty Care",
+      "3": "Urgent Care",
+      "4": "Multi-specialty Clinic",
+      "5": "Community Health Center"
+    },
+    "ownershipTypes": {
+      "1": "Physician Owned",
+      "2": "Hospital Owned",
+      "3": "Health System",
+      "4": "Academic",
+      "5": "Government",
+      "6": "Nonprofit"
+    },
+    "sourceSystems": {
+      "1": "EHR",
+      "2": "EMR",
+      "3": "Custom Platform",
+      "4": "Legacy PMS"
+    }
+  },
+  "bookAppointment": {
+    "eyebrow": "Patient Booking",
+    "title": "Schedule your next consultation",
+    "subtitle": "Select a doctor, date, and time. You can later request postponement from your calendar.",
+    "cardTitle": "Book appointment",
+    "cardSubtitle": "Choose one of the doctors available in your clinic.",
+    "messages": {
+      "booked": "Appointment booked.",
+      "loadingSlots": "Loading available slots...",
+      "noSlots": "No available slots for the selected doctor and date.",
+      "slotsTimezone": "Times shown in {{timezone}}."
+    },
+    "errors": {
+      "loadDoctors": "Unable to load doctors right now.",
+      "loadSlots": "Unable to load available slots right now.",
+      "fillAllFields": "Please fill all fields before submitting.",
+      "timeUnavailable": "Selected time slot is no longer available. Please choose another slot.",
+      "bookFailed": "Failed to book appointment."
+    }
+  }
+}

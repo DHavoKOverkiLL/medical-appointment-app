@@ -1,0 +1,125 @@
+<section class="appointments-page">
+  <header class="appointments-hero">
+    <p class="appointments-eyebrow">{{ 'appointmentsMy.eyebrow' | translate }}</p>
+    <h1>{{ 'appointmentsMy.title' | translate }}</h1>
+    <p>{{ 'appointmentsMy.subtitle' | translate }}</p>
+
+    <div class="appointments-actions">
+      <a mat-flat-button routerLink="/dashboard/appointments/book">{{ 'actions.bookAppointment' | translate }}</a>
+      <a mat-stroked-button routerLink="/dashboard/patient/calendar">{{ 'actions.openCalendar' | translate }}</a>
+    </div>
+  </header>
+
+  <section class="appointments-metrics">
+    <mat-card>
+      <span>{{ 'metrics.upcoming' | translate }}</span>
+      <strong>{{ upcomingCount }}</strong>
+    </mat-card>
+    <mat-card>
+      <span>{{ 'metrics.pendingRequests' | translate }}</span>
+      <strong>{{ pendingPostponeCount }}</strong>
+    </mat-card>
+    <mat-card>
+      <span>{{ 'metrics.counterProposals' | translate }}</span>
+      <strong>{{ counterProposalCount }}</strong>
+    </mat-card>
+  </section>
+
+  <p *ngIf="successMessage" class="success">{{ successMessage | translate }}</p>
+  <p *ngIf="loading && appointments.length > 0" class="state">{{ 'state.loadingAppointments' | translate }}</p>
+  <p *ngIf="errorMessage" class="error">{{ errorMessage | translate }}</p>
+
+  <section class="app-skeleton-list" *ngIf="loading && appointments.length === 0" aria-hidden="true">
+    <article class="app-skeleton-card" *ngFor="let _ of skeletonRows">
+      <div class="app-skeleton-line app-skeleton-line--title"></div>
+      <div class="app-skeleton-line app-skeleton-line--meta"></div>
+      <div class="app-skeleton-pills">
+        <span class="app-skeleton-pill"></span>
+        <span class="app-skeleton-pill"></span>
+        <span class="app-skeleton-pill"></span>
+      </div>
+    </article>
+  </section>
+
+  <section *ngIf="!loading && !errorMessage && appointments.length === 0" class="empty-state">
+    {{ 'appointmentsMy.empty' | translate }}
+  </section>
+
+  <section class="appointments-list" *ngIf="!loading && appointments.length > 0">
+    <mat-card class="appointment-card" *ngFor="let appointment of appointments; trackBy: trackAppointment">
+      <div class="appointment-main">
+        <div class="appointment-title">
+          <h2>{{ appointment.doctorName }}</h2>
+          <span [class]="getStatusClass(appointment)">
+            {{ getStatusLabel(appointment) | translate }}
+          </span>
+        </div>
+
+        <div class="appointment-meta">
+          <span>{{ appointment.appointmentDateTime | date:'dd/MM/yyyy' }}</span>
+          <span>{{ appointment.appointmentDateTime | date:'HH:mm' }}</span>
+          <span>{{ appointment.clinicName }}</span>
+          <span [class.appointment-past]="isPast(appointment)">
+            {{ isPast(appointment) ? ('statuses.completed' | translate) : ('statuses.upcoming' | translate) }}
+          </span>
+        </div>
+
+        <p *ngIf="appointment.proposedDateTime" class="appointment-extra">
+          {{ 'common.proposed' | translate }}: {{ appointment.proposedDateTime | date:'dd/MM/yyyy HH:mm' }}
+        </p>
+        <p *ngIf="appointment.postponeReason" class="appointment-extra">
+          {{ 'common.reason' | translate }}: {{ appointment.postponeReason }}
+        </p>
+        <p *ngIf="appointment.cancellationReason" class="appointment-extra">
+          {{ 'common.cancelReason' | translate }}: {{ appointment.cancellationReason }}
+        </p>
+        <p *ngIf="appointment.doctorResponseNote && !isRejectedStatus(appointment.postponeRequestStatus)" class="appointment-extra">
+          {{ 'common.doctorNote' | translate }}: {{ appointment.doctorResponseNote }}
+        </p>
+        <section *ngIf="appointment.doctorResponseNote && isRejectedStatus(appointment.postponeRequestStatus)" class="reject-reason-box">
+          <strong>{{ 'statuses.rejectedByDoctor' | translate }}</strong>
+          <p>{{ appointment.doctorResponseNote }}</p>
+        </section>
+
+        <div class="counter-response-actions" *ngIf="canRespondToCounterProposal(appointment)">
+          <button
+            mat-flat-button
+            class="button-with-spinner"
+            type="button"
+            [disabled]="actionSubmittingAppointmentId === appointment.appointmentId"
+            (click)="respondToCounterProposal(appointment, 'Accept')">
+            <mat-progress-spinner *ngIf="actionSubmittingAppointmentId === appointment.appointmentId && actionDecision === 'Accept'" mode="indeterminate" diameter="16"></mat-progress-spinner>
+            <span>{{ 'actions.acceptCounterProposal' | translate }}</span>
+          </button>
+          <button
+            mat-stroked-button
+            class="button-with-spinner"
+            type="button"
+            [disabled]="actionSubmittingAppointmentId === appointment.appointmentId"
+            (click)="respondToCounterProposal(appointment, 'Reject')">
+            <mat-progress-spinner *ngIf="actionSubmittingAppointmentId === appointment.appointmentId && actionDecision === 'Reject'" mode="indeterminate" diameter="16"></mat-progress-spinner>
+            <span>{{ 'actions.rejectCounterProposal' | translate }}</span>
+          </button>
+        </div>
+
+        <div class="counter-response-actions" *ngIf="canCancelAppointment(appointment)">
+          <button
+            mat-stroked-button
+            class="button-with-spinner"
+            type="button"
+            [disabled]="actionSubmittingAppointmentId === appointment.appointmentId"
+            (click)="cancelAppointment(appointment)">
+            <mat-progress-spinner *ngIf="actionSubmittingAppointmentId === appointment.appointmentId && actionDecision === 'Cancel'" mode="indeterminate" diameter="16"></mat-progress-spinner>
+            <span>{{ 'actions.cancelAppointment' | translate }}</span>
+          </button>
+        </div>
+
+        <div class="counter-response-actions">
+          <a mat-button [routerLink]="['/dashboard/appointments', appointment.appointmentId, 'audit']">
+            {{ 'actions.viewAudit' | translate }}
+          </a>
+        </div>
+      </div>
+    </mat-card>
+  </section>
+</section>

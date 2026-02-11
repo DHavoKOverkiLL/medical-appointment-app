@@ -1,0 +1,256 @@
+<section class="doctor-consults">
+  <header class="consults-hero">
+    <p class="consults-eyebrow">{{ 'appointmentsDoctor.eyebrow' | translate }}</p>
+    <h1>{{ 'appointmentsDoctor.title' | translate }}</h1>
+    <p>{{ 'appointmentsDoctor.subtitle' | translate }}</p>
+
+    <div class="consults-actions">
+      <a mat-flat-button routerLink="/dashboard/doctor">{{ 'actions.backToDashboard' | translate }}</a>
+    </div>
+  </header>
+
+  <section class="consults-metrics">
+    <mat-card>
+      <span>{{ 'metrics.upcomingConsults' | translate }}</span>
+      <strong>{{ upcomingConsults.length }}</strong>
+    </mat-card>
+    <mat-card>
+      <span>{{ 'metrics.pendingRequests' | translate }}</span>
+      <strong>{{ pendingRequests.length }}</strong>
+    </mat-card>
+    <mat-card>
+      <span>{{ 'metrics.awaitingPatientReply' | translate }}</span>
+      <strong>{{ counterProposalsAwaitingPatient.length }}</strong>
+    </mat-card>
+  </section>
+
+  <p *ngIf="successMessage" class="success">{{ successMessage | translate }}</p>
+  <p *ngIf="loading && appointments.length > 0" class="state">{{ 'state.loadingConsults' | translate }}</p>
+  <p *ngIf="errorMessage" class="error">{{ errorMessage | translate }}</p>
+
+  <section class="app-skeleton-list" *ngIf="loading && appointments.length === 0" aria-hidden="true">
+    <article class="app-skeleton-card" *ngFor="let _ of skeletonRows">
+      <div class="app-skeleton-line app-skeleton-line--title"></div>
+      <div class="app-skeleton-line app-skeleton-line--meta"></div>
+      <div class="app-skeleton-pills">
+        <span class="app-skeleton-pill"></span>
+        <span class="app-skeleton-pill"></span>
+        <span class="app-skeleton-pill"></span>
+      </div>
+    </article>
+  </section>
+
+  <section *ngIf="!loading && !errorMessage && appointments.length === 0" class="empty-state">
+    {{ 'appointmentsDoctor.empty' | translate }}
+  </section>
+
+  <section *ngIf="!loading && pendingRequests.length > 0" class="request-section">
+    <h2>{{ 'appointmentsDoctor.pendingRequestsTitle' | translate }}</h2>
+
+    <mat-card class="request-card" *ngFor="let appointment of pendingRequests; trackBy: trackAppointment">
+      <div class="request-title">
+        <strong>{{ appointment.patientName }}</strong>
+        <span [class]="getStatusClass(appointment)">
+          {{ getStatusLabel(appointment) | translate }}
+        </span>
+      </div>
+      <p>{{ 'appointmentsDoctor.currentSlot' | translate }}: {{ appointment.appointmentDateTime | date:'dd/MM/yyyy HH:mm' }}</p>
+      <p *ngIf="appointment.proposedDateTime">
+        {{ 'appointmentsDoctor.proposedSlot' | translate }}: {{ appointment.proposedDateTime | date:'dd/MM/yyyy HH:mm' }}
+      </p>
+      <p *ngIf="appointment.postponeReason" class="request-reason">
+        {{ 'common.reason' | translate }}: {{ appointment.postponeReason }}
+      </p>
+
+      <div class="request-actions">
+        <button
+          mat-flat-button
+          class="button-with-spinner"
+          type="button"
+          [disabled]="actionSubmitting"
+          (click)="respondToPendingRequest(appointment.appointmentId)">
+          <mat-progress-spinner *ngIf="actionSubmitting && actionSubmittingMode === 'approve' && actionSubmittingAppointmentId === appointment.appointmentId" mode="indeterminate" diameter="16"></mat-progress-spinner>
+          <span>{{ 'actions.approve' | translate }}</span>
+        </button>
+        <button
+          mat-stroked-button
+          type="button"
+          [disabled]="actionSubmitting"
+          (click)="openRejectRequest(appointment)">
+          {{ 'actions.reject' | translate }}
+        </button>
+        <button
+          mat-stroked-button
+          type="button"
+          [disabled]="actionSubmitting"
+          (click)="openCounterProposal(appointment)">
+          {{ 'actions.counterPropose' | translate }}
+        </button>
+      </div>
+    </mat-card>
+  </section>
+
+  <section *ngIf="!loading && counterProposalsAwaitingPatient.length > 0" class="request-section">
+    <h2>{{ 'appointmentsDoctor.awaitingCounterResponseTitle' | translate }}</h2>
+
+    <mat-card class="request-card" *ngFor="let appointment of counterProposalsAwaitingPatient; trackBy: trackAppointment">
+      <div class="request-title">
+        <strong>{{ appointment.patientName }}</strong>
+        <span [class]="getStatusClass(appointment)">
+          {{ getStatusLabel(appointment) | translate }}
+        </span>
+      </div>
+      <p>{{ 'appointmentsDoctor.currentSlot' | translate }}: {{ appointment.appointmentDateTime | date:'dd/MM/yyyy HH:mm' }}</p>
+      <p *ngIf="appointment.proposedDateTime">
+        {{ 'appointmentsDoctor.counterProposedSlot' | translate }}: {{ appointment.proposedDateTime | date:'dd/MM/yyyy HH:mm' }}
+      </p>
+      <p *ngIf="appointment.doctorResponseNote" class="request-reason">
+        {{ 'common.note' | translate }}: {{ appointment.doctorResponseNote }}
+      </p>
+    </mat-card>
+  </section>
+
+  <section *ngIf="!loading && appointments.length > 0" class="timeline-section">
+    <h2>{{ 'appointmentsDoctor.timelineTitle' | translate }}</h2>
+
+    <mat-card class="consult-card" *ngFor="let appointment of appointments; trackBy: trackAppointment">
+      <div class="consult-title">
+        <strong>{{ appointment.patientName }}</strong>
+        <span [class]="getStatusClass(appointment)">
+          {{ getStatusLabel(appointment) | translate }}
+        </span>
+      </div>
+      <div class="consult-meta">
+        <span>{{ appointment.appointmentDateTime | date:'dd/MM/yyyy' }}</span>
+        <span>{{ appointment.appointmentDateTime | date:'HH:mm' }}</span>
+      </div>
+      <p *ngIf="appointment.proposedDateTime" class="consult-extra">
+        {{ 'common.proposed' | translate }}: {{ appointment.proposedDateTime | date:'dd/MM/yyyy HH:mm' }}
+      </p>
+      <p *ngIf="appointment.postponeReason" class="consult-extra">
+        {{ 'common.reason' | translate }}: {{ appointment.postponeReason }}
+      </p>
+      <p *ngIf="appointment.cancellationReason" class="consult-extra">
+        {{ 'common.cancelReason' | translate }}: {{ appointment.cancellationReason }}
+      </p>
+      <p *ngIf="appointment.doctorResponseNote" class="consult-extra">
+        {{ 'common.doctorNote' | translate }}: {{ appointment.doctorResponseNote }}
+      </p>
+
+      <div class="request-actions" *ngIf="canCancelAppointment(appointment)">
+        <button
+          mat-stroked-button
+          class="button-with-spinner"
+          type="button"
+          [disabled]="actionSubmitting"
+          (click)="cancelAppointment(appointment)">
+          <mat-progress-spinner *ngIf="actionSubmitting && actionSubmittingMode === 'cancel' && actionSubmittingAppointmentId === appointment.appointmentId" mode="indeterminate" diameter="16"></mat-progress-spinner>
+          <span>{{ 'actions.cancelAppointment' | translate }}</span>
+        </button>
+      </div>
+
+      <div class="request-actions" *ngIf="canMarkAttendance(appointment)">
+        <button
+          mat-flat-button
+          class="button-with-spinner"
+          type="button"
+          [disabled]="actionSubmitting"
+          (click)="markAttendance(appointment, 'Completed')">
+          <mat-progress-spinner *ngIf="actionSubmitting && actionSubmittingMode === 'complete' && actionSubmittingAppointmentId === appointment.appointmentId" mode="indeterminate" diameter="16"></mat-progress-spinner>
+          <span>{{ 'actions.markCompleted' | translate }}</span>
+        </button>
+        <button
+          mat-stroked-button
+          class="button-with-spinner"
+          type="button"
+          [disabled]="actionSubmitting"
+          (click)="markAttendance(appointment, 'NoShow')">
+          <mat-progress-spinner *ngIf="actionSubmitting && actionSubmittingMode === 'noshow' && actionSubmittingAppointmentId === appointment.appointmentId" mode="indeterminate" diameter="16"></mat-progress-spinner>
+          <span>{{ 'actions.markNoShow' | translate }}</span>
+        </button>
+      </div>
+
+      <div class="request-actions">
+        <a mat-button [routerLink]="['/dashboard/appointments', appointment.appointmentId, 'audit']">
+          {{ 'actions.viewAudit' | translate }}
+        </a>
+      </div>
+    </mat-card>
+  </section>
+
+  <div class="action-modal-backdrop" *ngIf="activeRejectAppointmentId" (click)="cancelRejectRequest()"></div>
+  <section class="action-modal action-modal--reject" *ngIf="activeRejectAppointmentId" (click)="$event.stopPropagation()">
+    <header class="action-modal-header">
+      <h3>{{ 'appointmentsDoctor.rejectModalTitle' | translate }}</h3>
+      <p *ngIf="rejectTargetAppointment">{{ 'common.patient' | translate }}: {{ rejectTargetAppointment.patientName }}</p>
+    </header>
+
+    <form class="action-modal-form" [formGroup]="rejectForm" (ngSubmit)="submitRejectRequest()">
+      <mat-form-field appearance="outline">
+        <mat-label>{{ 'appointmentsDoctor.rejectReason' | translate }}</mat-label>
+        <textarea matInput rows="3" maxlength="500" formControlName="reason"></textarea>
+      </mat-form-field>
+
+      <div class="reject-actions">
+        <button mat-flat-button class="button-with-spinner" type="submit" [disabled]="rejectForm.invalid || actionSubmitting">
+          <mat-progress-spinner *ngIf="actionSubmitting && actionSubmittingMode === 'reject' && actionSubmittingAppointmentId === activeRejectAppointmentId" mode="indeterminate" diameter="16"></mat-progress-spinner>
+          <span>{{ 'actions.confirmRejection' | translate }}</span>
+        </button>
+        <button mat-stroked-button type="button" [disabled]="actionSubmitting" (click)="cancelRejectRequest()">
+          {{ 'common.cancel' | translate }}
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <div class="action-modal-backdrop" *ngIf="activeCounterAppointmentId" (click)="cancelCounterProposal()"></div>
+  <section class="action-modal" *ngIf="activeCounterAppointmentId" (click)="$event.stopPropagation()">
+    <header class="action-modal-header">
+      <h3>{{ 'appointmentsDoctor.counterModalTitle' | translate }}</h3>
+      <p *ngIf="counterTargetAppointment">{{ 'common.patient' | translate }}: {{ counterTargetAppointment.patientName }}</p>
+    </header>
+
+    <form class="action-modal-form" [formGroup]="counterForm" (ngSubmit)="submitCounterProposal()">
+      <div class="counter-grid">
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'common.date' | translate }}</mat-label>
+          <input matInput [matDatepicker]="counterModalDatePicker" formControlName="date" [min]="minDate" />
+          <mat-datepicker-toggle matSuffix [for]="counterModalDatePicker"></mat-datepicker-toggle>
+          <mat-datepicker #counterModalDatePicker></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'common.timeSlot30' | translate }}</mat-label>
+          <mat-select formControlName="time" [disabled]="loadingCounterSlots || availableCounterSlots.length === 0">
+            <mat-option *ngFor="let slot of availableCounterSlots" [value]="slot">
+              {{ slot }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <p class="consult-extra" *ngIf="loadingCounterSlots">{{ 'appointmentsDoctor.messages.loadingSlots' | translate }}</p>
+      <p class="consult-extra" *ngIf="!loadingCounterSlots && counterForm.value.date && availableCounterSlots.length === 0">
+        {{ 'appointmentsDoctor.messages.noSlots' | translate }}
+      </p>
+      <p class="consult-extra" *ngIf="!loadingCounterSlots && counterSlotsTimezone && availableCounterSlots.length > 0">
+        {{ 'appointmentsDoctor.messages.slotsTimezone' | translate:{ timezone: counterSlotsTimezone } }}
+      </p>
+
+      <mat-form-field appearance="outline">
+        <mat-label>{{ 'common.noteOptional' | translate }}</mat-label>
+        <input matInput type="text" maxlength="500" formControlName="note" />
+      </mat-form-field>
+
+      <div class="counter-actions">
+        <button mat-flat-button class="button-with-spinner" type="submit" [disabled]="counterForm.invalid || actionSubmitting">
+          <mat-progress-spinner *ngIf="actionSubmitting && actionSubmittingMode === 'counter' && actionSubmittingAppointmentId === activeCounterAppointmentId" mode="indeterminate" diameter="16"></mat-progress-spinner>
+          <span>{{ 'actions.sendCounterProposal' | translate }}</span>
+        </button>
+        <button mat-stroked-button type="button" [disabled]="actionSubmitting" (click)="cancelCounterProposal()">
+          {{ 'common.cancel' | translate }}
+        </button>
+      </div>
+    </form>
+  </section>
+</section>

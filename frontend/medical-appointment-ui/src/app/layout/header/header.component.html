@@ -1,0 +1,37 @@
+<aside *ngIf="isLoggedIn" class="sidebar">
+  <div class="sidebar__brand">
+    <span class="sidebar__mark">M</span>
+    <div>
+      <p class="sidebar__eyebrow">Medio Care Network</p>
+      <h2 class="sidebar__title">
+        {{ 'header.workspaceTitle' | translate:{ role: (roleLabelKey | translate) } }}
+      </h2>
+    </div>
+  </div>
+
+  <nav class="sidebar__nav" [attr.aria-label]="'header.mainNavigation' | translate">
+    <a
+      *ngFor="let item of navItems; trackBy: trackByRoute"
+      [routerLink]="item.route"
+      routerLinkActive="sidebar__link--active"
+      [routerLinkActiveOptions]="{ exact: item.exact !== false }"
+      class="sidebar__link">
+      <span class="sidebar__dot" aria-hidden="true"></span>
+      <span class="sidebar__link-label">{{ item.labelKey | translate }}</span>
+      <span
+        class="sidebar__badge"
+        [class.sidebar__badge--pulse]="badgePulse"
+        *ngIf="isNotificationsItem(item) && unreadCount > 0">
+        {{ unreadCountLabel }}
+      </span>
+    </a>
+  </nav>
+
+  <section class="sidebar__identity">
+    <p class="sidebar__identity-label">{{ 'header.signedInAs' | translate }}</p>
+    <strong>{{ userEmail }}</strong>
+    <span>{{ clinicName }}</span>
+  </section>
+
+  <button type="button" class="sidebar__logout" (click)="logout()">{{ 'common.signOut' | translate }}</button>
+</aside>

@@ -1,0 +1,148 @@
+<section class="admin-appointments-page">
+  <header class="appointments-hero">
+    <p class="eyebrow">{{ 'roles.admin' | translate }}</p>
+    <h1>{{ 'appointmentsAdmin.title' | translate }}</h1>
+    <p>{{ 'appointmentsAdmin.subtitle' | translate }}</p>
+
+    <div class="hero-actions">
+      <a mat-flat-button routerLink="/dashboard/admin/users">{{ 'actions.manageUsers' | translate }}</a>
+      <a mat-stroked-button routerLink="/dashboard/admin/clinics">{{ 'actions.manageClinics' | translate }}</a>
+    </div>
+  </header>
+
+  <mat-card class="filter-panel">
+    <div class="filter-row">
+      <div>
+        <h2>{{ 'appointmentsAdmin.filterScopeTitle' | translate }}</h2>
+        <p>{{ 'appointmentsAdmin.filterScopeSubtitle' | translate:{ clinic: (selectedClinicLabel | translate) } }}</p>
+      </div>
+
+      <div class="filter-actions">
+        <mat-form-field appearance="outline" class="clinic-filter">
+          <mat-label>{{ 'common.clinic' | translate }}</mat-label>
+          <mat-select [value]="selectedClinicId" (selectionChange)="onClinicChange($event.value)">
+            <mat-option value="all">{{ 'common.allClinics' | translate }}</mat-option>
+            <mat-option *ngFor="let clinic of clinics" [value]="clinic.clinicId">{{ clinic.name }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="status-filter">
+          <mat-label>{{ 'common.status' | translate }}</mat-label>
+          <mat-select [value]="selectedStatus" (selectionChange)="onStatusChange($event.value)">
+            <mat-option *ngFor="let option of statusFilterOptions" [value]="option.value">
+              {{ option.label | translate }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="date-filter">
+          <mat-label>{{ 'filters.dateFrom' | translate }}</mat-label>
+          <input matInput #dateFromInput type="date" [value]="dateFrom">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="date-filter">
+          <mat-label>{{ 'filters.dateTo' | translate }}</mat-label>
+          <input matInput #dateToInput type="date" [value]="dateTo">
+        </mat-form-field>
+
+        <button
+          mat-flat-button
+          type="button"
+          [disabled]="loading || exporting"
+          (click)="applyDateFilters(dateFromInput.value, dateToInput.value)">
+          {{ 'actions.applyFilters' | translate }}
+        </button>
+
+        <button
+          mat-button
+          type="button"
+          [disabled]="loading || exporting"
+          (click)="clearFilters()">
+          {{ 'actions.clearFilters' | translate }}
+        </button>
+
+        <button
+          mat-stroked-button
+          class="button-with-spinner export-button"
+          type="button"
+          [disabled]="loading || exporting"
+          (click)="exportAppointmentsCsv()">
+          <mat-progress-spinner *ngIf="exporting" mode="indeterminate" diameter="16"></mat-progress-spinner>
+          <span>{{ 'actions.exportCsv' | translate }}</span>
+        </button>
+      </div>
+    </div>
+  </mat-card>
+
+  <section class="appointments-metrics">
+    <mat-card>
+      <span>{{ 'metrics.totalLoaded' | translate }}</span>
+      <strong>{{ appointments.length }}</strong>
+    </mat-card>
+    <mat-card>
+      <span>{{ 'metrics.today' | translate }}</span>
+      <strong>{{ todayCount }}</strong>
+    </mat-card>
+    <mat-card>
+      <span>{{ 'metrics.upcoming' | translate }}</span>
+      <strong>{{ upcomingCount }}</strong>
+    </mat-card>
+    <mat-card>
+      <span>{{ 'metrics.pendingRequests' | translate }}</span>
+      <strong>{{ pendingCount }}</strong>
+    </mat-card>
+  </section>
+
+  <p *ngIf="loading && appointments.length > 0" class="state">{{ 'state.loadingAppointments' | translate }}</p>
+  <p *ngIf="successMessage" class="success">{{ successMessage | translate }}</p>
+  <p *ngIf="errorMessage" class="error">{{ errorMessage | translate }}</p>
+
+  <section class="app-skeleton-list" *ngIf="loading && appointments.length === 0" aria-hidden="true">
+    <article class="app-skeleton-card" *ngFor="let _ of skeletonRows">
+      <div class="app-skeleton-line app-skeleton-line--title"></div>
+      <div class="app-skeleton-line app-skeleton-line--meta"></div>
+      <div class="app-skeleton-pills">
+        <span class="app-skeleton-pill"></span>
+        <span class="app-skeleton-pill"></span>
+        <span class="app-skeleton-pill"></span>
+      </div>
+    </article>
+  </section>
+
+  <section *ngIf="!loading && !errorMessage && appointments.length === 0" class="empty-state">
+    {{ 'appointmentsAdmin.empty' | translate }}
+  </section>
+
+  <section class="appointments-list" *ngIf="!loading && appointments.length > 0">
+    <mat-card class="appointment-card" *ngFor="let appointment of appointments; trackBy: trackAppointment">
+      <div class="appointment-title">
+        <h3>{{ appointment.patientName }} {{ 'common.with' | translate }} {{ appointment.doctorName }}</h3>
+        <span [class]="getStatusClass(appointment)">
+          {{ getStatusLabel(appointment) | translate }}
+        </span>
+      </div>
+
+      <div class="appointment-meta">
+        <span>{{ appointment.clinicName }}</span>
+        <span>{{ appointment.appointmentDateTime | date:'dd/MM/yyyy' }}</span>
+        <span>{{ appointment.appointmentDateTime | date:'HH:mm' }}</span>
+      </div>
+
+      <p *ngIf="appointment.proposedDateTime" class="appointment-extra">
+        {{ 'common.proposed' | translate }}: {{ appointment.proposedDateTime | date:'dd/MM/yyyy HH:mm' }}
+      </p>
+      <p *ngIf="appointment.postponeReason" class="appointment-extra">
+        {{ 'common.reason' | translate }}: {{ appointment.postponeReason }}
+      </p>
+      <p *ngIf="appointment.cancellationReason" class="appointment-extra">
+        {{ 'common.cancelReason' | translate }}: {{ appointment.cancellationReason }}
+      </p>
+
+      <div class="appointment-actions">
+        <a mat-button [routerLink]="['/dashboard/appointments', appointment.appointmentId, 'audit']">
+          {{ 'actions.viewAudit' | translate }}
+        </a>
+      </div>
+    </mat-card>
+  </section>
+</section>

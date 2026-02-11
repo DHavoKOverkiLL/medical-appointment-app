@@ -1,0 +1,785 @@
+﻿{
+  "language": {
+    "switch": "Schimbă limba",
+    "romanian": "RO",
+    "english": "EN"
+  },
+  "errors": {
+    "apiUnavailable": "Nu se poate accesa API-ul. Pornește backend-ul și verifică Jwt:Key."
+  },
+  "roles": {
+    "admin": "Administrator",
+    "doctor": "Medic",
+    "patient": "Pacient",
+    "user": "Utilizator"
+  },
+  "nav": {
+    "dashboard": "Panou",
+    "calendar": "Calendar",
+    "availability": "Disponibilitate",
+    "book": "Programare",
+    "profile": "Profil",
+    "settings": "Setări",
+    "users": "Utilizatori",
+    "clinics": "Clinici",
+    "appointments": "Programări",
+    "notifications": "Notificări",
+    "consults": "Consultații",
+    "myAppointments": "Programările mele",
+    "accountSettings": "Setări cont",
+    "workspaceHome": "Acasă workspace"
+  },
+  "actions": {
+    "bookAppointment": "Programează consultația",
+    "openCalendar": "Deschide calendarul",
+    "openConsults": "Deschide consultațiile",
+    "reviewConsultQueue": "Verifică lista de consultații",
+    "requestPostpone": "Cere amânare",
+    "sendRequest": "Trimite cererea",
+    "acceptCounterProposal": "Acceptă contrapropunerea",
+    "rejectCounterProposal": "Respinge contrapropunerea",
+    "approve": "Aprobă",
+    "reject": "Respinge",
+    "counterPropose": "Propune alternativa",
+    "cancelAppointment": "Anuleaza programarea",
+    "markCompleted": "Marcheaza finalizata",
+    "markNoShow": "Marcheaza absent",
+    "confirmRejection": "Confirmă respingerea",
+    "sendCounterProposal": "Trimite contrapropunerea",
+    "confirmBooking": "Confirmă programarea",
+    "saveProfile": "Salvează profilul",
+    "saveAccountSettings": "Salvează setările contului",
+    "saveRole": "Salvează rolul",
+    "saveChanges": "Salvează modificările",
+    "createUser": "Creează utilizator",
+    "addUser": "Adaugă utilizator",
+    "manageUsers": "Gestionează utilizatorii",
+    "manageClinics": "Gestionează clinicile",
+    "manageAvailability": "Gestionează disponibilitatea",
+    "viewAppointments": "Vezi programările",
+    "exportCsv": "Exportă CSV",
+    "applyFilters": "Aplică filtrele",
+    "clearFilters": "Resetează filtrele",
+    "viewAudit": "Vezi auditul",
+    "markAsRead": "Marchează ca citit",
+    "markAllAsRead": "Marchează tot ca citit",
+    "testAlert": "Testează alerta",
+    "backToAppointments": "Înapoi la programări",
+    "addClinic": "Adaugă clinică",
+    "createClinic": "Creează clinică",
+    "saveClinic": "Salvează clinica",
+    "backToDashboard": "Înapoi la panou"
+  },
+  "header": {
+    "workspaceTitle": "Workspace {{role}}",
+    "mainNavigation": "Navigare principală",
+    "signedInAs": "Autentificat ca"
+  },
+  "home": {
+    "loadingDashboard": "Se încarcă panoul...",
+    "redirectingWorkspace": "Redirecționare către workspace-ul {{role}}.",
+    "resolvingRole": "Se determină rolul utilizatorului."
+  },
+  "state": {
+    "working": "Se procesează...",
+    "loadingDashboard": "Se încarcă panoul...",
+    "loadingDashboardData": "Se încarcă datele panoului...",
+    "loadingProfile": "Se încarcă profilul...",
+    "loadingAccountSettings": "Se încarcă setările contului...",
+    "loadingAppointments": "Se încarcă programările...",
+    "loadingConsults": "Se încarcă consultațiile...",
+    "notScheduled": "Neprogramat",
+    "noneScheduled": "Nimic programat"
+  },
+  "metrics": {
+    "clinics": "Clinici",
+    "users": "Utilizatori",
+    "doctors": "Medici",
+    "patients": "Pacienți",
+    "admins": "Administratori",
+    "appointmentsToday": "Programări azi",
+    "upcomingAppointments": "Programări viitoare",
+    "upcoming": "Viitoare",
+    "nextAppointment": "Următoarea programare",
+    "doctorsInClinic": "Medici în clinică",
+    "patientsInQueue": "Pacienți în așteptare",
+    "throughput": "Ritm",
+    "pendingRequests": "Cereri în așteptare",
+    "counterProposals": "Contrapropuneri",
+    "upcomingConsults": "Consultații viitoare",
+    "awaitingPatientReply": "În așteptarea răspunsului pacientului",
+    "totalLoaded": "Total încărcat",
+    "today": "Astăzi",
+    "totalClinics": "Total clinici",
+    "mappedUsers": "Utilizatori alocați",
+    "totalUsers": "Total utilizatori",
+    "displayed": "Afișați"
+  },
+  "statuses": {
+    "active": "Activ",
+    "inactive": "Inactiv",
+    "open": "Deschis",
+    "closed": "Închis",
+    "approved": "Aprobat",
+    "rejected": "Respins",
+    "completed": "Finalizat",
+    "cancelled": "Anulat",
+    "noShow": "Absent",
+    "upcoming": "Viitor",
+    "onSchedule": "În program",
+    "pendingDoctorReview": "În așteptarea medicului",
+    "counterProposedByDoctor": "Contrapropus de medic",
+    "rejectedByDoctor": "Respins de medic",
+    "postponePending": "Amânare în așteptare",
+    "postponeApproved": "Amânare aprobată",
+    "postponeRejected": "Amânare respinsă",
+    "doctorCounterProposed": "Contrapropunere de la medic",
+    "requestPending": "Cerere în așteptare",
+    "counterProposalSent": "Contrapropunere trimisă",
+    "requestApproved": "Cerere aprobată",
+    "requestRejected": "Cerere respinsă",
+    "counterProposed": "Contrapropusă",
+    "inNetwork": "În rețea",
+    "outOfNetwork": "În afara rețelei"
+  },
+  "common": {
+    "add": "Adaugă",
+    "save": "Salvează",
+    "cancel": "Anulează",
+    "close": "Închide",
+    "edit": "Editează",
+    "remove": "Șterge",
+    "next": "Următor",
+    "previous": "Anterior",
+    "yes": "Da",
+    "no": "Nu",
+    "status": "Status",
+    "role": "Rol",
+    "clinic": "Clinică",
+    "allClinics": "Toate clinicile",
+    "allStatuses": "Toate statusurile",
+    "code": "Cod",
+    "username": "Nume utilizator",
+    "email": "Email",
+    "password": "Parolă",
+    "firstName": "Prenume",
+    "lastName": "Nume",
+    "birthDate": "Data nașterii",
+    "address": "Adresă",
+    "personalIdentifier": "Identificator personal",
+    "personalIdentifierShort": "CNP",
+    "date": "Data",
+    "day": "Zi",
+    "dayUnknown": "Zi necunoscută",
+    "doctor": "Medic",
+    "patient": "Pacient",
+    "reason": "Motiv",
+    "cancelReason": "Motiv anulare",
+    "note": "Notă",
+    "noteOptional": "Notă (opțional)",
+    "proposed": "Propusă",
+    "proposedDate": "Data propusă",
+    "proposedTimeSlot": "Interval propus (30 min)",
+    "timeSlot30": "Interval orar (30 min)",
+    "doctorNote": "Notă medic",
+    "signOut": "Deconectare",
+    "with": "cu",
+    "city": "Oraș",
+    "postalCode": "Cod poștal",
+    "fax": "Fax",
+    "daysShort": {
+      "mon": "Lun",
+      "tue": "Mar",
+      "wed": "Mie",
+      "thu": "Joi",
+      "fri": "Vin",
+      "sat": "Sam",
+      "sun": "Dum"
+    },
+    "days": {
+      "monday": "Luni",
+      "tuesday": "Marti",
+      "wednesday": "Miercuri",
+      "thursday": "Joi",
+      "friday": "Vineri",
+      "saturday": "Sâmbătă",
+      "sunday": "Duminica"
+    }
+  },
+  "filters": {
+    "dateFrom": "Data de la",
+    "dateTo": "Data până la"
+  },
+  "auth": {
+    "login": {
+      "heroAria": "Prezentare platforma medicala",
+      "heroTitle": "Coordonare profesionala a ingrijirii, construita pentru viteza si incredere.",
+      "heroCopy": "Accesează orarele de consultații, programările pacienților și fluxurile clinice într-un singur workspace securizat.",
+      "highlights": {
+        "uptime": "Disponibilitate portal",
+        "bookingTime": "Timp mediu de programare",
+        "secureAccess": "Acces securizat"
+      },
+      "formAria": "Formular autentificare",
+      "kicker": "Bine ai revenit",
+      "heading": "Autentifica-te in workspace-ul medical",
+      "subtitle": "Foloseste credentialele de staff sau pacient.",
+      "submit": "Autentificare securizata",
+      "signingIn": "Se autentifică...",
+      "needAccount": "Ai nevoie de cont?",
+      "createAccount": "Creeaza unul aici",
+      "errors": {
+        "invalidCredentials": "Email sau parola invalida.",
+        "failed": "Autentificarea a esuat. Incearca din nou."
+      }
+    },
+    "register": {
+      "heroAria": "Beneficiile contului",
+      "heroTitle": "Creeaza-ti contul securizat si incepe instant gestionarea ingrijirii.",
+      "heroCopy": "Înregistrarea publică creează un cont de pacient cu acces securizat la programări și urmărirea consultațiilor.",
+      "highlights": {
+        "roleBasedMetric": "Pe roluri",
+        "accessPermissions": "Permisiuni de acces",
+        "encryptedMetric": "Criptat",
+        "authFlow": "Flux de autentificare",
+        "unifiedMetric": "Unificat",
+        "workflows": "Fluxuri medicale"
+      },
+      "formAria": "Formular inregistrare",
+      "kicker": "Incepe acum",
+      "heading": "Creeaza contul Medio",
+      "subtitle": "Completează datele profilului pentru a activa accesul.",
+      "roleNote": "Conturile noi sunt create cu rolul Pacient.",
+      "submit": "Creeaza cont",
+      "alreadyRegistered": "Ai deja cont?",
+      "signInHere": "Autentifica-te aici",
+      "errors": {
+        "loadClinics": "Nu s-au putut încărca clinicile. Încearcă din nou în câteva momente.",
+        "conflict": "Exista deja un cont cu acest email, nume utilizator sau identificator personal.",
+        "failed": "Înregistrarea a eșuat. Verifică datele și încearcă din nou."
+      }
+    }
+  },
+  "profile": {
+    "eyebrow": "Profil {{role}}",
+    "title": "Date personale si identitate",
+    "subtitle": "Păstrează profilul actualizat pentru ca programările și datele clinicii să rămână corecte.",
+    "accountRole": "Cont {{role}}",
+    "editTitle": "Editeaza profilul",
+    "editSubtitle": "In aceasta sectiune poti edita doar datele personale.",
+    "messages": {
+      "updated": "Profil actualizat cu succes."
+    },
+    "errors": {
+      "loadFailed": "Profilul nu a putut fi încărcat.",
+      "updateFailed": "Profilul nu a putut fi actualizat."
+    }
+  },
+  "accountSettings": {
+    "eyebrow": "Setari cont {{role}}",
+    "title": "Controale de securitate si credentiale",
+    "subtitle": "Gestioneaza identitatea de autentificare, schimba parola si mentine securitatea contului.",
+    "securityTitle": "Checklist securitate",
+    "securitySubtitle": "Foloseste aceasta sectiune ori de cate ori se modifica datele contului.",
+    "security": {
+      "identityTitle": "Identitate",
+      "identityCopy": "Numele de utilizator si emailul trebuie sa fie unice si actualizate.",
+      "passwordTitle": "Actualizare parola",
+      "passwordCopy": "Folosește confirmarea parolei curente pentru a preveni schimbări neautorizate.",
+      "credentialsTitle": "Credentiale puternice",
+      "credentialsCopy": "Foloseste cel putin 8 caractere, cu litere si simboluri mixte."
+    },
+    "editTitle": "Editează setările contului",
+    "editSubtitle": "Parola curentă este necesară pentru orice actualizare.",
+    "currentPassword": "Parola curentă",
+    "newPasswordOptional": "Parolă nouă (opțional)",
+    "confirmNewPassword": "Confirma parola noua",
+    "passwordMismatch": "Parola nouă și confirmarea trebuie să coincidă.",
+    "messages": {
+      "updated": "Setarile contului au fost actualizate."
+    },
+    "errors": {
+      "loadFailed": "Setările contului nu au putut fi încărcate.",
+      "updateFailed": "Setarile contului nu au putut fi actualizate."
+    }
+  },
+  "patientDashboard": {
+    "eyebrow": "Workspace pacient",
+    "title": "Programari si planificare ingrijire intr-un singur calendar",
+    "subtitle": "Urmareste vizitele programate, cere amanari catre medic si gestioneaza profilul in siguranta.",
+    "daySubtitle": "Programari si actiuni pentru ziua selectata.",
+    "emptySelectedDay": "Nu există programări în această zi.",
+    "postponeStatus": "Status amanare",
+    "reviewCounterProposal": "Revizuieste aceasta contrapropunere in",
+    "postponeRequestTitle": "Cerere amanare programare",
+    "postponeRequestSubtitle": "Propune o data noua si explica motivul. Medicul va analiza cererea.",
+    "messages": {
+      "postponeSent": "Cererea de amânare a fost trimisă medicului.",
+      "loadingSlots": "Se incarca sloturile disponibile...",
+      "noSlots": "Nu exista sloturi disponibile pentru data selectata.",
+      "slotsTimezone": "Orele sunt afisate in fusul {{timezone}}."
+    },
+    "errors": {
+      "loadDashboard": "Panoul pacientului nu a putut fi încărcat.",
+      "refreshAppointments": "Programarile nu au putut fi actualizate.",
+      "postponeFailed": "Cererea de amânare nu a putut fi trimisă.",
+      "loadSlots": "Sloturile disponibile nu pot fi incarcate acum.",
+      "timeUnavailable": "Slotul selectat nu mai este disponibil. Alege altul."
+    }
+  },
+  "doctorDashboard": {
+    "eyebrow": "Workspace medic",
+    "title": "Control asupra consultațiilor și programului",
+    "subtitle": "Monitorizeaza volumul zilnic, vizitele viitoare si fluxul pacientilor in {{clinic}}.",
+    "yourClinic": "clinica ta",
+    "snapshotTitle": "Imagine operationala",
+    "snapshotSubtitle": "Păstrează un ritm echilibrat al consultațiilor și prioritizează solicitările de follow-up.",
+    "snapshot": {
+      "today": "{{count}} azi",
+      "scheduledAhead": "{{count}} programate",
+      "uniquePatients": "{{count}} pacienti unici"
+    },
+    "nextConsultTitle": "Focus urmatoarea consultatie",
+    "nextConsultAt": "Urmatorul pacient incepe la {{date}}.",
+    "noNextConsult": "Nu este programată nicio consultație următoare. Deschide consultațiile pentru a verifica lista.",
+    "throughput": {
+      "stable": "Stabil",
+      "high": "Ridicat",
+      "moderate": "Mediu",
+      "low": "Scazut"
+    },
+    "errors": {
+      "loadDashboard": "Panoul medicului nu a putut fi incarcat."
+    }
+  },
+  "appointmentsMy": {
+    "eyebrow": "Programari",
+    "title": "Cronologia ingrijirii tale",
+    "subtitle": "Revizuiește consultațiile viitoare, statusul cererilor de amânare și vizitele finalizate.",
+    "empty": "Nu există programări încă. Folosește Programare pentru primul consult.",
+    "messages": {
+      "counterAccepted": "Contrapropunerea a fost acceptata. Programarea a fost actualizata.",
+      "counterRejected": "Contrapropunerea a fost respinsă.",
+      "cancelled": "Programarea a fost anulata."
+    },
+    "errors": {
+      "loadAppointments": "Programările nu pot fi încărcate acum.",
+      "counterResponseFailed": "Raspunsul la contrapropunere nu a putut fi procesat.",
+      "cancelFailed": "Programarea nu a putut fi anulata."
+    }
+  },
+  "appointmentsDoctor": {
+    "eyebrow": "Consultatii",
+    "title": "Lista de consultații a medicului",
+    "subtitle": "Urmareste sesiunile pacientilor, cererile de amanare si mentine programul echilibrat.",
+    "empty": "Nu există consultații programate încă.",
+    "pendingRequestsTitle": "Cereri de amanare in asteptare",
+    "awaitingCounterResponseTitle": "Contrapropuneri in asteptarea raspunsului pacientului",
+    "timelineTitle": "Cronologie consultații",
+    "currentSlot": "Interval curent",
+    "proposedSlot": "Interval propus",
+    "counterProposedSlot": "Interval contrapropus",
+    "rejectModalTitle": "Respinge cererea de amanare",
+    "rejectReason": "Motiv respingere",
+    "counterModalTitle": "Trimite contrapropunere",
+    "messages": {
+      "counterSent": "Contrapropunerea a fost trimisă pacientului.",
+      "requestApproved": "Cererea de amânare a fost aprobată.",
+      "requestRejected": "Cererea de amânare a fost respinsă cu motiv.",
+      "appointmentCancelled": "Programarea a fost anulata.",
+      "markedCompleted": "Programarea a fost marcata ca finalizata.",
+      "markedNoShow": "Programarea a fost marcata ca absent.",
+      "loadingSlots": "Se incarca sloturile disponibile...",
+      "noSlots": "Nu exista sloturi disponibile pentru data selectata.",
+      "slotsTimezone": "Orele sunt afisate in fusul {{timezone}}."
+    },
+    "errors": {
+      "loadConsults": "Consultațiile nu au putut fi încărcate.",
+      "counterSendFailed": "Contrapropunerea nu a putut fi trimisă.",
+      "approveFailed": "Raspunsul la amanare nu a putut fi procesat.",
+      "rejectFailed": "Cererea de amânare nu a putut fi respinsă.",
+      "cancelFailed": "Programarea nu a putut fi anulata.",
+      "markAttendanceFailed": "Prezenta programarii nu a putut fi actualizata.",
+      "loadSlots": "Sloturile disponibile nu pot fi incarcate acum.",
+      "timeUnavailable": "Slotul selectat nu mai este disponibil. Alege altul."
+    }
+  },
+  "availability": {
+    "eyebrow": "Disponibilitate",
+    "title": "Gestionare disponibilitate medici",
+    "subtitleDoctor": "Defineste intervalele saptamanale, pauzele si exceptiile folosite la generarea sloturilor de programare.",
+    "subtitleAdmin": "Configureaza modelul de disponibilitate si exceptiile pe data pentru orice medic din clinica.",
+    "sections": {
+      "weeklyAvailability": "Intervale saptamanale disponibile",
+      "weeklyBreaks": "Pauze saptamanale recurente",
+      "dateOverrides": "Exceptii pe data"
+    },
+    "fields": {
+      "selectDoctor": "Medic",
+      "filterClinic": "Filtru clinica",
+      "searchDoctor": "Cauta medic",
+      "timezone": "Fus orar clinica: {{timezone}}",
+      "startTime": "Ora inceput",
+      "endTime": "Ora sfarsit",
+      "overrideType": "Tip exceptie"
+    },
+    "override": {
+      "available": "Interval disponibil",
+      "unavailable": "Blocare indisponibilitate"
+    },
+    "actions": {
+      "addAvailabilityWindow": "Adauga interval disponibil",
+      "addBreak": "Adauga pauza",
+      "addOverride": "Adauga exceptie"
+    },
+    "hints": {
+      "weeklyAvailability": "Daca lista este goala, medicul poate fi programat in orele de functionare ale clinicii.",
+      "emptyWeeklyAvailability": "Nu exista intervale explicite configurate. Adauga intervale doar daca medicul are program personalizat.",
+      "weeklyBreaks": "Pauzele sunt scazute din disponibilitatea saptamanala inainte de generarea sloturilor.",
+      "dateOverrides": "Exceptiile de indisponibilitate pot bloca o zi intreaga sau un interval partial."
+    },
+    "messages": {
+      "loading": "Se incarca disponibilitatea...",
+      "saved": "Setarile de disponibilitate au fost salvate."
+    },
+    "errors": {
+      "invalidForm": "Completeaza toate campurile obligatorii de disponibilitate.",
+      "invalidRangeOrder": "Fiecare ora de inceput trebuie sa fie inaintea orei de sfarsit.",
+      "overlapInAvailability": "Intervalele saptamanale de disponibilitate se suprapun in aceeasi zi.",
+      "overlapInBreaks": "Pauzele saptamanale se suprapun in aceeasi zi.",
+      "breakOutsideAvailability": "Fiecare pauza saptamanala trebuie sa fie inclusa intr-un interval disponibil al zilei.",
+      "overridePartialTime": "Orele de inceput si sfarsit pentru exceptii trebuie completate ambele sau lasate ambele goale.",
+      "availableOverrideMissingTime": "Exceptiile disponibile necesita atat ora de inceput, cat si ora de sfarsit.",
+      "overrideRangeOrder": "Ora de inceput a exceptiei trebuie sa fie inaintea orei de sfarsit.",
+      "duplicateOverride": "Nu sunt permise exceptii duplicate.",
+      "overrideOverlapAvailable": "Exceptiile disponibile se suprapun in aceeasi data.",
+      "overrideOverlapUnavailable": "Exceptiile indisponibile se suprapun in aceeasi data.",
+      "selectDoctor": "Selecteaza mai intai un medic.",
+      "noDoctors": "Nu exista medici disponibili pentru configurare.",
+      "noMatchingDoctors": "Niciun medic nu corespunde filtrelor curente de clinica/cautare.",
+      "loadDoctorsFailed": "Medicii nu au putut fi incarcati.",
+      "loadFailed": "Disponibilitatea medicului nu a putut fi incarcata.",
+      "saveFailed": "Disponibilitatea medicului nu a putut fi salvata."
+    }
+  },
+  "appointmentsAdmin": {
+    "title": "Programari intre clinici",
+    "subtitle": "Monitorizează programările, cererile de amânare și încărcarea consultațiilor în rețeaua de clinici.",
+    "filterScopeTitle": "Domeniu filtrare",
+    "filterScopeSubtitle": "Se afișează programările pentru {{clinic}}.",
+    "empty": "Nu au fost găsite programări pentru filtrul selectat.",
+    "messages": {
+      "exported": "Raportul programarilor a fost exportat."
+    },
+    "errors": {
+      "loadClinics": "Clinicile nu au putut fi încărcate.",
+      "loadAppointments": "Programările nu au putut fi încărcate.",
+      "exportFailed": "Raportul programarilor nu a putut fi exportat."
+    }
+  },
+  "notifications": {
+    "title": "Notificări în aplicație",
+    "subtitle": "Urmărește actualizările de amânare și anulare care necesită atenție.",
+    "inbox": "Inbox notificări",
+    "unreadSummary": "{{count}} notificare(i) necitită(e)",
+    "loading": "Se încarcă notificările...",
+    "empty": "Nu există notificări momentan.",
+    "read": "Citit",
+    "unread": "Necitit",
+    "preferences": {
+      "title": "Preferințe alerte",
+      "hint": "Ambele sunt dezactivate implicit. Activează doar ce dorești.",
+      "sound": "Redă sunet pentru notificările noi",
+      "vibration": "Vibrează la notificări noi"
+    },
+    "messages": {
+      "markAllSuccess": "Toate notificările au fost marcate ca citite.",
+      "alreadyRead": "Toate notificările erau deja citite.",
+      "testAlertPlayed": "Alerta de test a fost declanșată."
+    },
+    "errors": {
+      "loadFailed": "Notificările nu au putut fi încărcate.",
+      "markReadFailed": "Notificarea nu a putut fi marcată ca citită.",
+      "markAllFailed": "Notificările nu au putut fi marcate ca citite."
+    }
+  },
+  "appointmentAudit": {
+    "eyebrow": "Audit programare",
+    "title": "Cronologia acțiunilor",
+    "subtitle": "Istoric audit pentru programarea {{appointmentId}}.",
+    "actor": "Actor",
+    "loading": "Se încarcă evenimentele de audit...",
+    "empty": "Nu există evenimente de audit pentru această programare.",
+    "eventTypes": {
+      "created": "Programare creată",
+      "postponeRequested": "Amânare solicitată",
+      "postponeApproved": "Amânare aprobată de medic",
+      "postponeRejected": "Amânare respinsă de medic",
+      "counterProposed": "Contrapropunere de la medic",
+      "counterAccepted": "Contrapropunere acceptată de pacient",
+      "counterRejected": "Contrapropunere respinsă de pacient",
+      "cancelled": "Programare anulată",
+      "attendanceCompleted": "Prezență marcată ca finalizată",
+      "attendanceNoShow": "Prezență marcată absent"
+    },
+    "errors": {
+      "invalidAppointment": "Lipsește identificatorul programării.",
+      "loadFailed": "Istoricul de audit nu a putut fi încărcat."
+    }
+  },
+  "adminDashboard": {
+    "eyebrow": "Centru de control administrator",
+    "title": "Privire de ansamblu asupra retelei de clinici si a accesului",
+    "subtitle": "Monitorizează încărcarea platformei, menține accesul utilizatorilor și gestionează structura clinicilor dintr-un singur workspace.",
+    "clinicLoadTitle": "Incarcare clinici",
+    "errors": {
+      "loadFailed": "Datele panoului de administrare nu au putut fi incarcate."
+    }
+  },
+  "userManagement": {
+    "title": "Utilizatori si guvernanta rolurilor",
+    "subtitle": "Creează conturi, menține acuratețea profilurilor și aplică accesul pe roluri în funcție de clinică.",
+    "modalsTitle": "Ferestre cont",
+    "modalsSubtitle": "Creeaza si editeaza in dialoguri cu tab-uri, nu in formulare inline.",
+    "directoryTitle": "Director utilizatori",
+    "directorySubtitle": "Se afișează {{count}} utilizator(i) în {{clinic}}.",
+    "filterByClinic": "Filtrează după clinică",
+    "empty": "Niciun utilizator nu corespunde filtrului.",
+    "messages": {
+      "roleUpdated": "Rol actualizat pentru {{email}}.",
+      "userCreated": "Utilizator creat cu succes.",
+      "userUpdated": "Profilul utilizatorului a fost actualizat."
+    },
+    "errors": {
+      "dataRequiredForCreate": "Rolurile și clinicile trebuie încărcate înainte de crearea utilizatorului.",
+      "dataRequiredForEdit": "Rolurile și clinicile trebuie încărcate înainte de editarea utilizatorului.",
+      "loadDataFailed": "Datele pentru managementul utilizatorilor nu au putut fi încărcate.",
+      "roleUpdateFailed": "Rolul nu a putut fi actualizat.",
+      "createFailed": "Utilizatorul nu a putut fi creat.",
+      "updateFailed": "Utilizatorul nu a putut fi actualizat."
+    }
+  },
+  "userEditor": {
+    "dialogTitleCreate": "Adauga utilizator",
+    "dialogTitleEdit": "Editeaza utilizator",
+    "dialogSubtitle": "Folosește tab-uri pentru gestionarea contului, profilului și clinicii.",
+    "tabs": {
+      "account": "Cont",
+      "profile": "Profil",
+      "review": "Revizuire"
+    },
+    "currentRole": "Rol curent",
+    "currentRoleHint": "Schimbarea rolului se face din controlul inline de pe cardul utilizatorului.",
+    "review": {
+      "identity": "Identitate",
+      "account": "Cont",
+      "noPersonalIdentifier": "Fara identificator personal",
+      "noEmail": "Fara email"
+    },
+    "noClinicSelected": "Nicio clinică selectată"
+  },
+  "clinicManagement": {
+    "title": "Managementul clinicilor",
+    "subtitle": "Controleaza granitele clinicilor, statusul de activare si distributia utilizatorilor in retea.",
+    "modalsTitle": "Ferestre clinică",
+    "modalsSubtitle": "Deschide un dialog cu tab-uri pentru a crea sau edita profiluri complete de clinică.",
+    "directoryTitle": "Director clinici",
+    "directorySubtitle": "Clinicile curente și gradul de încărcare.",
+    "usersCount": "{{count}} utilizatori",
+    "empty": "Nu au fost gasite clinici.",
+    "messages": {
+      "created": "Clinica a fost creata.",
+      "updated": "Clinica a fost actualizata."
+    },
+    "errors": {
+      "loadClinics": "Clinicile nu au putut fi încărcate.",
+      "loadOperations": "Operațiunile de servicii nu au putut fi încărcate.",
+      "loadAccreditations": "Tipurile de acreditări nu au putut fi încărcate.",
+      "loadClinicTypes": "Tipurile de clinică nu au putut fi încărcate.",
+      "loadOwnershipTypes": "Tipurile de proprietate nu au putut fi încărcate.",
+      "loadSourceSystems": "Sistemele sursă nu au putut fi încărcate.",
+      "loadSystemInfo": "Datele de lookup de sistem nu au putut fi încărcate.",
+      "operationsUnavailable": "Operațiunile de servicii nu sunt disponibile. Reîncarcă și încearcă din nou.",
+      "accreditationsUnavailable": "Tipurile de acreditări nu sunt disponibile. Reîncarcă și încearcă din nou.",
+      "clinicTypesUnavailable": "Tipurile de clinică nu sunt disponibile. Reîncarcă și încearcă din nou.",
+      "ownershipTypesUnavailable": "Tipurile de proprietate nu sunt disponibile. Reîncarcă și încearcă din nou.",
+      "sourceSystemsUnavailable": "Sistemele sursă nu sunt disponibile. Reîncarcă și încearcă din nou.",
+      "createFailed": "Clinica nu a putut fi creata.",
+      "updateFailed": "Clinica nu a putut fi actualizata."
+    }
+  },
+  "clinicEditor": {
+    "dialogTitleCreate": "Adaugă clinică",
+    "dialogTitleEdit": "Editează clinică",
+    "dialogSubtitle": "Editor de clinică pe tab-uri pentru profil, operațiuni și conformitate.",
+    "tabs": {
+      "identity": "Identitate",
+      "locationContact": "Locatie si contact",
+      "operations": "Operatiuni",
+      "networkCompliance": "Retea si conformitate"
+    },
+    "fields": {
+      "clinicName": "Nume clinică",
+      "clinicCode": "Cod clinică",
+      "legalName": "Denumire legala",
+      "clinicType": "Tip clinică",
+      "ownershipType": "Tip proprietate",
+      "foundedOn": "Data înființării",
+      "sourceSystem": "Sistem sursa",
+      "addressLine1": "Adresa linia 1",
+      "addressLine2": "Adresa linia 2",
+      "stateRegion": "Județ / Regiune",
+      "countryCode": "Cod tara",
+      "timezone": "Fus orar",
+      "mainPhone": "Telefon principal",
+      "mainEmail": "Email principal",
+      "websiteUrl": "URL website",
+      "patientPortalUrl": "URL portal pacient",
+      "bookingMethods": "Metode de programare (separate prin virgula)",
+      "avgWaitDays": "Timp mediu pacient nou (zile)",
+      "sameDayAvailability": "Disponibil în aceeași zi",
+      "npiOrganization": "NPI organizatie",
+      "ein": "EIN",
+      "taxonomyCode": "Cod taxonomie",
+      "stateLicenseFacility": "Licență de stat unitate",
+      "cliaNumber": "Număr CLIA",
+      "hipaaNoticeVersion": "Versiune nota HIPAA",
+      "lastSecurityRiskAssessment": "Ultima evaluare risc securitate",
+      "openTime": "Ora deschidere",
+      "closeTime": "Ora inchidere",
+      "serviceOperation": "Operatiune serviciu",
+      "telehealth": "Telemedicina",
+      "payerName": "Nume platitor",
+      "planName": "Nume plan",
+      "network": "Retea",
+      "accreditationType": "Tip acreditare",
+      "effectiveOn": "Valabil din",
+      "expiresOn": "Expiră la"
+    },
+    "placeholders": {
+      "clinicType": "primary_care",
+      "ownershipType": "physician_owned",
+      "bookingMethods": "telefon, portal"
+    },
+    "collections": {
+      "operatingHours": "Program de functionare",
+      "services": "Servicii",
+      "insurancePlans": "Planuri de asigurare",
+      "accreditations": "Acreditări"
+    },
+    "empty": {
+      "operatingHours": "Nu a fost adăugat încă niciun program.",
+      "services": "Nu au fost adăugate servicii.",
+      "noOperationsConfigured": "Nu sunt configurate operațiuni de servicii.",
+      "insurancePlans": "Nu au fost adăugate planuri de asigurare.",
+      "accreditations": "Nu au fost adăugate acreditări.",
+      "noAccreditationsConfigured": "Nu sunt configurate tipuri de acreditări."
+    },
+    "editorTitles": {
+      "addOperatingHour": "Adaugă interval orar",
+      "editOperatingHourDay": "Editează {{day}}",
+      "addService": "Adaugă serviciu",
+      "editService": "Editează serviciu",
+      "addInsurancePlan": "Adaugă plan asigurare",
+      "editInsurancePlan": "Editează plan asigurare",
+      "addAccreditation": "Adaugă acreditare",
+      "editAccreditation": "Editează acreditare"
+    },
+    "hints": {
+      "insurancePlans": "Sfat: păstrează câte un rând pentru fiecare contract plătitor-plan și actualizează separat statutul de rețea.",
+      "insurancePlansEmpty": "Folosește + Adaugă pentru a crea prima intrare de plan.",
+      "accreditations": "Sfat: urmărește datele de început și expirare ca să vezi rapid când trebuie reînnoite acreditările.",
+      "accreditationsEmpty": "Folosește + Adaugă pentru a crea prima intrare de acreditare."
+    },
+    "tooltips": {
+      "addInsurancePlan": "Adaugă o combinație plătitor și plan.",
+      "addAccreditation": "Adaugă tipul acreditării și perioada de valabilitate."
+    },
+    "telehealthAvailable": "Telemedicină disponibilă",
+    "inPersonOnly": "Doar in persoana",
+    "accreditationEffectiveOnly": "Valabil din: {{date}}",
+    "accreditationExpiresOnly": "Expiră la: {{date}}",
+    "noValidityWindow": "Fara interval de valabilitate",
+    "errors": {
+      "operatingHourFormat": "Orele trebuie sa fie in format HH:mm.",
+      "operatingHourOrder": "Ora de deschidere trebuie sa fie inainte de ora de inchidere.",
+      "operatingHourDuplicate": "Ziua '{{day}}' are deja un interval orar.",
+      "invalidServiceOperation": "Selectează o operațiune validă.",
+      "serviceDuplicate": "Serviciul '{{service}}' este deja adăugat.",
+      "insuranceRequired": "Numele platitorului si planului sunt obligatorii.",
+      "insuranceDuplicate": "Planul de asigurare '{{payer}} - {{plan}}' există deja.",
+      "invalidAccreditation": "Selecteaza un tip de acreditare valid.",
+      "accreditationDateOrder": "Acreditarea '{{accreditation}}' are data de inceput dupa data de expirare.",
+      "accreditationDuplicate": "Acreditarea '{{accreditation}}' există deja."
+    }
+  },
+  "sys": {
+    "operations": {
+      "1": "Consultație anuală de prevenție",
+      "2": "Monitorizare medicină de familie",
+      "3": "Managementul îngrijirii cronice",
+      "4": "Screening preventiv",
+      "5": "Vaccinare",
+      "6": "Consultație de urgență",
+      "7": "Consultație de telemedicină",
+      "8": "Analize de laborator",
+      "9": "Procedură minoră",
+      "10": "Consultație de sănătate mintală"
+    },
+    "accreditations": {
+      "1": "Joint Commission - îngrijire ambulatorie",
+      "2": "NCQA - Medical Home centrat pe pacient",
+      "3": "AAAHC - îngrijire ambulatorie",
+      "4": "URAC - acreditare telemedicină",
+      "5": "CAP - acreditare laborator",
+      "6": "CARF - acreditare program de sănătate",
+      "7": "ACR - acreditare imagistică",
+      "8": "COLA - acreditare laborator",
+      "9": "ACHC - acreditare îngrijire ambulatorie",
+      "10": "ISO 15189 - laborator medical"
+    },
+    "clinicTypes": {
+      "1": "Asistență primară",
+      "2": "Asistență de specialitate",
+      "3": "Îngrijire urgentă",
+      "4": "Clinică multidisciplinară",
+      "5": "Centru de sănătate comunitar"
+    },
+    "ownershipTypes": {
+      "1": "Deținută de medici",
+      "2": "Deținută de spital",
+      "3": "Sistem de sănătate",
+      "4": "Academic",
+      "5": "Guvernamental",
+      "6": "Nonprofit"
+    },
+    "sourceSystems": {
+      "1": "EHR",
+      "2": "EMR",
+      "3": "Platformă personalizată",
+      "4": "PMS legacy"
+    }
+  },
+  "bookAppointment": {
+    "eyebrow": "Programare pacient",
+    "title": "Programează următoarea consultație",
+    "subtitle": "Alege medicul, data si ora. Ulterior poti cere amanare din calendar.",
+    "cardTitle": "Programare consultație",
+    "cardSubtitle": "Alege unul dintre medicii disponibili în clinica ta.",
+    "messages": {
+      "booked": "Programare efectuata.",
+      "loadingSlots": "Se incarca sloturile disponibile...",
+      "noSlots": "Nu exista sloturi disponibile pentru medicul si data selectate.",
+      "slotsTimezone": "Orele sunt afisate in fusul {{timezone}}."
+    },
+    "errors": {
+      "loadDoctors": "Medicii nu pot fi încărcați acum.",
+      "loadSlots": "Sloturile disponibile nu pot fi incarcate acum.",
+      "fillAllFields": "Completeaza toate campurile inainte de trimitere.",
+      "timeUnavailable": "Slotul selectat nu mai este disponibil. Alege altul.",
+      "bookFailed": "Programarea nu a putut fi efectuata."
+    }
+  }
+}
+
+
