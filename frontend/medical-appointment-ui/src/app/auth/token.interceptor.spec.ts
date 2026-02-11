@@ -13,7 +13,7 @@ describe('TokenInterceptor', () => {
   let router: jasmine.SpyObj<Router>;
 
   beforeEach(() => {
-    authService = jasmine.createSpyObj<AuthService>('AuthService', ['getToken', 'logout']);
+    authService = jasmine.createSpyObj<AuthService>('AuthService', ['logout']);
     router = jasmine.createSpyObj<Router>('Router', ['navigate']);
 
     TestBed.configureTestingModule({
@@ -37,29 +37,23 @@ describe('TokenInterceptor', () => {
     httpMock.verify();
   });
 
-  it('adds bearer token to API requests', () => {
-    authService.getToken.and.returnValue('test-token');
-
+  it('enables credentials on API requests', () => {
     http.get(`${API_BASE_URL}/api/User/secure`).subscribe();
     const req = httpMock.expectOne(`${API_BASE_URL}/api/User/secure`);
 
-    expect(req.request.headers.get('Authorization')).toBe('Bearer test-token');
+    expect(req.request.withCredentials).toBeTrue();
     req.flush({});
   });
 
-  it('does not add bearer token to non-API requests', () => {
-    authService.getToken.and.returnValue('test-token');
-
+  it('does not force credentials on non-API requests', () => {
     http.get('https://example.com/ping').subscribe();
     const req = httpMock.expectOne('https://example.com/ping');
 
-    expect(req.request.headers.has('Authorization')).toBeFalse();
+    expect(req.request.withCredentials).toBeFalse();
     req.flush({});
   });
 
   it('logs out and redirects on 401 for protected API endpoints', () => {
-    authService.getToken.and.returnValue('test-token');
-
     http.get(`${API_BASE_URL}/api/Appointment/patient`).subscribe({
       error: () => undefined
     });
@@ -71,8 +65,6 @@ describe('TokenInterceptor', () => {
   });
 
   it('does not redirect on login 401', () => {
-    authService.getToken.and.returnValue(null);
-
     http.post(`${API_BASE_URL}/api/User/login`, { email: 'bad@example.com', password: 'wrongpass' }).subscribe({
       error: () => undefined
     });
@@ -83,4 +75,3 @@ describe('TokenInterceptor', () => {
     expect(router.navigate).not.toHaveBeenCalled();
   });
 });
-

@@ -60,6 +60,16 @@ public class AppDbContext : DbContext
             .HasMaxLength(256);
 
         modelBuilder.Entity<User>()
+            .Property(u => u.FailedLoginAttempts)
+            .HasDefaultValue(0);
+
+        modelBuilder.Entity<User>()
+            .Property(u => u.LockoutEndUtc);
+
+        modelBuilder.Entity<User>()
+            .Property(u => u.LastFailedLoginAtUtc);
+
+        modelBuilder.Entity<User>()
             .HasIndex(u => u.Email)
             .IsUnique();
 
@@ -84,6 +94,10 @@ public class AppDbContext : DbContext
             .Property(p => p.PersonalIdentifier)
             .IsRequired()
             .HasMaxLength(64);
+
+        modelBuilder.Entity<Person>()
+            .Property(p => p.PhoneNumber)
+            .HasMaxLength(32);
 
         modelBuilder.Entity<Person>()
             .HasIndex(p => p.PersonalIdentifier)

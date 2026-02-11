@@ -10,6 +10,9 @@ namespace MedicalAppointment.Domain.Models
         public string Email { get; set; } = string.Empty;
         [JsonIgnore]
         public string PasswordHash { get; set; } = string.Empty;
+        public int FailedLoginAttempts { get; set; }
+        public DateTime? LockoutEndUtc { get; set; }
+        public DateTime? LastFailedLoginAtUtc { get; set; }
 
         [JsonIgnore]
         public virtual SysRole? SysRole { get; set; }

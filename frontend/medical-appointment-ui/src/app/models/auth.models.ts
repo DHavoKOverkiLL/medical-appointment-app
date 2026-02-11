@@ -17,6 +17,8 @@ export interface LoginRequest {
 export interface LoginResponse {
   token: string;
   expiresAtUtc: string;
+  userId: string;
+  email: string;
   role: string;
   clinicId: string;
   clinicName: string;

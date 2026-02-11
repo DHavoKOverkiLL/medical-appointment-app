@@ -1,51 +1,81 @@
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
+import { API_BASE_URL } from '../core/api.config';
 import { AuthService } from './auth.service';
 
 describe('AuthService', () => {
   let service: AuthService;
-
-  const validToken =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.' +
-    'eyJuYW1laWQiOiIxMjMiLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJyb2xlIjoiUGF0aWVudCIsImV4cCI6NDA3MDkwODgwMCwiaWF0IjoxNzAwMDAwMDAwfQ.' +
-    'signature';
-
-  const expiredToken =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.' +
-    'eyJuYW1laWQiOiIxMjMiLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJyb2xlIjoiUGF0aWVudCIsImV4cCI6MTAwMCwiaWF0IjoxMDAwfQ.' +
-    'signature';
+  let httpMock: HttpTestingController;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
     service = TestBed.inject(AuthService);
-    localStorage.clear();
+    httpMock = TestBed.inject(HttpTestingController);
+    sessionStorage.clear();
   });
 
   afterEach(() => {
-    localStorage.clear();
+    httpMock.verify();
+    sessionStorage.clear();
   });
 
-  it('returns true for non-expired token', () => {
-    localStorage.setItem('token', validToken);
+  it('stores session data when login succeeds', () => {
+    service.login({ email: 'test@example.com', password: 'StrongPass1!' }).subscribe();
+    const req = httpMock.expectOne(`${API_BASE_URL}/api/User/login`);
+
+    expect(req.request.withCredentials).toBeTrue();
+    req.flush({
+      token: '',
+      expiresAtUtc: '2099-01-01T00:00:00Z',
+      userId: '11111111-1111-1111-1111-111111111111',
+      email: 'test@example.com',
+      role: 'Patient',
+      clinicId: '22222222-2222-2222-2222-222222222222',
+      clinicName: 'Main clinic'
+    });
 
     expect(service.isLoggedIn()).toBeTrue();
     expect(service.getUserRole()).toBe('Patient');
+    expect(service.getUserEmail()).toBe('test@example.com');
   });
 
-  it('returns false and clears storage for expired token', () => {
-    localStorage.setItem('token', expiredToken);
+  it('returns false and clears session for expired auth state', () => {
+    sessionStorage.setItem('auth_session', JSON.stringify({
+      userId: '11111111-1111-1111-1111-111111111111',
+      email: 'test@example.com',
+      role: 'Patient',
+      clinicId: '22222222-2222-2222-2222-222222222222',
+      clinicName: 'Main clinic',
+      expiresAtUtc: '2000-01-01T00:00:00Z'
+    }));
 
     expect(service.isLoggedIn()).toBeFalse();
-    expect(localStorage.getItem('token')).toBeNull();
+    expect(sessionStorage.getItem('auth_session')).toBeNull();
   });
 
-  it('returns false for malformed token', () => {
-    localStorage.setItem('token', 'invalid-token');
+  it('returns false for malformed session payload', () => {
+    sessionStorage.setItem('auth_session', 'invalid-json');
 
     expect(service.isLoggedIn()).toBeFalse();
-    expect(localStorage.getItem('token')).toBeNull();
+  });
+
+  it('clears local session and calls backend logout endpoint', () => {
+    sessionStorage.setItem('auth_session', JSON.stringify({
+      userId: '11111111-1111-1111-1111-111111111111',
+      email: 'test@example.com',
+      role: 'Patient',
+      clinicId: '22222222-2222-2222-2222-222222222222',
+      clinicName: 'Main clinic',
+      expiresAtUtc: '2099-01-01T00:00:00Z'
+    }));
+
+    service.logout();
+
+    expect(sessionStorage.getItem('auth_session')).toBeNull();
+    const req = httpMock.expectOne(`${API_BASE_URL}/api/User/logout`);
+    expect(req.request.withCredentials).toBeTrue();
+    req.flush({});
   });
 });
-

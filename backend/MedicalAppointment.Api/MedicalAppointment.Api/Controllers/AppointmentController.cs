@@ -2064,6 +2064,26 @@ public class AppointmentController : ControllerBase
     private static string EscapeCsv(string? value)
     {
         var text = value ?? string.Empty;
+
+        // Mitigate CSV formula injection in spreadsheet clients.
+        if (text.Length > 0)
+        {
+            var firstNonWhitespaceIndex = 0;
+            while (firstNonWhitespaceIndex < text.Length && char.IsWhiteSpace(text[firstNonWhitespaceIndex]))
+            {
+                firstNonWhitespaceIndex++;
+            }
+
+            if (firstNonWhitespaceIndex < text.Length)
+            {
+                var firstNonWhitespaceChar = text[firstNonWhitespaceIndex];
+                if (firstNonWhitespaceChar is '=' or '+' or '-' or '@')
+                {
+                    text = "'" + text;
+                }
+            }
+        }
+
         var escaped = text.Replace("\"", "\"\"");
         if (escaped.IndexOfAny(new[] { ',', '"', '\r', '\n' }) >= 0)
         {

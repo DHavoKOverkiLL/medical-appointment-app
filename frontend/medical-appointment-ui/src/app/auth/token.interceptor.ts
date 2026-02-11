@@ -18,13 +18,10 @@ export class TokenInterceptor implements HttpInterceptor {
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     const isApiRequest = req.url.startsWith(API_BASE_URL);
-    const token = this.authService.getToken();
 
-    if (isApiRequest && token) {
+    if (isApiRequest) {
       req = req.clone({
-        setHeaders: {
-          Authorization: `Bearer ${token}`
-        }
+        withCredentials: true
       });
     }
 
@@ -41,4 +38,3 @@ export class TokenInterceptor implements HttpInterceptor {
     );
   }
 }
-

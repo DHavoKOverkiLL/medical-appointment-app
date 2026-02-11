@@ -1,62 +1,53 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { jwtDecode } from 'jwt-decode';
 import { tap } from 'rxjs/operators';
-import { LoginRequest, LoginResponse, DecodedToken } from '../models/auth.models';
+import { LoginRequest, LoginResponse } from '../models/auth.models';
 import { API_BASE_URL } from '../core/api.config';
+
+interface AuthSession {
+  userId: string;
+  email: string;
+  role: string;
+  clinicId: string;
+  clinicName: string;
+  expiresAtUtc: string;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   private readonly apiUrl = `${API_BASE_URL}/api/User`;
-  private readonly tokenStorageKey = 'token';
-  private readonly roleClaimKeys = [
-    'role',
-    'http://schemas.microsoft.com/ws/2008/06/identity/claims/role',
-    'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role'
-  ];
-  private readonly emailClaimKeys = [
-    'email',
-    'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'
-  ];
-  private readonly userIdClaimKeys = [
-    'nameid',
-    'sub',
-    'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'
-  ];
-  private readonly clinicIdClaimKeys = ['clinic_id', 'clinicId'];
-  private readonly clinicNameClaimKeys = ['clinic_name', 'clinicName'];
+  private readonly sessionStorageKey = 'auth_session';
 
   constructor(private http: HttpClient) {}
 
   login(credentials: LoginRequest) {
-    return this.http.post<LoginResponse>(`${this.apiUrl}/login`, credentials).pipe(
+    return this.http
+      .post<LoginResponse>(`${this.apiUrl}/login`, credentials, { withCredentials: true })
+      .pipe(
       tap(response => {
-        localStorage.setItem(this.tokenStorageKey, response.token);
+        this.saveSession({
+          userId: response.userId,
+          email: response.email || credentials.email.trim().toLowerCase(),
+          role: response.role,
+          clinicId: response.clinicId,
+          clinicName: response.clinicName,
+          expiresAtUtc: response.expiresAtUtc
+        });
       })
     );
   }
 
   isLoggedIn(): boolean {
-    const token = this.getToken();
-    if (!token) return false;
-
-    const decoded = this.decodeToken(token);
-    if (!decoded) {
-      this.logout();
+    const session = this.getSession();
+    if (!session) {
       return false;
     }
 
-    const exp = this.readNumericClaim(decoded.exp);
-    if (!exp) {
-      this.logout();
-      return false;
-    }
-
-    const isExpired = exp * 1000 <= Date.now();
-    if (isExpired) {
-      this.logout();
+    const expiresAt = Date.parse(session.expiresAtUtc);
+    if (!Number.isFinite(expiresAt) || expiresAt <= Date.now()) {
+      this.clearSession();
       return false;
     }
 
@@ -64,11 +55,14 @@ export class AuthService {
   }
 
   logout(): void {
-    localStorage.removeItem(this.tokenStorageKey);
+    this.clearSession();
+    this.http.post(`${this.apiUrl}/logout`, {}, { withCredentials: true }).subscribe({
+      error: () => undefined
+    });
   }
 
   getUserRole(): string | null {
-    return this.readStringClaim(this.roleClaimKeys);
+    return this.getSession()?.role ?? null;
   }
 
   getUserRoleNormalized(): string | null {
@@ -81,68 +75,73 @@ export class AuthService {
   }
 
   getUserEmail(): string | null {
-    return this.readStringClaim(this.emailClaimKeys);
+    return this.getSession()?.email ?? null;
   }
 
   getUserId(): string | null {
-    return this.readStringClaim(this.userIdClaimKeys);
+    return this.getSession()?.userId ?? null;
   }
 
   getClinicId(): string | null {
-    return this.readStringClaim(this.clinicIdClaimKeys);
+    return this.getSession()?.clinicId ?? null;
   }
 
   getClinicName(): string | null {
-    return this.readStringClaim(this.clinicNameClaimKeys);
+    return this.getSession()?.clinicName ?? null;
   }
 
   getToken(): string | null {
-    return localStorage.getItem(this.tokenStorageKey);
+    return null;
   }
 
-  private getDecodedToken(): DecodedToken | null {
-    const token = this.getToken();
-    if (!token) return null;
+  private getSession(): AuthSession | null {
+    if (typeof sessionStorage === 'undefined') {
+      return null;
+    }
 
-    return this.decodeToken(token);
-  }
-
-  private decodeToken(token: string): DecodedToken | null {
+    const rawValue = sessionStorage.getItem(this.sessionStorageKey);
+    if (!rawValue) {
+      return null;
+    }
     try {
-      return jwtDecode<DecodedToken>(token);
+      const parsed = JSON.parse(rawValue) as Partial<AuthSession>;
+      if (
+        typeof parsed.userId !== 'string' ||
+        typeof parsed.email !== 'string' ||
+        typeof parsed.role !== 'string' ||
+        typeof parsed.clinicId !== 'string' ||
+        typeof parsed.clinicName !== 'string' ||
+        typeof parsed.expiresAtUtc !== 'string'
+      ) {
+        return null;
+      }
+
+      return {
+        userId: parsed.userId,
+        email: parsed.email,
+        role: parsed.role,
+        clinicId: parsed.clinicId,
+        clinicName: parsed.clinicName,
+        expiresAtUtc: parsed.expiresAtUtc
+      };
     } catch {
       return null;
     }
   }
 
-  private readStringClaim(claimKeys: string[]): string | null {
-    const decoded = this.getDecodedToken();
-    if (!decoded) return null;
-
-    for (const key of claimKeys) {
-      const value = decoded[key];
-      if (typeof value === 'string' && value.trim()) {
-        return value;
-      }
-
-      if (Array.isArray(value) && value.length > 0 && typeof value[0] === 'string') {
-        return value[0];
-      }
+  private saveSession(session: AuthSession): void {
+    if (typeof sessionStorage === 'undefined') {
+      return;
     }
 
-    return null;
+    sessionStorage.setItem(this.sessionStorageKey, JSON.stringify(session));
   }
 
-  private readNumericClaim(value: unknown): number | null {
-    if (typeof value === 'number') {
-      return Number.isFinite(value) ? value : null;
+  private clearSession(): void {
+    if (typeof sessionStorage === 'undefined') {
+      return;
     }
 
-    if (typeof value === 'string') {
-      const parsed = Number(value);
-      return Number.isFinite(parsed) ? parsed : null;
-    }
-
-    return null;
+    sessionStorage.removeItem(this.sessionStorageKey);
   }
 }

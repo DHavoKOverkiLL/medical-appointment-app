@@ -1,4 +1,5 @@
 using MedicalAppointment.Api.Contracts.Auth;
+using MedicalAppointment.Api.Configuration;
 using MedicalAppointment.Api.Extensions;
 using MedicalAppointment.Api.Services;
 using MedicalAppointment.Domain.Constants;
@@ -7,6 +8,7 @@ using MedicalAppointment.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
@@ -16,15 +18,24 @@ namespace MedicalAppointment.Api.Controllers;
 [Route("api/[controller]")]
 public class UserController : ControllerBase
 {
+    private const int MaxFailedLoginAttempts = 5;
+    private static readonly TimeSpan LoginLockoutDuration = TimeSpan.FromMinutes(15);
+
     private readonly AppDbContext _context;
     private readonly IJwtTokenService _jwtTokenService;
     private readonly ISystemInfoService _systemInfoService;
+    private readonly JwtSettings _jwtSettings;
 
-    public UserController(AppDbContext context, IJwtTokenService jwtTokenService, ISystemInfoService systemInfoService)
+    public UserController(
+        AppDbContext context,
+        IJwtTokenService jwtTokenService,
+        ISystemInfoService systemInfoService,
+        JwtSettings jwtSettings)
     {
         _context = context;
         _jwtTokenService = jwtTokenService;
         _systemInfoService = systemInfoService;
+        _jwtSettings = jwtSettings;
     }
 
     [HttpGet]
@@ -56,6 +67,7 @@ public class UserController : ControllerBase
                 LastName = u.Person.LastName,
                 PersonalIdentifier = u.Person.PersonalIdentifier,
                 Address = u.Person.Address,
+                PhoneNumber = u.Person.PhoneNumber,
                 BirthDate = u.Person.BirthDate,
                 ClinicId = u.ClinicId,
                 ClinicName = u.Clinic.Name
@@ -67,6 +79,7 @@ public class UserController : ControllerBase
 
     [HttpPost("register")]
     [AllowAnonymous]
+    [EnableRateLimiting("AuthRegister")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
         if (!ModelState.IsValid)
@@ -81,14 +94,16 @@ public class UserController : ControllerBase
         if (request.ClinicId == Guid.Empty)
             return BadRequest("Clinic is required.");
 
-        if (await _context.Users.AnyAsync(u => u.Email.ToLower() == normalizedEmail))
-            return Conflict("A user with this email already exists.");
+        var duplicateIdentityExists =
+            await _context.Users.AnyAsync(u =>
+                u.Email.ToLower() == normalizedEmail ||
+                u.Username.ToLower() == normalizedUsername.ToLower()) ||
+            await _context.Persons.AnyAsync(p => p.PersonalIdentifier == normalizedPersonalIdentifier);
 
-        if (await _context.Users.AnyAsync(u => u.Username.ToLower() == normalizedUsername.ToLower()))
-            return Conflict("A user with this username already exists.");
-
-        if (await _context.Persons.AnyAsync(p => p.PersonalIdentifier == normalizedPersonalIdentifier))
-            return Conflict("A person with this Personal Identifier already exists.");
+        if (duplicateIdentityExists)
+        {
+            return Conflict("Registration could not be completed with the provided details.");
+        }
 
         var clinic = await _context.Clinics
             .AsNoTracking()
@@ -112,6 +127,7 @@ public class UserController : ControllerBase
             NormalizedName = $"{request.FirstName}{request.LastName}".Replace(" ", string.Empty).Trim().ToUpperInvariant(),
             PersonalIdentifier = normalizedPersonalIdentifier,
             Address = (request.Address ?? string.Empty).Trim(),
+            PhoneNumber = NormalizePhoneNumber(request.PhoneNumber),
             BirthDate = request.BirthDate.Date
         };
 
@@ -190,6 +206,7 @@ public class UserController : ControllerBase
             NormalizedName = $"{request.FirstName}{request.LastName}".Replace(" ", string.Empty).Trim().ToUpperInvariant(),
             PersonalIdentifier = normalizedPersonalIdentifier,
             Address = (request.Address ?? string.Empty).Trim(),
+            PhoneNumber = NormalizePhoneNumber(request.PhoneNumber),
             BirthDate = request.BirthDate.Date
         };
 
@@ -221,6 +238,7 @@ public class UserController : ControllerBase
             LastName = person.LastName,
             PersonalIdentifier = person.PersonalIdentifier,
             Address = person.Address,
+            PhoneNumber = person.PhoneNumber,
             BirthDate = person.BirthDate,
             ClinicId = clinic.ClinicId,
             ClinicName = clinic.Name
@@ -287,6 +305,7 @@ public class UserController : ControllerBase
         user.Person.NormalizedName = $"{request.FirstName}{request.LastName}".Replace(" ", string.Empty).Trim().ToUpperInvariant();
         user.Person.PersonalIdentifier = normalizedPersonalIdentifier;
         user.Person.Address = (request.Address ?? string.Empty).Trim();
+        user.Person.PhoneNumber = NormalizePhoneNumber(request.PhoneNumber);
         user.Person.BirthDate = request.BirthDate.Date;
 
         await _context.SaveChangesAsync();
@@ -301,6 +320,7 @@ public class UserController : ControllerBase
             LastName = user.Person.LastName,
             PersonalIdentifier = user.Person.PersonalIdentifier,
             Address = user.Person.Address,
+            PhoneNumber = user.Person.PhoneNumber,
             BirthDate = user.Person.BirthDate,
             ClinicId = user.ClinicId,
             ClinicName = clinic.Name
@@ -354,6 +374,7 @@ public class UserController : ControllerBase
 
     [HttpPost("login")]
     [AllowAnonymous]
+    [EnableRateLimiting("AuthLogin")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
         if (!ModelState.IsValid)
@@ -361,6 +382,7 @@ public class UserController : ControllerBase
             return ValidationProblem(ModelState);
         }
 
+        var nowUtc = DateTime.UtcNow;
         var normalizedEmail = NormalizeEmail(request.Email);
 
         var user = await _context.Users
@@ -369,30 +391,75 @@ public class UserController : ControllerBase
             .FirstOrDefaultAsync(u => u.Email.ToLower() == normalizedEmail);
 
         if (user == null || user.SysRole == null || !user.SysRole.IsActive || user.Clinic == null || !user.Clinic.IsActive)
+        {
             return Unauthorized("Invalid credentials");
+        }
+
+        if (user.LockoutEndUtc.HasValue && user.LockoutEndUtc.Value > nowUtc)
+        {
+            return Unauthorized("Invalid credentials");
+        }
 
         var hasher = new PasswordHasher<User>();
         var result = hasher.VerifyHashedPassword(user, user.PasswordHash, request.Password);
 
         if (result == PasswordVerificationResult.Failed)
-            return Unauthorized("Invalid credentials");
+        {
+            user.FailedLoginAttempts += 1;
+            user.LastFailedLoginAtUtc = nowUtc;
 
+            if (user.FailedLoginAttempts >= MaxFailedLoginAttempts)
+            {
+                user.LockoutEndUtc = nowUtc.Add(LoginLockoutDuration);
+                user.FailedLoginAttempts = 0;
+            }
+
+            await _context.SaveChangesAsync();
+            return Unauthorized("Invalid credentials");
+        }
+
+        var shouldSaveUser = false;
         if (result == PasswordVerificationResult.SuccessRehashNeeded)
         {
             user.PasswordHash = hasher.HashPassword(user, request.Password);
+            shouldSaveUser = true;
+        }
+
+        if (user.FailedLoginAttempts > 0 || user.LockoutEndUtc.HasValue || user.LastFailedLoginAtUtc.HasValue)
+        {
+            user.FailedLoginAttempts = 0;
+            user.LockoutEndUtc = null;
+            user.LastFailedLoginAtUtc = null;
+            shouldSaveUser = true;
+        }
+
+        if (shouldSaveUser)
+        {
             await _context.SaveChangesAsync();
         }
 
         var normalizedRoleName = NormalizeRoleName(user.SysRole.Name);
         var (token, expiresAtUtc) = _jwtTokenService.CreateToken(user, normalizedRoleName);
+        AppendAuthCookie(token, expiresAtUtc);
+
         return Ok(new LoginResponse
         {
             Token = token,
             ExpiresAtUtc = expiresAtUtc,
+            UserId = user.UserId,
+            Email = user.Email,
             Role = normalizedRoleName,
             ClinicId = user.ClinicId,
             ClinicName = user.Clinic.Name
         });
+    }
+
+    [HttpPost("logout")]
+    [AllowAnonymous]
+    public IActionResult Logout()
+    {
+        ClearAuthCookie();
+        return Ok(new { Message = "Logged out." });
     }
 
     [HttpGet("secure")]
@@ -490,6 +557,7 @@ public class UserController : ControllerBase
             LastName = user.Person.LastName,
             PersonalIdentifier = user.Person.PersonalIdentifier,
             Address = user.Person.Address,
+            PhoneNumber = user.Person.PhoneNumber,
             BirthDate = user.Person.BirthDate,
             ClinicId = user.ClinicId,
             ClinicName = user.Clinic.Name
@@ -525,6 +593,7 @@ public class UserController : ControllerBase
         user.Person.LastName = request.LastName.Trim();
         user.Person.NormalizedName = $"{request.FirstName}{request.LastName}".Replace(" ", string.Empty).Trim().ToUpperInvariant();
         user.Person.Address = (request.Address ?? string.Empty).Trim();
+        user.Person.PhoneNumber = NormalizePhoneNumber(request.PhoneNumber);
         user.Person.BirthDate = request.BirthDate.Date;
 
         await _context.SaveChangesAsync();
@@ -539,6 +608,7 @@ public class UserController : ControllerBase
             LastName = user.Person.LastName,
             PersonalIdentifier = user.Person.PersonalIdentifier,
             Address = user.Person.Address,
+            PhoneNumber = user.Person.PhoneNumber,
             BirthDate = user.Person.BirthDate,
             ClinicId = user.ClinicId,
             ClinicName = user.Clinic.Name
@@ -613,6 +683,38 @@ public class UserController : ControllerBase
         });
     }
 
+    private void AppendAuthCookie(string token, DateTime expiresAtUtc)
+    {
+        var cookieName = string.IsNullOrWhiteSpace(_jwtSettings.CookieName)
+            ? "medio_access_token"
+            : _jwtSettings.CookieName.Trim();
+
+        Response.Cookies.Append(cookieName, token, new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.None,
+            Expires = new DateTimeOffset(DateTime.SpecifyKind(expiresAtUtc, DateTimeKind.Utc)),
+            IsEssential = true,
+            Path = "/"
+        });
+    }
+
+    private void ClearAuthCookie()
+    {
+        var cookieName = string.IsNullOrWhiteSpace(_jwtSettings.CookieName)
+            ? "medio_access_token"
+            : _jwtSettings.CookieName.Trim();
+
+        Response.Cookies.Delete(cookieName, new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.None,
+            Path = "/"
+        });
+    }
+
     private static string NormalizeEmail(string email)
     {
         return email.Trim().ToLowerInvariant();
@@ -626,6 +728,16 @@ public class UserController : ControllerBase
     private static string NormalizeUsername(string username)
     {
         return username.Trim();
+    }
+
+    private static string? NormalizePhoneNumber(string? phoneNumber)
+    {
+        if (string.IsNullOrWhiteSpace(phoneNumber))
+        {
+            return null;
+        }
+
+        return phoneNumber.Trim();
     }
 
     private static string NormalizeRoleName(string roleName)
