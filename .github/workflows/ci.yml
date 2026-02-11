@@ -20,6 +20,8 @@ jobs:
   backend:
     name: Backend (.NET)
     runs-on: ubuntu-latest
+    env:
+      DOTNET_SYSTEM_GLOBALIZATION_INVARIANT: "0"
     defaults:
       run:
         working-directory: backend/MedicalAppointment.Api
