@@ -14,6 +14,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { TranslateModule } from '@ngx-translate/core';
 import { DashboardApiService } from '../dashboard-api.service';
 import { PatientAppointment, PatientDashboardResponse } from '../dashboard.models';
+import { combineDateAndTime, toDateKey, toTimeInputValue } from '../../core/date-time/date-time.utils';
 
 interface CalendarCell {
   date: Date;
@@ -121,7 +122,7 @@ export class PatientDashboardComponent implements OnInit {
 
     this.postponeForm.patchValue({
       date: source,
-      time: this.toTimeInputValue(source),
+      time: toTimeInputValue(source),
       reason: appointment.postponeReason || ''
     });
 
@@ -151,7 +152,7 @@ export class PatientDashboardComponent implements OnInit {
       return;
     }
 
-    const proposedDateTime = this.combineDateAndTime(dateValue, timeValue).toISOString();
+    const proposedDateTime = combineDateAndTime(dateValue, timeValue).toISOString();
 
     this.postponeSubmitting = true;
     this.errorMessage = '';
@@ -294,12 +295,12 @@ export class PatientDashboardComponent implements OnInit {
     for (let i = 0; i < 42; i++) {
       const date = new Date(gridStart);
       date.setDate(gridStart.getDate() + i);
-      const key = this.toDateKey(date);
+      const key = toDateKey(date);
 
       cells.push({
         date,
         inCurrentMonth: date.getMonth() === monthStart.getMonth(),
-        isToday: this.toDateKey(date) === this.toDateKey(today),
+        isToday: toDateKey(date) === toDateKey(today),
         appointments: appointmentsByDate.get(key) || []
       });
     }
@@ -312,7 +313,7 @@ export class PatientDashboardComponent implements OnInit {
 
     for (const appointment of items) {
       const date = new Date(appointment.appointmentDateTime);
-      const key = this.toDateKey(date);
+      const key = toDateKey(date);
       const list = map.get(key) || [];
       list.push(appointment);
       map.set(key, list);
@@ -322,9 +323,9 @@ export class PatientDashboardComponent implements OnInit {
   }
 
   private getAppointmentsForDate(date: Date): PatientAppointment[] {
-    const targetKey = this.toDateKey(date);
+    const targetKey = toDateKey(date);
     return this.appointments
-      .filter(appointment => this.toDateKey(new Date(appointment.appointmentDateTime)) === targetKey)
+      .filter(appointment => toDateKey(new Date(appointment.appointmentDateTime)) === targetKey)
       .sort((a, b) => a.appointmentDateTime.localeCompare(b.appointmentDateTime));
   }
 
@@ -341,32 +342,6 @@ export class PatientDashboardComponent implements OnInit {
 
   private getDateOnly(date: Date): Date {
     return new Date(date.getFullYear(), date.getMonth(), date.getDate());
-  }
-
-  private toDateKey(date: Date): string {
-    const y = date.getFullYear();
-    const m = String(date.getMonth() + 1).padStart(2, '0');
-    const d = String(date.getDate()).padStart(2, '0');
-    return `${y}-${m}-${d}`;
-  }
-
-  private toTimeInputValue(date: Date): string {
-    const hh = String(date.getHours()).padStart(2, '0');
-    const mm = String(date.getMinutes()).padStart(2, '0');
-    return `${hh}:${mm}`;
-  }
-
-  private combineDateAndTime(date: Date, time: string): Date {
-    const [hours, minutes] = time.split(':').map(v => Number(v));
-    return new Date(
-      date.getFullYear(),
-      date.getMonth(),
-      date.getDate(),
-      hours,
-      minutes,
-      0,
-      0
-    );
   }
 
   private normalizeStatus(status: string): string {

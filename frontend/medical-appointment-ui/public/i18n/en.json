@@ -161,6 +161,7 @@
     "code": "Code",
     "username": "Username",
     "email": "Email",
+    "phone": "Phone",
     "password": "Password",
     "firstName": "First name",
     "lastName": "Last name",
@@ -275,6 +276,22 @@
       "updateFailed": "Unable to update profile."
     }
   },
+  "doctorProfile": {
+    "eyebrow": "Doctor Profile",
+    "title": "Professional identity and patient-facing details",
+    "subtitle": "Keep your contact and identity details accurate so consult coordination remains reliable.",
+    "accountRole": "Doctor account",
+    "editTitle": "Update profile",
+    "editSubtitle": "Maintain your profile details used in schedules, consult queues, and reminders."
+  },
+  "adminProfile": {
+    "eyebrow": "Admin Profile",
+    "title": "Administrative identity and contact details",
+    "subtitle": "Maintain your administrator profile used for governance, user access, and clinic oversight.",
+    "accountRole": "Administrator account",
+    "editTitle": "Update profile",
+    "editSubtitle": "Keep your admin identity details current for audit and operations workflows."
+  },
   "accountSettings": {
     "eyebrow": "{{role}} Account Settings",
     "title": "Security controls and login credentials",
@@ -301,6 +318,38 @@
     "errors": {
       "loadFailed": "Unable to load account settings.",
       "updateFailed": "Unable to update account settings."
+    }
+  },
+  "doctorAccountSettings": {
+    "eyebrow": "Doctor Account Security",
+    "title": "Clinical account security and credentials",
+    "subtitle": "Protect your clinician access and keep login credentials aligned with policy.",
+    "securityTitle": "Security checklist",
+    "securitySubtitle": "Review these controls whenever your account or credential posture changes.",
+    "editTitle": "Update account settings",
+    "editSubtitle": "Current password confirmation is required for all account updates.",
+    "messages": {
+      "updated": "Doctor account settings updated."
+    },
+    "errors": {
+      "loadFailed": "Unable to load doctor account settings.",
+      "updateFailed": "Unable to update doctor account settings."
+    }
+  },
+  "adminAccountSettings": {
+    "eyebrow": "Admin Account Security",
+    "title": "Administrator security controls and credentials",
+    "subtitle": "Protect privileged access with deliberate identity and password management.",
+    "securityTitle": "Security checklist",
+    "securitySubtitle": "Use this checklist to keep your admin account hardened and auditable.",
+    "editTitle": "Update account settings",
+    "editSubtitle": "Current password confirmation is required before applying any changes.",
+    "messages": {
+      "updated": "Admin account settings updated."
+    },
+    "errors": {
+      "loadFailed": "Unable to load admin account settings.",
+      "updateFailed": "Unable to update admin account settings."
     }
   },
   "patientDashboard": {
@@ -425,7 +474,15 @@
     },
     "override": {
       "available": "Available window",
-      "unavailable": "Unavailable block/day"
+      "unavailable": "Unavailable block/day",
+      "fullDay": "Full day"
+    },
+    "dialogs": {
+      "editAvailabilityWindow": "Edit availability window",
+      "editBreak": "Edit break",
+      "editOverride": "Edit override",
+      "createEntry": "Add entry",
+      "saveEntry": "Save entry"
     },
     "actions": {
       "addAvailabilityWindow": "Add availability window",

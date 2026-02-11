@@ -9,8 +9,10 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTabsModule } from '@angular/material/tabs';
+import { MatTimepickerModule } from '@angular/material/timepicker';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { isValidTime, parseIsoDate, parseTime, toIsoDate, toTimeString } from '../../core/date-time/date-time.utils';
 import {
   ClinicAccreditation,
   ClinicInsurancePlan,
@@ -60,6 +62,7 @@ interface DayOption {
     MatSelectModule,
     MatDatepickerModule,
     MatNativeDateModule,
+    MatTimepickerModule,
     MatTooltipModule,
     MatButtonModule,
     TranslateModule
@@ -154,8 +157,8 @@ export class ClinicEditorDialogComponent {
 
     this.operatingHourForm = this.fb.group({
       dayOfWeek: [1, [Validators.required, Validators.min(0), Validators.max(6)]],
-      open: ['08:00'],
-      close: ['17:00'],
+      open: [parseTime('08:00')],
+      close: [parseTime('17:00')],
       isClosed: [false]
     });
 
@@ -183,7 +186,7 @@ export class ClinicEditorDialogComponent {
         legalName: data.clinic.legalName,
         sysClinicTypeId: data.clinic.sysClinicTypeId,
         sysOwnershipTypeId: data.clinic.sysOwnershipTypeId,
-        foundedOn: this.parseIsoDate(data.clinic.foundedOn),
+        foundedOn: parseIsoDate(data.clinic.foundedOn),
         npiOrganization: data.clinic.npiOrganization,
         ein: data.clinic.ein,
         taxonomyCode: data.clinic.taxonomyCode,
@@ -205,7 +208,7 @@ export class ClinicEditorDialogComponent {
         avgNewPatientWaitDays: data.clinic.avgNewPatientWaitDays,
         sameDayAvailable: data.clinic.sameDayAvailable,
         hipaaNoticeVersion: data.clinic.hipaaNoticeVersion,
-        lastSecurityRiskAssessmentOn: this.parseIsoDate(data.clinic.lastSecurityRiskAssessmentOn),
+        lastSecurityRiskAssessmentOn: parseIsoDate(data.clinic.lastSecurityRiskAssessmentOn),
         sysSourceSystemId: data.clinic.sysSourceSystemId,
         isActive: data.clinic.isActive
       });
@@ -314,8 +317,8 @@ export class ClinicEditorDialogComponent {
     this.editingOperatingHourDay = null;
     this.operatingHourForm.reset({
       dayOfWeek: 1,
-      open: '08:00',
-      close: '17:00',
+      open: parseTime('08:00'),
+      close: parseTime('17:00'),
       isClosed: false
     });
   }
@@ -327,8 +330,8 @@ export class ClinicEditorDialogComponent {
     this.editingOperatingHourDay = hour.dayOfWeek;
     this.operatingHourForm.reset({
       dayOfWeek: hour.dayOfWeek,
-      open: hour.open || '08:00',
-      close: hour.close || '17:00',
+      open: parseTime(hour.open || '08:00'),
+      close: parseTime(hour.close || '17:00'),
       isClosed: hour.isClosed
     });
   }
@@ -338,8 +341,8 @@ export class ClinicEditorDialogComponent {
     this.editingOperatingHourDay = null;
     this.operatingHourForm.reset({
       dayOfWeek: 1,
-      open: '08:00',
-      close: '17:00',
+      open: parseTime('08:00'),
+      close: parseTime('17:00'),
       isClosed: false
     });
   }
@@ -354,11 +357,11 @@ export class ClinicEditorDialogComponent {
     const raw = this.operatingHourForm.getRawValue();
     const dayOfWeek = Number(raw.dayOfWeek);
     const isClosed = !!raw.isClosed;
-    const open = String(raw.open || '').trim();
-    const close = String(raw.close || '').trim();
+    const open = toTimeString(raw.open);
+    const close = toTimeString(raw.close);
 
     if (!isClosed) {
-      if (!this.isValidTime(open) || !this.isValidTime(close)) {
+      if (!open || !close || !isValidTime(open) || !isValidTime(close)) {
         this.errorMessage = 'clinicEditor.errors.operatingHourFormat';
         return;
       }
@@ -599,8 +602,8 @@ export class ClinicEditorDialogComponent {
     this.editingAccreditationId = accreditation.sysAccreditationId;
     this.accreditationForm.reset({
       sysAccreditationId: accreditation.sysAccreditationId,
-      effectiveOn: this.parseIsoDate(accreditation.effectiveOn),
-      expiresOn: this.parseIsoDate(accreditation.expiresOn)
+      effectiveOn: parseIsoDate(accreditation.effectiveOn),
+      expiresOn: parseIsoDate(accreditation.expiresOn)
     });
   }
 
@@ -630,8 +633,8 @@ export class ClinicEditorDialogComponent {
       return;
     }
 
-    const effectiveOn = this.toIsoDate(raw.effectiveOn);
-    const expiresOn = this.toIsoDate(raw.expiresOn);
+    const effectiveOn = toIsoDate(raw.effectiveOn);
+    const expiresOn = toIsoDate(raw.expiresOn);
     if (effectiveOn && expiresOn && effectiveOn > expiresOn) {
       this.errorMessage = this.translate.instant('clinicEditor.errors.accreditationDateOrder', {
         accreditation: this.getAccreditationDisplayName(
@@ -820,7 +823,7 @@ export class ClinicEditorDialogComponent {
   }
 
   private normalizeDate(value: unknown): string | null {
-    return this.toIsoDate(value);
+    return toIsoDate(value);
   }
 
   private normalizeCountryCode(value: unknown): string {
@@ -863,56 +866,4 @@ export class ClinicEditorDialogComponent {
     return fallbackName;
   }
 
-  private isValidTime(value: string): boolean {
-    return /^([01]\d|2[0-3]):[0-5]\d$/.test(value);
-  }
-
-  private parseIsoDate(value: string | null | undefined): Date | null {
-    if (!value) {
-      return null;
-    }
-
-    const parsed = new Date(value);
-    if (Number.isNaN(parsed.getTime())) {
-      return null;
-    }
-
-    return parsed;
-  }
-
-  private toIsoDate(value: unknown): string | null {
-    if (!value) {
-      return null;
-    }
-
-    if (value instanceof Date) {
-      if (Number.isNaN(value.getTime())) {
-        return null;
-      }
-
-      const year = value.getFullYear();
-      const month = String(value.getMonth() + 1).padStart(2, '0');
-      const day = String(value.getDate()).padStart(2, '0');
-      return `${year}-${month}-${day}`;
-    }
-
-    const raw = this.normalizeText(value);
-    if (!raw) {
-      return null;
-    }
-
-    if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
-      return raw;
-    }
-
-    const parsed = new Date(raw);
-    if (Number.isNaN(parsed.getTime())) {
-      return null;
-    }
-
-    const year = parsed.getFullYear();
-    const month = String(parsed.getMonth() + 1).padStart(2, '0');
-    const day = String(parsed.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  }
 }

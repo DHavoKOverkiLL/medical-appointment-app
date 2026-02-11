@@ -1,0 +1,167 @@
+.doctor-settings {
+  padding: clamp(1rem, 2vw, 1.5rem);
+}
+
+.settings-hero {
+  border: 1px solid #d6e8f5;
+  border-radius: 1rem;
+  padding: 1rem 1.1rem;
+  background:
+    radial-gradient(circle at 88% 18%, rgba(44, 124, 216, 0.21), transparent 36%),
+    radial-gradient(circle at 12% 84%, rgba(10, 148, 134, 0.16), transparent 42%),
+    #f3fbff;
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #345e7f;
+  font-weight: 700;
+}
+
+.settings-hero h1 {
+  margin: 0.38rem 0 0.3rem;
+  font-size: clamp(1.35rem, 2.1vw, 1.85rem);
+}
+
+.settings-hero p {
+  margin: 0;
+  color: #4a6f8f;
+}
+
+.settings-actions {
+  margin-top: 0.8rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.settings-actions a[mat-flat-button] {
+  background: linear-gradient(130deg, #0a9486, #2f7fd8);
+  color: #fff;
+}
+
+.settings-actions a[mat-stroked-button] {
+  border-color: #b8d7ef;
+  color: #184d72;
+}
+
+.settings-layout {
+  margin-top: 0.9rem;
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.25fr);
+}
+
+.security-card,
+.settings-card {
+  border: 1px solid #d7e8f5;
+  box-shadow: 0 10px 20px rgba(11, 45, 74, 0.07);
+}
+
+.security-card {
+  background: #f6fbff;
+}
+
+.security-card h2 {
+  margin: 0;
+  font-size: 1.03rem;
+}
+
+.security-card > p {
+  margin: 0.3rem 0 0.8rem;
+  color: #4c6f8d;
+  font-size: 0.84rem;
+}
+
+.security-list {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.security-list > div {
+  border: 1px solid #d9e8f4;
+  border-radius: 0.75rem;
+  background: #fff;
+  padding: 0.6rem 0.68rem;
+  display: grid;
+  gap: 0.2rem;
+}
+
+.security-list strong {
+  font-size: 0.86rem;
+  color: #1e577f;
+}
+
+.security-list span {
+  font-size: 0.79rem;
+  color: #50718f;
+}
+
+.settings-card h3 {
+  margin: 0;
+  font-size: 1.03rem;
+}
+
+.card-subtitle {
+  margin: 0.28rem 0 0.8rem;
+  font-size: 0.84rem;
+  color: #50708f;
+}
+
+.form-grid {
+  display: grid;
+  gap: 0.65rem;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.full-width {
+  grid-column: span 2;
+}
+
+.validation-error {
+  margin: 0.25rem 0 0;
+  color: #bb3e58;
+  font-size: 0.82rem;
+}
+
+button[mat-flat-button] {
+  margin-top: 0.55rem;
+  background: linear-gradient(130deg, #0a9486, #2f7fd8);
+  color: #fff;
+}
+
+.state,
+.error,
+.success {
+  margin-top: 0.8rem;
+  border-radius: 0.6rem;
+  padding: 0.72rem 0.85rem;
+}
+
+.state {
+  background: #e9f6ff;
+  color: #2a5a80;
+}
+
+.error {
+  background: #fff4f7;
+  color: #bc3f5b;
+}
+
+.success {
+  background: #ecfaf2;
+  color: #286947;
+}
+
+@media (max-width: 850px) {
+  .settings-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .full-width {
+    grid-column: span 1;
+  }
+}

@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { API_BASE_URL } from '../core/api.config';
+import { toDateKey } from '../core/date-time/date-time.utils';
 import {
   AdminDashboardResponse,
   DoctorDashboardResponse,
@@ -45,7 +46,7 @@ export class DashboardApiService {
   getAvailableSlots(doctorId: string, date: Date | string) {
     const dateParam = typeof date === 'string'
       ? date
-      : this.toDateOnlyString(date);
+      : toDateKey(date);
 
     return this.http.get<AvailableAppointmentSlotsResponse>(`${this.apiBase}/Appointment/available-slots`, {
       params: {
@@ -69,13 +70,6 @@ export class DashboardApiService {
     return this.http.put<DoctorAvailabilityResponse>(`${this.apiBase}/Appointment/doctor-availability`, payload, { params });
   }
 
-  private toDateOnlyString(date: Date): string {
-    const y = date.getFullYear();
-    const m = String(date.getMonth() + 1).padStart(2, '0');
-    const d = String(date.getDate()).padStart(2, '0');
-    return `${y}-${m}-${d}`;
-  }
-
   requestPostponeAppointment(appointmentId: string, payload: { proposedDateTime: string; reason: string }) {
     return this.http.post(`${this.apiBase}/Appointment/${appointmentId}/postpone-request`, payload);
   }
@@ -92,6 +86,7 @@ export class DashboardApiService {
     lastName: string;
     personalIdentifier: string;
     address: string;
+    phoneNumber?: string | null;
     birthDate: string;
     roleName: string;
     clinicId: string;
@@ -106,6 +101,7 @@ export class DashboardApiService {
     lastName: string;
     personalIdentifier: string;
     address: string;
+    phoneNumber?: string | null;
     birthDate: string;
     clinicId: string;
   }) {

@@ -108,7 +108,8 @@ public class AppointmentReminderBackgroundService : BackgroundService
                 DoctorName = (a.Doctor.Person.FirstName + " " + a.Doctor.Person.LastName).Trim(),
                 PatientUserId = a.PatientId,
                 PatientDisplayName = (a.Patient.Person.FirstName + " " + a.Patient.Person.LastName).Trim(),
-                PatientEmail = a.Patient.Email
+                PatientEmail = a.Patient.Email,
+                PatientPhoneNumber = a.Patient.Person.PhoneNumber
             })
             .ToListAsync(cancellationToken);
 
@@ -189,6 +190,7 @@ public class AppointmentReminderBackgroundService : BackgroundService
                     candidate.AppointmentId,
                     candidate.PatientUserId,
                     candidate.PatientEmail,
+                    candidate.PatientPhoneNumber,
                     candidate.PatientDisplayName,
                     definition.Type,
                     definition.Title,
@@ -302,6 +304,7 @@ public class AppointmentReminderBackgroundService : BackgroundService
         public Guid PatientUserId { get; set; }
         public string PatientDisplayName { get; set; } = string.Empty;
         public string? PatientEmail { get; set; }
+        public string? PatientPhoneNumber { get; set; }
         public string DoctorName { get; set; } = string.Empty;
         public string ClinicName { get; set; } = string.Empty;
         public string ClinicTimeZoneId { get; set; } = "UTC";

@@ -10,6 +10,7 @@ namespace MedicalAppointment.Domain.Models
         public string NormalizedName { get; set; } = string.Empty;
         public string PersonalIdentifier { get; set; } = string.Empty;
         public string Address { get; set; } = string.Empty;
+        public string? PhoneNumber { get; set; }
         public DateTime BirthDate { get; set; }
     }
 }

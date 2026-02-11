@@ -1,145 +1,169 @@
 import { Routes } from '@angular/router';
-import { HomeComponent } from './home/home.component';
 import { AuthGuard } from '../auth/auth.guard';
 import { RoleGuard } from '../auth/role.guard';
-import { BookAppointmentComponent } from './appointments/book-appointment/book-appointment.component';
-import { ViewDoctorAppointmentsComponent } from './appointments/view-doctor-appointments.component';
-import { ViewMyAppointmentsComponent } from './appointments/view-my-appointments.component';
-import { ViewAllAppointmentsComponent } from './appointments/view-all-appointments.component';
-import { AppointmentAuditComponent } from './appointments/appointment-audit.component';
-import { AdminDashboardComponent } from './admin/admin-dashboard.component';
-import { DoctorDashboardComponent } from './doctor/doctor-dashboard.component';
-import { DoctorAvailabilityComponent } from './doctor/doctor-availability.component';
-import { PatientDashboardComponent } from './patient/patient-dashboard.component';
-import { PatientProfileComponent } from './patient/patient-profile.component';
-import { PatientAccountSettingsComponent } from './patient/patient-account-settings.component';
-import { UserManagementComponent } from './admin/user-management.component';
-import { ClinicManagementComponent } from './admin/clinic-management.component';
-import { NotificationsComponent } from './notifications/notifications.component';
+
+const loadHomeComponent = () =>
+  import('./home/home.component').then(m => m.HomeComponent);
+const loadAdminDashboardComponent = () =>
+  import('./admin/admin-dashboard.component').then(m => m.AdminDashboardComponent);
+const loadDoctorDashboardComponent = () =>
+  import('./doctor/doctor-dashboard.component').then(m => m.DoctorDashboardComponent);
+const loadDoctorAvailabilityComponent = () =>
+  import('./doctor/doctor-availability.component').then(m => m.DoctorAvailabilityComponent);
+const loadPatientDashboardComponent = () =>
+  import('./patient/patient-dashboard.component').then(m => m.PatientDashboardComponent);
+const loadPatientProfileComponent = () =>
+  import('./patient/patient-profile.component').then(m => m.PatientProfileComponent);
+const loadPatientAccountSettingsComponent = () =>
+  import('./patient/patient-account-settings.component').then(m => m.PatientAccountSettingsComponent);
+const loadDoctorProfileComponent = () =>
+  import('./doctor/doctor-profile.component').then(m => m.DoctorProfileComponent);
+const loadDoctorAccountSettingsComponent = () =>
+  import('./doctor/doctor-account-settings.component').then(m => m.DoctorAccountSettingsComponent);
+const loadAdminProfileComponent = () =>
+  import('./admin/admin-profile.component').then(m => m.AdminProfileComponent);
+const loadAdminAccountSettingsComponent = () =>
+  import('./admin/admin-account-settings.component').then(m => m.AdminAccountSettingsComponent);
+const loadUserManagementComponent = () =>
+  import('./admin/user-management.component').then(m => m.UserManagementComponent);
+const loadClinicManagementComponent = () =>
+  import('./admin/clinic-management.component').then(m => m.ClinicManagementComponent);
+const loadBookAppointmentComponent = () =>
+  import('./appointments/book-appointment/book-appointment.component').then(m => m.BookAppointmentComponent);
+const loadViewMyAppointmentsComponent = () =>
+  import('./appointments/view-my-appointments.component').then(m => m.ViewMyAppointmentsComponent);
+const loadViewAllAppointmentsComponent = () =>
+  import('./appointments/view-all-appointments.component').then(m => m.ViewAllAppointmentsComponent);
+const loadAppointmentAuditComponent = () =>
+  import('./appointments/appointment-audit.component').then(m => m.AppointmentAuditComponent);
+const loadNotificationsComponent = () =>
+  import('./notifications/notifications.component').then(m => m.NotificationsComponent);
+const loadViewDoctorAppointmentsComponent = () =>
+  import('./appointments/view-doctor-appointments.component').then(m => m.ViewDoctorAppointmentsComponent);
 
 export const DASHBOARD_ROUTES: Routes = [
   {
     path: '',
-    component: HomeComponent,
-    canActivate: [AuthGuard],
+    loadComponent: loadHomeComponent,
+    canActivate: [AuthGuard]
   },
   {
     path: 'admin',
-    component: AdminDashboardComponent,
+    loadComponent: loadAdminDashboardComponent,
     canActivate: [AuthGuard, RoleGuard],
     data: { roles: ['Admin'] }
   },
   {
     path: 'doctor',
-    component: DoctorDashboardComponent,
+    loadComponent: loadDoctorDashboardComponent,
     canActivate: [AuthGuard, RoleGuard],
     data: { roles: ['Doctor'] }
   },
   {
     path: 'doctor/availability',
-    component: DoctorAvailabilityComponent,
+    loadComponent: loadDoctorAvailabilityComponent,
     canActivate: [AuthGuard, RoleGuard],
     data: { roles: ['Doctor'] }
   },
   {
     path: 'patient',
-    component: PatientDashboardComponent,
+    loadComponent: loadPatientDashboardComponent,
     canActivate: [AuthGuard, RoleGuard],
     data: { roles: ['Patient'] }
   },
   {
     path: 'patient/calendar',
-    component: PatientDashboardComponent,
+    loadComponent: loadPatientDashboardComponent,
     canActivate: [AuthGuard, RoleGuard],
     data: { roles: ['Patient'] }
   },
   {
     path: 'patient/profile',
-    component: PatientProfileComponent,
+    loadComponent: loadPatientProfileComponent,
     canActivate: [AuthGuard, RoleGuard],
     data: { roles: ['Patient'] }
   },
   {
     path: 'patient/settings',
-    component: PatientAccountSettingsComponent,
+    loadComponent: loadPatientAccountSettingsComponent,
     canActivate: [AuthGuard, RoleGuard],
     data: { roles: ['Patient'] }
   },
   {
     path: 'doctor/profile',
-    component: PatientProfileComponent,
+    loadComponent: loadDoctorProfileComponent,
     canActivate: [AuthGuard, RoleGuard],
     data: { roles: ['Doctor'] }
   },
   {
     path: 'doctor/settings',
-    component: PatientAccountSettingsComponent,
+    loadComponent: loadDoctorAccountSettingsComponent,
     canActivate: [AuthGuard, RoleGuard],
     data: { roles: ['Doctor'] }
   },
   {
     path: 'admin/profile',
-    component: PatientProfileComponent,
+    loadComponent: loadAdminProfileComponent,
     canActivate: [AuthGuard, RoleGuard],
     data: { roles: ['Admin'] }
   },
   {
     path: 'admin/settings',
-    component: PatientAccountSettingsComponent,
+    loadComponent: loadAdminAccountSettingsComponent,
     canActivate: [AuthGuard, RoleGuard],
     data: { roles: ['Admin'] }
   },
   {
     path: 'admin/users',
-    component: UserManagementComponent,
+    loadComponent: loadUserManagementComponent,
     canActivate: [AuthGuard, RoleGuard],
     data: { roles: ['Admin'] }
   },
   {
     path: 'admin/clinics',
-    component: ClinicManagementComponent,
+    loadComponent: loadClinicManagementComponent,
     canActivate: [AuthGuard, RoleGuard],
     data: { roles: ['Admin'] }
   },
   {
     path: 'admin/availability',
-    component: DoctorAvailabilityComponent,
+    loadComponent: loadDoctorAvailabilityComponent,
     canActivate: [AuthGuard, RoleGuard],
     data: { roles: ['Admin'] }
   },
   {
     path: 'appointments/book',
-    component: BookAppointmentComponent,
+    loadComponent: loadBookAppointmentComponent,
     canActivate: [AuthGuard, RoleGuard],
     data: { roles: ['Patient'] }
   },
   {
     path: 'appointments/my',
-    component: ViewMyAppointmentsComponent,
+    loadComponent: loadViewMyAppointmentsComponent,
     canActivate: [AuthGuard, RoleGuard],
     data: { roles: ['Patient'] }
   },
   {
     path: 'appointments/all',
-    component: ViewAllAppointmentsComponent,
+    loadComponent: loadViewAllAppointmentsComponent,
     canActivate: [AuthGuard, RoleGuard],
     data: { roles: ['Admin'] }
   },
   {
     path: 'appointments/:appointmentId/audit',
-    component: AppointmentAuditComponent,
+    loadComponent: loadAppointmentAuditComponent,
     canActivate: [AuthGuard, RoleGuard],
     data: { roles: ['Admin', 'Doctor', 'Patient'] }
   },
   {
     path: 'notifications',
-    component: NotificationsComponent,
+    loadComponent: loadNotificationsComponent,
     canActivate: [AuthGuard, RoleGuard],
     data: { roles: ['Admin', 'Doctor', 'Patient'] }
   },
   {
     path: 'doctor-appointments',
-    component: ViewDoctorAppointmentsComponent,
+    loadComponent: loadViewDoctorAppointmentsComponent,
     canActivate: [AuthGuard, RoleGuard],
     data: { roles: ['Doctor'] }
   },

@@ -1,0 +1,95 @@
+<section class="doctor-profile">
+  <header class="profile-hero">
+    <p class="eyebrow">{{ 'doctorProfile.eyebrow' | translate }}</p>
+    <h1>{{ 'doctorProfile.title' | translate }}</h1>
+    <p>{{ 'doctorProfile.subtitle' | translate }}</p>
+
+    <div class="profile-actions" *ngIf="me">
+      <a mat-flat-button [routerLink]="dashboardRoute">{{ 'actions.backToDashboard' | translate }}</a>
+      <a mat-stroked-button [routerLink]="settingsRoute">{{ 'nav.accountSettings' | translate }}</a>
+    </div>
+  </header>
+
+  <p *ngIf="loading" class="state">{{ 'state.loadingProfile' | translate }}</p>
+  <p *ngIf="errorMessage" class="error">{{ errorMessage | translate }}</p>
+  <p *ngIf="successMessage" class="success">{{ successMessage | translate }}</p>
+
+  <section class="app-skeleton-list" *ngIf="loading && !me" aria-hidden="true">
+    <article class="app-skeleton-card" *ngFor="let _ of profileSkeletons">
+      <div class="app-skeleton-line app-skeleton-line--title"></div>
+      <div class="app-skeleton-line app-skeleton-line--meta"></div>
+      <div class="app-skeleton-pills">
+        <span class="app-skeleton-pill"></span>
+        <span class="app-skeleton-pill"></span>
+      </div>
+    </article>
+  </section>
+
+  <div class="profile-layout" *ngIf="me">
+    <mat-card class="profile-summary-card">
+      <div class="avatar">{{ me.firstName[0] }}{{ me.lastName[0] }}</div>
+      <h2>{{ me.firstName }} {{ me.lastName }}</h2>
+      <p>{{ 'doctorProfile.accountRole' | translate }}</p>
+
+      <div class="profile-summary-grid">
+        <div>
+          <span class="label">{{ 'common.clinic' | translate }}</span>
+          <strong>{{ me.clinicName }}</strong>
+        </div>
+        <div>
+          <span class="label">{{ 'common.username' | translate }}</span>
+          <strong>{{ me.username }}</strong>
+        </div>
+        <div>
+          <span class="label">{{ 'common.personalIdentifier' | translate }}</span>
+          <strong>{{ me.personalIdentifier }}</strong>
+        </div>
+        <div>
+          <span class="label">{{ 'common.email' | translate }}</span>
+          <strong>{{ me.email }}</strong>
+        </div>
+      </div>
+    </mat-card>
+
+    <mat-card class="profile-edit-card">
+      <h3>{{ 'doctorProfile.editTitle' | translate }}</h3>
+      <p class="card-subtitle">{{ 'doctorProfile.editSubtitle' | translate }}</p>
+
+      <form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+        <div class="form-grid">
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'common.firstName' | translate }}</mat-label>
+            <input matInput formControlName="firstName" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'common.lastName' | translate }}</mat-label>
+            <input matInput formControlName="lastName" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'common.birthDate' | translate }}</mat-label>
+            <input matInput [matDatepicker]="doctorBirthDatePicker" formControlName="birthDate" />
+            <mat-datepicker-toggle matSuffix [for]="doctorBirthDatePicker"></mat-datepicker-toggle>
+            <mat-datepicker #doctorBirthDatePicker></mat-datepicker>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>{{ 'common.address' | translate }}</mat-label>
+            <input matInput formControlName="address" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>{{ 'common.phone' | translate }}</mat-label>
+            <input matInput formControlName="phoneNumber" />
+          </mat-form-field>
+        </div>
+
+        <button mat-flat-button class="button-with-spinner" type="submit" [disabled]="profileForm.invalid || saving">
+          <mat-progress-spinner *ngIf="saving" mode="indeterminate" diameter="18"></mat-progress-spinner>
+          <span>{{ 'actions.saveProfile' | translate }}</span>
+        </button>
+      </form>
+    </mat-card>
+  </div>
+</section>

@@ -121,6 +121,7 @@ export interface UserSummary {
   lastName: string;
   personalIdentifier: string;
   address: string;
+  phoneNumber?: string | null;
   birthDate: string;
   clinicId: string;
   clinicName: string;
@@ -251,6 +252,7 @@ export interface UpdateProfileRequest {
   firstName: string;
   lastName: string;
   address: string;
+  phoneNumber?: string | null;
   birthDate: string;
 }
 

@@ -1,0 +1,172 @@
+.doctor-profile {
+  padding: clamp(1rem, 2vw, 1.5rem);
+}
+
+.profile-hero {
+  border: 1px solid #d4e6f6;
+  border-radius: 1rem;
+  padding: 1rem 1.1rem;
+  background:
+    radial-gradient(circle at 85% 15%, rgba(44, 124, 216, 0.24), transparent 35%),
+    radial-gradient(circle at 10% 84%, rgba(10, 148, 134, 0.18), transparent 42%),
+    #f3fbff;
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #365c7d;
+  font-weight: 700;
+}
+
+.profile-hero h1 {
+  margin: 0.38rem 0 0.3rem;
+  font-size: clamp(1.35rem, 2.1vw, 1.85rem);
+}
+
+.profile-hero p {
+  margin: 0;
+  color: #486e8d;
+}
+
+.profile-actions {
+  margin-top: 0.8rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.profile-actions a[mat-flat-button] {
+  background: linear-gradient(130deg, #0a9486, #2f7fd8);
+  color: #fff;
+}
+
+.profile-actions a[mat-stroked-button] {
+  border-color: #b7d8ef;
+  color: #194b70;
+}
+
+.profile-layout {
+  margin-top: 0.9rem;
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.3fr);
+}
+
+.profile-summary-card,
+.profile-edit-card {
+  border: 1px solid #d6e8f5;
+  box-shadow: 0 12px 24px rgba(11, 48, 77, 0.07);
+}
+
+.profile-summary-card {
+  background: #f4fbff;
+}
+
+.avatar {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(130deg, #0a9486, #2f7fd8);
+}
+
+.profile-summary-card h2 {
+  margin: 0.65rem 0 0.2rem;
+  font-size: 1.1rem;
+}
+
+.profile-summary-card > p {
+  margin: 0;
+  color: #4f728f;
+  font-size: 0.88rem;
+}
+
+.profile-summary-grid {
+  margin-top: 0.85rem;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.profile-summary-grid > div {
+  border: 1px solid #d8e9f5;
+  border-radius: 0.75rem;
+  background: #fff;
+  padding: 0.6rem 0.7rem;
+}
+
+.profile-edit-card h3 {
+  margin: 0;
+  font-size: 1.03rem;
+}
+
+.card-subtitle {
+  margin: 0.3rem 0 0.85rem;
+  font-size: 0.84rem;
+  color: #4f738f;
+}
+
+.form-grid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.label {
+  display: block;
+  font-size: 0.78rem;
+  color: #4e718c;
+}
+
+.profile-summary-grid strong {
+  display: block;
+  margin-top: 0.2rem;
+}
+
+.full-width {
+  grid-column: span 2;
+}
+
+button[mat-flat-button] {
+  margin-top: 0.5rem;
+  background: linear-gradient(130deg, #0a9486, #2f7fd8);
+  color: #fff;
+}
+
+.state,
+.error,
+.success {
+  margin-top: 0.8rem;
+  border-radius: 0.6rem;
+  padding: 0.72rem 0.85rem;
+}
+
+.state {
+  background: #e9f6ff;
+  color: #285a81;
+}
+
+.error {
+  background: #fff4f7;
+  color: #bc3d59;
+}
+
+.success {
+  background: #ecfaf2;
+  color: #296946;
+}
+
+@media (max-width: 800px) {
+  .profile-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .full-width {
+    grid-column: span 1;
+  }
+}

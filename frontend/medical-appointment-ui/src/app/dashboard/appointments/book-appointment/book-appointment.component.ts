@@ -14,6 +14,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { TranslateModule } from '@ngx-translate/core';
 import { API_BASE_URL } from '../../../core/api.config';
 import { DashboardApiService } from '../../dashboard-api.service';
+import { combineDateAndTime } from '../../../core/date-time/date-time.utils';
 
 interface DoctorOption {
   id: string;
@@ -71,6 +72,9 @@ export class BookAppointmentComponent implements OnInit {
       time: ['', Validators.required],
     });
 
+    this.syncDoctorControlState();
+    this.syncTimeControlState();
+
     this.appointmentForm.get('doctorId')?.valueChanges.subscribe(() => {
       this.reloadAvailableSlots();
     });
@@ -82,14 +86,18 @@ export class BookAppointmentComponent implements OnInit {
 
   loadDoctors(): void {
     this.loadingDoctors = true;
+    this.syncDoctorControlState();
+
     this.http.get<DoctorOption[]>(`${this.apiBaseUrl}/User/doctors`).subscribe({
       next: doctors => {
         this.doctors = doctors;
         this.loadingDoctors = false;
+        this.syncDoctorControlState();
       },
       error: () => {
         this.errorMessage = 'bookAppointment.errors.loadDoctors';
         this.loadingDoctors = false;
+        this.syncDoctorControlState();
       }
     });
   }
@@ -103,6 +111,7 @@ export class BookAppointmentComponent implements OnInit {
     this.errorMessage = '';
     this.successMessage = '';
     this.isSubmitting = true;
+    this.syncDoctorControlState();
 
     const date = this.appointmentForm.value.date as Date;
     const time = this.appointmentForm.value.time as string;
@@ -114,18 +123,20 @@ export class BookAppointmentComponent implements OnInit {
 
     const payload = {
       doctorId: this.appointmentForm.value.doctorId,
-      appointmentDateTime: this.combineDateAndTime(date, time).toISOString(),
+      appointmentDateTime: combineDateAndTime(date, time).toISOString(),
     };
 
     this.http.post(`${this.apiBaseUrl}/Appointment`, payload).subscribe({
       next: () => {
         this.successMessage = 'bookAppointment.messages.booked';
         this.isSubmitting = false;
+        this.syncDoctorControlState();
         this.router.navigate(['/dashboard/patient/calendar']);
       },
       error: err => {
         this.errorMessage = err?.error?.message || err?.error || 'bookAppointment.errors.bookFailed';
         this.isSubmitting = false;
+        this.syncDoctorControlState();
       }
     });
   }
@@ -134,6 +145,7 @@ export class BookAppointmentComponent implements OnInit {
     this.appointmentForm.patchValue({ time: '' }, { emitEvent: false });
     this.availableSlots = [];
     this.slotTimezone = '';
+    this.syncTimeControlState();
 
     const doctorId = (this.appointmentForm?.value?.doctorId as string) || '';
     const date = this.appointmentForm?.value?.date as Date | null;
@@ -143,30 +155,45 @@ export class BookAppointmentComponent implements OnInit {
 
     this.loadingSlots = true;
     this.errorMessage = '';
+    this.syncTimeControlState();
 
     this.dashboardApi.getAvailableSlots(doctorId, date).subscribe({
       next: response => {
         this.availableSlots = response.slots.map(slot => slot.localTime);
         this.slotTimezone = response.timezone;
         this.loadingSlots = false;
+        this.syncTimeControlState();
       },
       error: err => {
         this.errorMessage = err?.error?.message || err?.error || 'bookAppointment.errors.loadSlots';
         this.loadingSlots = false;
+        this.syncTimeControlState();
       }
     });
   }
 
-  private combineDateAndTime(date: Date, time: string): Date {
-    const [hours, minutes] = time.split(':').map(v => Number(v));
-    return new Date(
-      date.getFullYear(),
-      date.getMonth(),
-      date.getDate(),
-      hours,
-      minutes,
-      0,
-      0
-    );
+  private syncDoctorControlState(): void {
+    this.setControlDisabled('doctorId', this.loadingDoctors || this.isSubmitting);
   }
+
+  private syncTimeControlState(): void {
+    this.setControlDisabled('time', this.loadingSlots || this.availableSlots.length === 0);
+  }
+
+  private setControlDisabled(controlName: 'doctorId' | 'time', disabled: boolean): void {
+    const control = this.appointmentForm?.get(controlName);
+    if (!control) {
+      return;
+    }
+
+    if (disabled && control.enabled) {
+      control.disable({ emitEvent: false });
+      return;
+    }
+
+    if (!disabled && control.disabled) {
+      control.enable({ emitEvent: false });
+    }
+  }
+
 }

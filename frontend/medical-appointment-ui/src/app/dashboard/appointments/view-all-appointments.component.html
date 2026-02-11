@@ -37,19 +37,31 @@
 
         <mat-form-field appearance="outline" class="date-filter">
           <mat-label>{{ 'filters.dateFrom' | translate }}</mat-label>
-          <input matInput #dateFromInput type="date" [value]="dateFrom">
+          <input
+            matInput
+            [matDatepicker]="adminDateFromPicker"
+            [value]="dateFromInput"
+            (dateChange)="dateFromInput = $event.value" />
+          <mat-datepicker-toggle matSuffix [for]="adminDateFromPicker"></mat-datepicker-toggle>
+          <mat-datepicker #adminDateFromPicker></mat-datepicker>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="date-filter">
           <mat-label>{{ 'filters.dateTo' | translate }}</mat-label>
-          <input matInput #dateToInput type="date" [value]="dateTo">
+          <input
+            matInput
+            [matDatepicker]="adminDateToPicker"
+            [value]="dateToInput"
+            (dateChange)="dateToInput = $event.value" />
+          <mat-datepicker-toggle matSuffix [for]="adminDateToPicker"></mat-datepicker-toggle>
+          <mat-datepicker #adminDateToPicker></mat-datepicker>
         </mat-form-field>
 
         <button
           mat-flat-button
           type="button"
           [disabled]="loading || exporting"
-          (click)="applyDateFilters(dateFromInput.value, dateToInput.value)">
+          (click)="applyDateFilters()">
           {{ 'actions.applyFilters' | translate }}
         </button>
 

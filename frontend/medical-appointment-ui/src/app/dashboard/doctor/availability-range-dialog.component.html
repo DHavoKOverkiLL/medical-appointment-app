@@ -1,0 +1,40 @@
+<div class="dialog-shell" [formGroup]="form">
+  <header class="dialog-header">
+    <div>
+      <p class="dialog-eyebrow">{{ 'availability.eyebrow' | translate }}</p>
+      <h2>{{ titleKey | translate }}</h2>
+      <p class="dialog-subtitle">{{ subtitleKey | translate }}</p>
+    </div>
+    <button mat-stroked-button type="button" (click)="close()">{{ 'common.close' | translate }}</button>
+  </header>
+
+  <section class="dialog-grid">
+    <mat-form-field appearance="outline">
+      <mat-label>{{ 'common.day' | translate }}</mat-label>
+      <mat-select formControlName="dayOfWeek">
+        <mat-option *ngFor="let day of data.dayOptions" [value]="day.value">
+          {{ day.labelKey | translate }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>{{ 'availability.fields.startTime' | translate }}</mat-label>
+      <input matInput [matTimepicker]="availabilityStartPicker" formControlName="start" />
+      <mat-timepicker-toggle matSuffix [for]="availabilityStartPicker"></mat-timepicker-toggle>
+      <mat-timepicker #availabilityStartPicker interval="15m"></mat-timepicker>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>{{ 'availability.fields.endTime' | translate }}</mat-label>
+      <input matInput [matTimepicker]="availabilityEndPicker" formControlName="end" />
+      <mat-timepicker-toggle matSuffix [for]="availabilityEndPicker"></mat-timepicker-toggle>
+      <mat-timepicker #availabilityEndPicker interval="15m"></mat-timepicker>
+    </mat-form-field>
+  </section>
+
+  <footer class="dialog-footer">
+    <button mat-stroked-button type="button" (click)="close()">{{ 'common.cancel' | translate }}</button>
+    <button mat-flat-button type="button" (click)="submit()">{{ submitLabelKey | translate }}</button>
+  </footer>
+</div>

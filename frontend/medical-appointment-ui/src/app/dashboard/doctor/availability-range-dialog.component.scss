@@ -1,0 +1,57 @@
+.dialog-shell {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.8rem;
+}
+
+.dialog-eyebrow {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #4d6580;
+}
+
+.dialog-header h2 {
+  margin: 0.32rem 0 0.25rem;
+  font-size: 1.2rem;
+  line-height: 1.2;
+}
+
+.dialog-subtitle {
+  margin: 0;
+  color: #59718a;
+  font-size: 0.86rem;
+}
+
+.dialog-grid {
+  display: grid;
+  gap: 0.65rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.55rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid #d9e6f2;
+}
+
+.dialog-footer button[mat-flat-button] {
+  background: linear-gradient(130deg, #0f8ca3, #2a7cd8);
+  color: #fff;
+}
+
+@media (max-width: 720px) {
+  .dialog-header {
+    flex-direction: column;
+  }
+}

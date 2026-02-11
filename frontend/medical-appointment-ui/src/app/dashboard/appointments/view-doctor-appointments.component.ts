@@ -14,6 +14,7 @@ import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { API_BASE_URL } from '../../core/api.config';
 import { DashboardApiService } from '../dashboard-api.service';
+import { combineDateAndTime, toTimeInputValue } from '../../core/date-time/date-time.utils';
 
 interface DoctorAppointmentRow {
   appointmentId: string;
@@ -182,7 +183,7 @@ export class ViewDoctorAppointmentsComponent implements OnInit {
 
     this.counterForm.patchValue({
       date: source,
-      time: this.toTimeInputValue(source),
+      time: toTimeInputValue(source),
       note: appointment.doctorResponseNote || ''
     });
 
@@ -225,7 +226,7 @@ export class ViewDoctorAppointmentsComponent implements OnInit {
     }
 
     const note = (this.counterForm.value.note as string || '').trim();
-    const counterProposedDateTime = this.combineDateAndTime(dateValue, timeValue).toISOString();
+    const counterProposedDateTime = combineDateAndTime(dateValue, timeValue).toISOString();
 
     this.actionSubmitting = true;
     this.actionSubmittingAppointmentId = this.activeCounterAppointmentId;
@@ -439,25 +440,6 @@ export class ViewDoctorAppointmentsComponent implements OnInit {
 
   private normalizeLifecycleStatus(status: string): string {
     return (status || '').trim().toLowerCase();
-  }
-
-  private toTimeInputValue(date: Date): string {
-    const hh = String(date.getHours()).padStart(2, '0');
-    const mm = String(date.getMinutes()).padStart(2, '0');
-    return `${hh}:${mm}`;
-  }
-
-  private combineDateAndTime(date: Date, time: string): Date {
-    const [hours, minutes] = time.split(':').map(v => Number(v));
-    return new Date(
-      date.getFullYear(),
-      date.getMonth(),
-      date.getDate(),
-      hours,
-      minutes,
-      0,
-      0
-    );
   }
 
   private findAppointmentById(appointmentId: string): DoctorAppointmentRow | null {

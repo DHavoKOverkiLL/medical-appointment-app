@@ -4,6 +4,7 @@ public sealed record AppointmentReminderDeliveryContext(
     Guid AppointmentId,
     Guid RecipientUserId,
     string? RecipientEmail,
+    string? RecipientPhoneNumber,
     string RecipientDisplayName,
     string ReminderType,
     string Title,

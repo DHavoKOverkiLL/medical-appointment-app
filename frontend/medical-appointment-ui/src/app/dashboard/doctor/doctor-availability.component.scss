@@ -106,25 +106,61 @@
   gap: 0.55rem;
 }
 
-.range-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr auto;
-  gap: 0.55rem;
+.entry-card {
+  border: 1px solid #dce8f2;
+  border-radius: 0.75rem;
+  background: #fff;
+  padding: 0.75rem;
+  display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
 }
 
-.override-row {
-  grid-template-columns: 1fr 1fr 1fr 1fr 2fr auto;
+.entry-content {
+  min-width: 0;
 }
 
-.reason-field {
-  width: 100%;
+.entry-title {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #1d4669;
 }
 
-.range-row button {
-  min-height: 40px;
+.entry-subtitle {
+  margin: 0.18rem 0 0;
+  font-size: 0.85rem;
+  color: #59728a;
+}
+
+.entry-note {
+  margin: 0.3rem 0 0;
+  font-size: 0.82rem;
+  color: #6a7f91;
+  line-height: 1.35;
+}
+
+.entry-actions {
+  display: flex;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  flex-shrink: 0;
+}
+
+.entry-actions button {
+  border-color: #c8dae9;
+  color: #2b597a;
+}
+
+.entry-actions button:last-child {
   border-color: #e4bfc8;
   color: #905566;
+}
+
+.override-entry {
+  align-items: flex-start;
 }
 
 .submit-row {
@@ -160,16 +196,6 @@
 }
 
 @media (max-width: 1180px) {
-  .override-row {
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-  }
-
-  .reason-field {
-    grid-column: span 3;
-  }
-}
-
-@media (max-width: 840px) {
   .admin-filters {
     grid-template-columns: 1fr;
   }
@@ -178,8 +204,12 @@
     width: 100%;
   }
 
-  .range-row,
-  .override-row {
-    grid-template-columns: 1fr;
+  .entry-card {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .entry-actions {
+    justify-content: flex-start;
   }
 }

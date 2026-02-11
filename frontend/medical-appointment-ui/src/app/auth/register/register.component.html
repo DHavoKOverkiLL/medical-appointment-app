@@ -51,7 +51,7 @@
 
           <mat-form-field appearance="outline" class="auth-shell__field">
             <mat-label>{{ 'common.clinic' | translate }}</mat-label>
-            <mat-select formControlName="clinicId" required [disabled]="loadingClinics">
+            <mat-select formControlName="clinicId" required>
               <mat-option *ngFor="let clinic of clinics" [value]="clinic.clinicId">
                 {{ clinic.name }}
               </mat-option>
@@ -81,13 +81,20 @@
 
           <mat-form-field appearance="outline" class="auth-shell__field">
             <mat-label>{{ 'common.birthDate' | translate }}</mat-label>
-            <input matInput type="date" formControlName="birthDate" />
+            <input matInput [matDatepicker]="registerBirthDatePicker" formControlName="birthDate" />
+            <mat-datepicker-toggle matSuffix [for]="registerBirthDatePicker"></mat-datepicker-toggle>
+            <mat-datepicker #registerBirthDatePicker></mat-datepicker>
           </mat-form-field>
         </div>
 
         <mat-form-field appearance="outline" class="auth-shell__field">
           <mat-label>{{ 'common.address' | translate }}</mat-label>
           <input matInput formControlName="address" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="auth-shell__field">
+          <mat-label>{{ 'common.phone' | translate }}</mat-label>
+          <input matInput formControlName="phoneNumber" />
         </mat-form-field>
 
         <button mat-flat-button class="auth-shell__submit button-with-spinner" type="submit" [disabled]="registerForm.invalid || isSubmitting || loadingClinics">

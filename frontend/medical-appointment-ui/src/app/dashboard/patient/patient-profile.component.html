@@ -69,12 +69,19 @@
 
           <mat-form-field appearance="outline">
             <mat-label>{{ 'common.birthDate' | translate }}</mat-label>
-            <input matInput type="date" formControlName="birthDate" />
+            <input matInput [matDatepicker]="patientBirthDatePicker" formControlName="birthDate" />
+            <mat-datepicker-toggle matSuffix [for]="patientBirthDatePicker"></mat-datepicker-toggle>
+            <mat-datepicker #patientBirthDatePicker></mat-datepicker>
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>{{ 'common.address' | translate }}</mat-label>
             <input matInput formControlName="address" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>{{ 'common.phone' | translate }}</mat-label>
+            <input matInput formControlName="phoneNumber" />
           </mat-form-field>
         </div>
 

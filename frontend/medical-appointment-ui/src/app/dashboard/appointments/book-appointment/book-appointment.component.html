@@ -20,7 +20,7 @@
       <div class="book-grid">
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>{{ 'common.doctor' | translate }}</mat-label>
-          <mat-select formControlName="doctorId" [disabled]="loadingDoctors || isSubmitting">
+          <mat-select formControlName="doctorId">
             <mat-option *ngFor="let doctor of doctors" [value]="doctor.id">
               {{ doctor.name }}
             </mat-option>
@@ -36,7 +36,7 @@
 
         <mat-form-field appearance="outline">
           <mat-label>{{ 'common.timeSlot30' | translate }}</mat-label>
-          <mat-select formControlName="time" [disabled]="loadingSlots || availableSlots.length === 0">
+          <mat-select formControlName="time">
             <mat-option *ngFor="let slot of availableSlots" [value]="slot">
               {{ slot }}
             </mat-option>

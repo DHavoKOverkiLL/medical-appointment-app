@@ -7,10 +7,20 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { AuthService } from '../../auth/auth.service';
 import { DashboardApiService } from '../dashboard-api.service';
+import {
+  AvailabilityRangeDialogComponent,
+  AvailabilityRangeDialogContext,
+  AvailabilityRangeDialogResult
+} from './availability-range-dialog.component';
+import {
+  AvailabilityOverrideDialogComponent,
+  AvailabilityOverrideDialogResult
+} from './availability-override-dialog.component';
 import {
   DoctorAvailabilityResponse,
   DoctorDateOverride,
@@ -51,6 +61,7 @@ type DoctorAvailabilityUpsertPayload = {
     MatSelectModule,
     MatButtonModule,
     MatProgressSpinnerModule,
+    MatDialogModule,
     TranslateModule
   ],
   templateUrl: './doctor-availability.component.html',
@@ -87,7 +98,8 @@ export class DoctorAvailabilityComponent implements OnInit {
   constructor(
     private readonly fb: FormBuilder,
     private readonly auth: AuthService,
-    private readonly dashboardApi: DashboardApiService
+    private readonly dashboardApi: DashboardApiService,
+    private readonly dialog: MatDialog
   ) {
     this.form = this.fb.group({
       weeklyAvailability: this.fb.array<AvailabilityRangeForm>([]),
@@ -167,7 +179,11 @@ export class DoctorAvailabilityComponent implements OnInit {
   }
 
   addWeeklyAvailability(): void {
-    this.weeklyAvailability.push(this.createRangeGroup());
+    this.openRangeDialog('availability');
+  }
+
+  editWeeklyAvailability(index: number): void {
+    this.openRangeDialog('availability', index);
   }
 
   removeWeeklyAvailability(index: number): void {
@@ -175,7 +191,11 @@ export class DoctorAvailabilityComponent implements OnInit {
   }
 
   addWeeklyBreak(): void {
-    this.weeklyBreaks.push(this.createRangeGroup(1, '12:00', '13:00'));
+    this.openRangeDialog('break');
+  }
+
+  editWeeklyBreak(index: number): void {
+    this.openRangeDialog('break', index);
   }
 
   removeWeeklyBreak(index: number): void {
@@ -183,7 +203,11 @@ export class DoctorAvailabilityComponent implements OnInit {
   }
 
   addOverride(): void {
-    this.overrides.push(this.createOverrideGroup(this.getTodayDateKey()));
+    this.openOverrideDialog();
+  }
+
+  editOverride(index: number): void {
+    this.openOverrideDialog(index);
   }
 
   removeOverride(index: number): void {
@@ -233,6 +257,16 @@ export class DoctorAvailabilityComponent implements OnInit {
 
   trackDoctor(_: number, doctor: UserSummary): string {
     return doctor.userId;
+  }
+
+  getDayLabelKey(dayOfWeek: number | null | undefined): string {
+    return this.dayOptions.find(day => day.value === Number(dayOfWeek))?.labelKey ?? 'common.dayUnknown';
+  }
+
+  hasOverrideTimeRange(group: AvailabilityOverrideForm): boolean {
+    const start = String(group.value.start || '').trim();
+    const end = String(group.value.end || '').trim();
+    return !!start && !!end;
   }
 
   private loadAdminDoctors(): void {
@@ -352,8 +386,8 @@ export class DoctorAvailabilityComponent implements OnInit {
         return {
           date: this.normalizeDateValue(group.value.date),
           isAvailable,
-          start: isAvailable ? start : null,
-          end: isAvailable ? end : null,
+          start,
+          end,
           reason: String(group.value.reason || '')
         };
       })
@@ -587,7 +621,7 @@ export class DoctorAvailabilityComponent implements OnInit {
     this.overrides.clear();
   }
 
-  private normalizeDateValue(value: unknown): string {
+  normalizeDateValue(value: unknown): string {
     if (value instanceof Date) {
       const y = value.getFullYear();
       const m = String(value.getMonth() + 1).padStart(2, '0');
@@ -604,5 +638,111 @@ export class DoctorAvailabilityComponent implements OnInit {
     const m = String(now.getMonth() + 1).padStart(2, '0');
     const d = String(now.getDate()).padStart(2, '0');
     return `${y}-${m}-${d}`;
+  }
+
+  private openRangeDialog(context: AvailabilityRangeDialogContext, index?: number): void {
+    const sourceArray = context === 'availability' ? this.weeklyAvailability : this.weeklyBreaks;
+    const sourceGroup = index !== undefined ? sourceArray.at(index) : null;
+    const defaultRange = context === 'availability'
+      ? { dayOfWeek: 1, start: '09:00', end: '17:00' }
+      : { dayOfWeek: 1, start: '12:00', end: '13:00' };
+
+    const dialogRef = this.dialog.open<
+      AvailabilityRangeDialogComponent,
+      {
+        mode: 'create' | 'edit';
+        context: AvailabilityRangeDialogContext;
+        dayOfWeek: number;
+        start: string;
+        end: string;
+        dayOptions: ReadonlyArray<{ value: number; labelKey: string }>;
+      },
+      AvailabilityRangeDialogResult
+    >(AvailabilityRangeDialogComponent, {
+      width: 'min(560px, 94vw)',
+      panelClass: 'modern-admin-dialog',
+      backdropClass: 'modern-admin-backdrop',
+      disableClose: true,
+      data: {
+        mode: index === undefined ? 'create' : 'edit',
+        context,
+        dayOfWeek: Number(sourceGroup?.value.dayOfWeek ?? defaultRange.dayOfWeek),
+        start: String(sourceGroup?.value.start ?? defaultRange.start),
+        end: String(sourceGroup?.value.end ?? defaultRange.end),
+        dayOptions: this.dayOptions
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (!result) {
+        return;
+      }
+
+      if (index === undefined) {
+        sourceArray.push(this.createRangeGroup(result.dayOfWeek, result.start, result.end));
+        return;
+      }
+
+      sourceArray.at(index).patchValue({
+        dayOfWeek: result.dayOfWeek,
+        start: result.start,
+        end: result.end
+      });
+    });
+  }
+
+  private openOverrideDialog(index?: number): void {
+    const sourceGroup = index !== undefined ? this.overrides.at(index) : null;
+
+    const dialogRef = this.dialog.open<
+      AvailabilityOverrideDialogComponent,
+      {
+        mode: 'create' | 'edit';
+        date: string;
+        isAvailable: boolean;
+        start: string;
+        end: string;
+        reason: string;
+      },
+      AvailabilityOverrideDialogResult
+    >(AvailabilityOverrideDialogComponent, {
+      width: 'min(620px, 96vw)',
+      panelClass: 'modern-admin-dialog',
+      backdropClass: 'modern-admin-backdrop',
+      disableClose: true,
+      data: {
+        mode: index === undefined ? 'create' : 'edit',
+        date: this.normalizeDateValue(sourceGroup?.value.date ?? this.getTodayDateKey()),
+        isAvailable: sourceGroup?.value.isAvailable === true || sourceGroup?.value.isAvailable === 'true',
+        start: String(sourceGroup?.value.start ?? ''),
+        end: String(sourceGroup?.value.end ?? ''),
+        reason: String(sourceGroup?.value.reason ?? '')
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (!result) {
+        return;
+      }
+
+      if (index === undefined) {
+        this.overrides.push(this.createOverrideGroup(
+          result.date,
+          result.isAvailable,
+          result.start,
+          result.end,
+          result.reason
+        ));
+        return;
+      }
+
+      this.overrides.at(index).patchValue({
+        date: result.date,
+        isAvailable: result.isAvailable,
+        start: result.start,
+        end: result.end,
+        reason: result.reason
+      });
+    });
   }
 }

@@ -161,6 +161,7 @@
     "code": "Cod",
     "username": "Nume utilizator",
     "email": "Email",
+    "phone": "Telefon",
     "password": "Parolă",
     "firstName": "Prenume",
     "lastName": "Nume",
@@ -275,6 +276,22 @@
       "updateFailed": "Profilul nu a putut fi actualizat."
     }
   },
+  "doctorProfile": {
+    "eyebrow": "Profil medic",
+    "title": "Identitate profesionala si date vizibile pacientilor",
+    "subtitle": "Mentine datele de contact si identitate corecte pentru coordonarea consultatiilor.",
+    "accountRole": "Cont de medic",
+    "editTitle": "Actualizeaza profilul",
+    "editSubtitle": "Pastreaza datele folosite in programari, consultatii si remindere in forma actualizata."
+  },
+  "adminProfile": {
+    "eyebrow": "Profil administrator",
+    "title": "Identitate administrativa si date de contact",
+    "subtitle": "Mentine profilul de administrator folosit pentru guvernanta, acces utilizatori si operatiuni.",
+    "accountRole": "Cont de administrator",
+    "editTitle": "Actualizeaza profilul",
+    "editSubtitle": "Pastreaza datele administrative corecte pentru fluxurile de audit si operatiuni."
+  },
   "accountSettings": {
     "eyebrow": "Setari cont {{role}}",
     "title": "Controale de securitate si credentiale",
@@ -301,6 +318,38 @@
     "errors": {
       "loadFailed": "Setările contului nu au putut fi încărcate.",
       "updateFailed": "Setarile contului nu au putut fi actualizate."
+    }
+  },
+  "doctorAccountSettings": {
+    "eyebrow": "Securitate cont medic",
+    "title": "Securitate clinica si credentiale",
+    "subtitle": "Protejeaza accesul de medic si mentine credentialele in linie cu politica de securitate.",
+    "securityTitle": "Checklist securitate",
+    "securitySubtitle": "Revizuieste aceste controale ori de cate ori se schimba datele contului sau credentialele.",
+    "editTitle": "Actualizeaza setarile contului",
+    "editSubtitle": "Confirmarea parolei curente este necesara pentru orice modificare.",
+    "messages": {
+      "updated": "Setarile contului de medic au fost actualizate."
+    },
+    "errors": {
+      "loadFailed": "Setarile contului de medic nu au putut fi incarcate.",
+      "updateFailed": "Setarile contului de medic nu au putut fi actualizate."
+    }
+  },
+  "adminAccountSettings": {
+    "eyebrow": "Securitate cont administrator",
+    "title": "Controale de securitate pentru acces privilegiat",
+    "subtitle": "Protejeaza accesul de administrator prin gestionare atenta a identitatii si parolelor.",
+    "securityTitle": "Checklist securitate",
+    "securitySubtitle": "Foloseste acest checklist pentru a mentine contul admin sigur si auditabil.",
+    "editTitle": "Actualizeaza setarile contului",
+    "editSubtitle": "Confirmarea parolei curente este necesara inainte de aplicarea modificarilor.",
+    "messages": {
+      "updated": "Setarile contului de administrator au fost actualizate."
+    },
+    "errors": {
+      "loadFailed": "Setarile contului de administrator nu au putut fi incarcate.",
+      "updateFailed": "Setarile contului de administrator nu au putut fi actualizate."
     }
   },
   "patientDashboard": {
@@ -425,7 +474,15 @@
     },
     "override": {
       "available": "Interval disponibil",
-      "unavailable": "Blocare indisponibilitate"
+      "unavailable": "Blocare indisponibilitate",
+      "fullDay": "Zi intreaga"
+    },
+    "dialogs": {
+      "editAvailabilityWindow": "Editeaza intervalul disponibil",
+      "editBreak": "Editeaza pauza",
+      "editOverride": "Editeaza exceptia",
+      "createEntry": "Adauga intrarea",
+      "saveEntry": "Salveaza intrarea"
     },
     "actions": {
       "addAvailabilityWindow": "Adauga interval disponibil",

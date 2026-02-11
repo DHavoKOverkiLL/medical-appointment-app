@@ -1,0 +1,51 @@
+<div class="dialog-shell" [formGroup]="form">
+  <header class="dialog-header">
+    <div>
+      <p class="dialog-eyebrow">{{ 'availability.eyebrow' | translate }}</p>
+      <h2>{{ titleKey | translate }}</h2>
+      <p class="dialog-subtitle">{{ 'availability.hints.dateOverrides' | translate }}</p>
+    </div>
+    <button mat-stroked-button type="button" (click)="close()">{{ 'common.close' | translate }}</button>
+  </header>
+
+  <section class="dialog-grid">
+    <mat-form-field appearance="outline">
+      <mat-label>{{ 'common.date' | translate }}</mat-label>
+      <input matInput [matDatepicker]="overrideDatePicker" formControlName="date" />
+      <mat-datepicker-toggle matSuffix [for]="overrideDatePicker"></mat-datepicker-toggle>
+      <mat-datepicker #overrideDatePicker></mat-datepicker>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>{{ 'availability.fields.overrideType' | translate }}</mat-label>
+      <mat-select formControlName="isAvailable">
+        <mat-option [value]="true">{{ 'availability.override.available' | translate }}</mat-option>
+        <mat-option [value]="false">{{ 'availability.override.unavailable' | translate }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>{{ 'availability.fields.startTime' | translate }}</mat-label>
+      <input matInput [matTimepicker]="overrideStartPicker" formControlName="start" />
+      <mat-timepicker-toggle matSuffix [for]="overrideStartPicker"></mat-timepicker-toggle>
+      <mat-timepicker #overrideStartPicker interval="15m"></mat-timepicker>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>{{ 'availability.fields.endTime' | translate }}</mat-label>
+      <input matInput [matTimepicker]="overrideEndPicker" formControlName="end" />
+      <mat-timepicker-toggle matSuffix [for]="overrideEndPicker"></mat-timepicker-toggle>
+      <mat-timepicker #overrideEndPicker interval="15m"></mat-timepicker>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="field-wide">
+      <mat-label>{{ 'common.reason' | translate }}</mat-label>
+      <input matInput type="text" maxlength="250" formControlName="reason" />
+    </mat-form-field>
+  </section>
+
+  <footer class="dialog-footer">
+    <button mat-stroked-button type="button" (click)="close()">{{ 'common.cancel' | translate }}</button>
+    <button mat-flat-button type="button" (click)="submit()">{{ submitLabelKey | translate }}</button>
+  </footer>
+</div>

@@ -343,12 +343,16 @@
 
       <mat-form-field appearance="outline" *ngIf="!operatingHourForm.value.isClosed">
         <mat-label>{{ 'clinicEditor.fields.openTime' | translate }}</mat-label>
-        <input matInput type="time" formControlName="open" />
+        <input matInput [matTimepicker]="clinicOpenTimePicker" formControlName="open" />
+        <mat-timepicker-toggle matSuffix [for]="clinicOpenTimePicker"></mat-timepicker-toggle>
+        <mat-timepicker #clinicOpenTimePicker interval="15m"></mat-timepicker>
       </mat-form-field>
 
       <mat-form-field appearance="outline" *ngIf="!operatingHourForm.value.isClosed">
         <mat-label>{{ 'clinicEditor.fields.closeTime' | translate }}</mat-label>
-        <input matInput type="time" formControlName="close" />
+        <input matInput [matTimepicker]="clinicCloseTimePicker" formControlName="close" />
+        <mat-timepicker-toggle matSuffix [for]="clinicCloseTimePicker"></mat-timepicker-toggle>
+        <mat-timepicker #clinicCloseTimePicker interval="15m"></mat-timepicker>
       </mat-form-field>
     </form>
 

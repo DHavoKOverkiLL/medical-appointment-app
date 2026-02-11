@@ -1,9 +1,10 @@
-<mat-progress-bar
+<div
   *ngIf="loadingService.isVisible$ | async"
-  mode="indeterminate"
   class="app-network-loader"
+  role="status"
   [attr.aria-label]="'state.working' | translate">
-</mat-progress-bar>
+  <span class="app-network-loader__bar"></span>
+</div>
 
 <div class="app-language-switcher" role="group" [attr.aria-label]="'language.switch' | translate">
   <button

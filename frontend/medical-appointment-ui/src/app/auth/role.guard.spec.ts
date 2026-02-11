@@ -10,7 +10,7 @@ describe('RoleGuard', () => {
   let router: Router;
 
   beforeEach(() => {
-    authService = jasmine.createSpyObj<AuthService>('AuthService', ['isLoggedIn', 'getUserRole']);
+    authService = jasmine.createSpyObj<AuthService>('AuthService', ['isLoggedIn', 'getUserRoleNormalized']);
 
     TestBed.configureTestingModule({
       imports: [RouterTestingModule],
@@ -26,7 +26,7 @@ describe('RoleGuard', () => {
 
   it('allows access for matching role', () => {
     authService.isLoggedIn.and.returnValue(true);
-    authService.getUserRole.and.returnValue('Doctor');
+    authService.getUserRoleNormalized.and.returnValue('doctor');
 
     const route = { data: { roles: ['Doctor'] } } as any;
     const result = guard.canActivate(route);
@@ -36,7 +36,7 @@ describe('RoleGuard', () => {
 
   it('redirects to dashboard for mismatched role', () => {
     authService.isLoggedIn.and.returnValue(true);
-    authService.getUserRole.and.returnValue('Patient');
+    authService.getUserRoleNormalized.and.returnValue('patient');
 
     const route = { data: { roles: ['Admin'] } } as any;
     const result = guard.canActivate(route) as UrlTree;
@@ -44,4 +44,3 @@ describe('RoleGuard', () => {
     expect(router.serializeUrl(result)).toBe('/dashboard');
   });
 });
-

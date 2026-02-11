@@ -8,8 +8,11 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 import { TranslateModule } from '@ngx-translate/core';
 import { API_BASE_URL } from '../../core/api.config';
+import { toDateKey, toIsoDate } from '../../core/date-time/date-time.utils';
 
 interface AppointmentRow {
   appointmentId: string;
@@ -44,6 +47,8 @@ interface ClinicRow {
     MatInputModule,
     MatButtonModule,
     MatProgressSpinnerModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
     TranslateModule
   ],
   templateUrl: './view-all-appointments.component.html',
@@ -57,6 +62,8 @@ export class ViewAllAppointmentsComponent implements OnInit {
   selectedStatus = 'all';
   dateFrom = '';
   dateTo = '';
+  dateFromInput: Date | null = null;
+  dateToInput: Date | null = null;
   readonly statusFilterOptions = [
     { value: 'all', label: 'common.allStatuses' },
     { value: 'Scheduled', label: 'statuses.onSchedule' },
@@ -98,10 +105,10 @@ export class ViewAllAppointmentsComponent implements OnInit {
   }
 
   get todayCount(): number {
-    const todayKey = this.toDateKey(new Date());
+    const todayKey = toDateKey(new Date());
     return this.appointments.filter(appointment =>
       this.normalizeLifecycleStatus(appointment.status) === 'scheduled' &&
-      this.toDateKey(new Date(appointment.appointmentDateTime)) === todayKey).length;
+      toDateKey(new Date(appointment.appointmentDateTime)) === todayKey).length;
   }
 
   get upcomingCount(): number {
@@ -127,9 +134,9 @@ export class ViewAllAppointmentsComponent implements OnInit {
     this.loadAppointments();
   }
 
-  applyDateFilters(dateFrom: string, dateTo: string): void {
-    this.dateFrom = dateFrom;
-    this.dateTo = dateTo;
+  applyDateFilters(): void {
+    this.dateFrom = toIsoDate(this.dateFromInput) ?? '';
+    this.dateTo = toIsoDate(this.dateToInput) ?? '';
     this.loadAppointments();
   }
 
@@ -138,6 +145,8 @@ export class ViewAllAppointmentsComponent implements OnInit {
     this.selectedStatus = 'all';
     this.dateFrom = '';
     this.dateTo = '';
+    this.dateFromInput = null;
+    this.dateToInput = null;
     this.loadAppointments();
   }
 
@@ -270,12 +279,5 @@ export class ViewAllAppointmentsComponent implements OnInit {
     anchor.download = fileName;
     anchor.click();
     window.URL.revokeObjectURL(objectUrl);
-  }
-
-  private toDateKey(date: Date): string {
-    const y = date.getFullYear();
-    const m = String(date.getMonth() + 1).padStart(2, '0');
-    const d = String(date.getDate()).padStart(2, '0');
-    return `${y}-${m}-${d}`;
   }
 }

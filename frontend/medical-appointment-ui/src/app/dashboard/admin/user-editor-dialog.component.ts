@@ -11,6 +11,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatTabsModule } from '@angular/material/tabs';
 import { TranslateModule } from '@ngx-translate/core';
 import { ClinicSummary, RoleSummary, UserSummary } from '../dashboard.models';
+import { parseIsoDate, toIsoDate } from '../../core/date-time/date-time.utils';
 
 export interface CreateUserDialogPayload {
   username: string;
@@ -20,6 +21,7 @@ export interface CreateUserDialogPayload {
   lastName: string;
   personalIdentifier: string;
   address: string;
+  phoneNumber?: string | null;
   birthDate: string;
   roleName: string;
   clinicId: string;
@@ -32,6 +34,7 @@ export interface EditUserDialogPayload {
   lastName: string;
   personalIdentifier: string;
   address: string;
+  phoneNumber?: string | null;
   birthDate: string;
   clinicId: string;
 }
@@ -88,7 +91,8 @@ export class UserEditorDialogComponent {
       lastName: ['', Validators.required],
       personalIdentifier: ['', Validators.required],
       birthDate: [null, Validators.required],
-      address: ['']
+      address: [''],
+      phoneNumber: ['']
     });
 
     if (this.isEditMode && data.user) {
@@ -100,8 +104,9 @@ export class UserEditorDialogComponent {
         firstName: data.user.firstName,
         lastName: data.user.lastName,
         personalIdentifier: data.user.personalIdentifier,
-        birthDate: this.parseIsoDate(data.user.birthDate),
-        address: data.user.address
+        birthDate: parseIsoDate(data.user.birthDate),
+        address: data.user.address,
+        phoneNumber: data.user.phoneNumber ?? ''
       });
 
       this.form.get('password')?.clearValidators();
@@ -139,7 +144,7 @@ export class UserEditorDialogComponent {
     }
 
     const raw = this.form.getRawValue();
-    const birthDate = this.toIsoDate(raw.birthDate);
+    const birthDate = toIsoDate(raw.birthDate);
     if (!birthDate)
     {
       this.form.get('birthDate')?.setErrors({ invalidDate: true });
@@ -154,6 +159,7 @@ export class UserEditorDialogComponent {
         lastName: raw.lastName,
         personalIdentifier: raw.personalIdentifier,
         address: raw.address || '',
+        phoneNumber: raw.phoneNumber || null,
         birthDate,
         clinicId: raw.clinicId
       };
@@ -170,60 +176,12 @@ export class UserEditorDialogComponent {
       lastName: raw.lastName,
       personalIdentifier: raw.personalIdentifier,
       address: raw.address || '',
+      phoneNumber: raw.phoneNumber || null,
       birthDate,
       roleName: raw.roleName,
       clinicId: raw.clinicId
     };
 
     this.dialogRef.close({ mode: 'create', payload });
-  }
-
-  private parseIsoDate(value: string | null | undefined): Date | null {
-    if (!value) {
-      return null;
-    }
-
-    const parsed = new Date(value);
-    if (Number.isNaN(parsed.getTime())) {
-      return null;
-    }
-
-    return parsed;
-  }
-
-  private toIsoDate(value: unknown): string | null {
-    if (!value) {
-      return null;
-    }
-
-    if (value instanceof Date) {
-      if (Number.isNaN(value.getTime())) {
-        return null;
-      }
-
-      const year = value.getFullYear();
-      const month = String(value.getMonth() + 1).padStart(2, '0');
-      const day = String(value.getDate()).padStart(2, '0');
-      return `${year}-${month}-${day}`;
-    }
-
-    const raw = String(value).trim();
-    if (!raw) {
-      return null;
-    }
-
-    if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
-      return raw;
-    }
-
-    const parsed = new Date(raw);
-    if (Number.isNaN(parsed.getTime())) {
-      return null;
-    }
-
-    const year = parsed.getFullYear();
-    const month = String(parsed.getMonth() + 1).padStart(2, '0');
-    const day = String(parsed.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
   }
 }

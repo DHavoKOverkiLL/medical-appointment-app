@@ -7,9 +7,12 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 import { TranslateModule } from '@ngx-translate/core';
 import { DashboardApiService } from '../dashboard-api.service';
 import { UserSummary } from '../dashboard.models';
+import { parseIsoDate, toIsoDate } from '../../core/date-time/date-time.utils';
 
 @Component({
   selector: 'app-patient-profile',
@@ -23,6 +26,8 @@ import { UserSummary } from '../dashboard.models';
     MatInputModule,
     MatButtonModule,
     MatProgressSpinnerModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
     TranslateModule
   ],
   templateUrl: './patient-profile.component.html',
@@ -41,8 +46,9 @@ export class PatientProfileComponent implements OnInit {
     this.profileForm = this.fb.group({
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
-      birthDate: ['', Validators.required],
-      address: ['']
+      birthDate: [null, Validators.required],
+      address: [''],
+      phoneNumber: ['']
     });
   }
 
@@ -83,14 +89,29 @@ export class PatientProfileComponent implements OnInit {
     this.errorMessage = '';
     this.successMessage = '';
 
-    this.dashboardApi.updateMyProfile(this.profileForm.value).subscribe({
+    const value = this.profileForm.value;
+    const birthDate = toIsoDate(value.birthDate);
+    if (!birthDate) {
+      this.profileForm.controls['birthDate'].setErrors({ invalidDate: true });
+      this.saving = false;
+      return;
+    }
+
+    this.dashboardApi.updateMyProfile({
+      firstName: value.firstName,
+      lastName: value.lastName,
+      address: value.address || '',
+      phoneNumber: value.phoneNumber || null,
+      birthDate
+    }).subscribe({
       next: updated => {
         this.me = updated;
         this.profileForm.patchValue({
           firstName: updated.firstName,
           lastName: updated.lastName,
-          birthDate: updated.birthDate ? updated.birthDate.slice(0, 10) : '',
-          address: updated.address || ''
+          birthDate: parseIsoDate(updated.birthDate),
+          address: updated.address || '',
+          phoneNumber: updated.phoneNumber || ''
         });
         this.successMessage = 'profile.messages.updated';
         this.saving = false;
@@ -112,8 +133,9 @@ export class PatientProfileComponent implements OnInit {
         this.profileForm.patchValue({
           firstName: me.firstName,
           lastName: me.lastName,
-          birthDate: me.birthDate ? me.birthDate.slice(0, 10) : '',
-          address: me.address || ''
+          birthDate: parseIsoDate(me.birthDate),
+          address: me.address || '',
+          phoneNumber: me.phoneNumber || ''
         });
         this.loading = false;
       },

@@ -13,6 +13,10 @@ frontend/medical-appointment-ui/node_modules/
 frontend/medical-appointment-ui/dist/
 frontend/medical-appointment-ui/.angular/
 frontend/medical-appointment-ui/test-results/
+frontend/medical-appointment-ui/coverage/
+
+# Test outputs
+backend/MedicalAppointment.Api/TestResults/
 
 # Temporary/debug scripts and accidental files
 frontend/medical-appointment-ui/tmp-*.js

@@ -7,9 +7,12 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 import { CommonModule } from '@angular/common';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { API_BASE_URL } from '../../core/api.config';
+import { toIsoDate } from '../../core/date-time/date-time.utils';
 
 interface RegisterPayload {
   username: string;
@@ -19,6 +22,7 @@ interface RegisterPayload {
   lastName: string;
   personalIdentifier: string;
   address: string;
+  phoneNumber?: string | null;
   birthDate: string;
   clinicId: string;
 }
@@ -42,6 +46,8 @@ interface ClinicOption {
     MatButtonModule,
     MatSelectModule,
     MatProgressSpinnerModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
     TranslateModule
   ],
   templateUrl: './register.component.html',
@@ -50,7 +56,7 @@ interface ClinicOption {
 export class RegisterComponent implements OnInit {
   registerForm: FormGroup;
   clinics: ClinicOption[] = [];
-  loadingClinics = false;
+  loadingClinics = true;
   isSubmitting = false;
   errorMessage = '';
   private readonly clinicsEndpoint = `${API_BASE_URL}/api/Clinic/public`;
@@ -70,8 +76,9 @@ export class RegisterComponent implements OnInit {
       lastName: ['', Validators.required],
       personalIdentifier: ['', Validators.required],
       address: [''],
-      birthDate: ['', Validators.required],
-      clinicId: ['', Validators.required]
+      phoneNumber: [''],
+      birthDate: [null, Validators.required],
+      clinicId: [{ value: '', disabled: true }, Validators.required]
     });
   }
 
@@ -85,6 +92,13 @@ export class RegisterComponent implements OnInit {
     this.isSubmitting = true;
 
     const value = this.registerForm.value;
+    const birthDate = toIsoDate(value.birthDate);
+    if (!birthDate) {
+      this.registerForm.controls['birthDate'].setErrors({ invalidDate: true });
+      this.isSubmitting = false;
+      return;
+    }
+
     const payload: RegisterPayload = {
       username: value.username,
       email: value.email,
@@ -93,7 +107,8 @@ export class RegisterComponent implements OnInit {
       lastName: value.lastName,
       personalIdentifier: value.personalIdentifier,
       address: value.address || '',
-      birthDate: value.birthDate,
+      phoneNumber: value.phoneNumber || null,
+      birthDate,
       clinicId: value.clinicId
     };
 
@@ -111,6 +126,9 @@ export class RegisterComponent implements OnInit {
 
   private loadClinics(): void {
     this.loadingClinics = true;
+    const clinicControl = this.registerForm.get('clinicId');
+    clinicControl?.disable({ emitEvent: false });
+
     this.http.get<ClinicOption[]>(this.clinicsEndpoint).subscribe({
       next: clinics => {
         this.clinics = clinics;
@@ -120,10 +138,12 @@ export class RegisterComponent implements OnInit {
         }
 
         this.loadingClinics = false;
+        clinicControl?.enable({ emitEvent: false });
       },
       error: () => {
         this.errorMessage = this.translate.instant('auth.register.errors.loadClinics');
         this.loadingClinics = false;
+        clinicControl?.enable({ emitEvent: false });
       }
     });
   }
