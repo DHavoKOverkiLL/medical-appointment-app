@@ -65,6 +65,12 @@ public class ConfigurableTransactionalEmailSender : ITransactionalEmailSender
                 return new TransactionalEmailSendResult(TransactionalEmailSendStatus.Sent);
             }
 
+            if (provider == ReminderEmailProviders.Brevo)
+            {
+                await SendViaBrevoAsync(message, cancellationToken);
+                return new TransactionalEmailSendResult(TransactionalEmailSendStatus.Sent);
+            }
+
             return new TransactionalEmailSendResult(
                 TransactionalEmailSendStatus.Failed,
                 $"Unsupported email provider '{_settings.Provider}'.");
@@ -165,6 +171,73 @@ public class ConfigurableTransactionalEmailSender : ITransactionalEmailSender
             $"SendGrid transactional delivery failed with status {(int)response.StatusCode}: {responseBody}");
     }
 
+    private async Task SendViaBrevoAsync(TransactionalEmailMessage message, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(_settings.Brevo.ApiKey))
+        {
+            throw new InvalidOperationException("Brevo ApiKey must be configured for transactional emails.");
+        }
+
+        object payload;
+        if (message.TemplateId.HasValue && message.TemplateId.Value > 0)
+        {
+            payload = new
+            {
+                sender = new
+                {
+                    email = _settings.FromEmail,
+                    name = _settings.FromName
+                },
+                to = new[]
+                {
+                    new
+                    {
+                        email = message.RecipientEmail,
+                        name = message.RecipientDisplayName
+                    }
+                },
+                templateId = message.TemplateId.Value,
+                @params = message.TemplateParams ?? new Dictionary<string, object?>()
+            };
+        }
+        else
+        {
+            payload = new
+            {
+                sender = new
+                {
+                    email = _settings.FromEmail,
+                    name = _settings.FromName
+                },
+                to = new[]
+                {
+                    new
+                    {
+                        email = message.RecipientEmail,
+                        name = message.RecipientDisplayName
+                    }
+                },
+                subject = message.Subject,
+                textContent = message.Body
+            };
+        }
+
+        var request = new HttpRequestMessage(HttpMethod.Post, "https://api.brevo.com/v3/smtp/email");
+        request.Headers.TryAddWithoutValidation("api-key", _settings.Brevo.ApiKey);
+        request.Content = JsonContent.Create(payload);
+
+        var client = _httpClientFactory.CreateClient();
+        using var response = await client.SendAsync(request, cancellationToken);
+        if (response.IsSuccessStatusCode)
+        {
+            return;
+        }
+
+        var responseBody = await response.Content.ReadAsStringAsync(cancellationToken);
+        throw new InvalidOperationException(
+            $"Brevo transactional delivery failed with status {(int)response.StatusCode}: {responseBody}");
+    }
+
     private static string NormalizeProvider(string? provider)
     {
         var normalized = provider?.Trim();
@@ -181,6 +254,11 @@ public class ConfigurableTransactionalEmailSender : ITransactionalEmailSender
         if (normalized.Equals(ReminderEmailProviders.SendGrid, StringComparison.OrdinalIgnoreCase))
         {
             return ReminderEmailProviders.SendGrid;
+        }
+
+        if (normalized.Equals(ReminderEmailProviders.Brevo, StringComparison.OrdinalIgnoreCase))
+        {
+            return ReminderEmailProviders.Brevo;
         }
 
         if (normalized.Equals(ReminderEmailProviders.None, StringComparison.OrdinalIgnoreCase))

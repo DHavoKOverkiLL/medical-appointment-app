@@ -69,6 +69,24 @@ public sealed class ReminderProviderSendersTests
     }
 
     [Fact]
+    public void ConfigurableReminderEmailSender_ThrowsForMissingBrevoApiKey_WhenBrevoSelected()
+    {
+        var exception = Assert.Throws<InvalidOperationException>(() => CreateEmailSender(
+            settings: new ReminderEmailProviderSettings
+            {
+                Provider = ReminderEmailProviders.Brevo,
+                FromEmail = "no-reply@medio.test",
+                Brevo = new ReminderBrevoSettings
+                {
+                    ApiKey = string.Empty
+                }
+            },
+            reminderSettings: EnabledEmailSettings()));
+
+        Assert.Contains("Brevo:ApiKey", exception.Message);
+    }
+
+    [Fact]
     public void ConfigurableReminderEmailSender_ThrowsForMissingSmtpHost_WhenSmtpSelected()
     {
         var exception = Assert.Throws<InvalidOperationException>(() => CreateEmailSender(
@@ -169,6 +187,89 @@ public sealed class ReminderProviderSendersTests
 
         Assert.Contains("status 400", exception.Message);
         Assert.Contains("invalid payload", exception.Message);
+    }
+
+    [Fact]
+    public async Task ConfigurableReminderEmailSender_UsesBrevoProvider_WhenConfigured()
+    {
+        var handler = new CapturingHttpMessageHandler((_, _) => new HttpResponseMessage(HttpStatusCode.Created));
+        var factory = new CapturingHttpClientFactory(handler);
+        var sender = CreateEmailSender(
+            settings: BrevoEmailSettings(),
+            reminderSettings: EnabledEmailSettings(),
+            httpClientFactory: factory);
+
+        await sender.SendReminderAsync(BuildReminder());
+
+        var request = Assert.Single(handler.Requests);
+        Assert.Equal(HttpMethod.Post, request.Method);
+        Assert.Equal("https://api.brevo.com/v3/smtp/email", request.RequestUri);
+        Assert.Equal("application/json", request.ContentType);
+        Assert.Equal(1, factory.CreateClientCalls);
+
+        using var body = JsonDocument.Parse(request.Body);
+        Assert.Equal("Reminder title", body.RootElement.GetProperty("subject").GetString());
+        Assert.Equal(
+            "patient@medio.test",
+            body.RootElement.GetProperty("to")[0].GetProperty("email").GetString());
+        Assert.Equal(
+            "Appointment reminder body",
+            body.RootElement.GetProperty("textContent").GetString());
+    }
+
+    [Fact]
+    public async Task ConfigurableTransactionalEmailSender_UsesBrevoTemplate_WhenTemplateIdProvided()
+    {
+        var handler = new CapturingHttpMessageHandler((_, _) => new HttpResponseMessage(HttpStatusCode.Created));
+        var sender = CreateTransactionalSender(
+            settings: BrevoEmailSettings(),
+            httpClientFactory: new CapturingHttpClientFactory(handler));
+
+        var result = await sender.SendAsync(new TransactionalEmailMessage(
+            RecipientEmail: "patient@medio.test",
+            RecipientDisplayName: "Patient Test",
+            Subject: "ignored",
+            Body: "ignored",
+            TemplateId: 2,
+            TemplateParams: new Dictionary<string, object?>
+            {
+                ["code"] = "123456",
+                ["ttlMinutes"] = 10,
+                ["firstName"] = "John"
+            }));
+
+        Assert.Equal(TransactionalEmailSendStatus.Sent, result.Status);
+        var request = Assert.Single(handler.Requests);
+        Assert.Equal("https://api.brevo.com/v3/smtp/email", request.RequestUri);
+
+        using var body = JsonDocument.Parse(request.Body);
+        Assert.Equal(2, body.RootElement.GetProperty("templateId").GetInt32());
+        Assert.Equal("123456", body.RootElement.GetProperty("params").GetProperty("code").GetString());
+        Assert.False(body.RootElement.TryGetProperty("subject", out _));
+    }
+
+    [Fact]
+    public async Task ConfigurableTransactionalEmailSender_UsesBrevoTextPayload_WhenTemplateIdMissing()
+    {
+        var handler = new CapturingHttpMessageHandler((_, _) => new HttpResponseMessage(HttpStatusCode.Created));
+        var sender = CreateTransactionalSender(
+            settings: BrevoEmailSettings(),
+            httpClientFactory: new CapturingHttpClientFactory(handler));
+
+        var result = await sender.SendAsync(new TransactionalEmailMessage(
+            RecipientEmail: "patient@medio.test",
+            RecipientDisplayName: "Patient Test",
+            Subject: "Verify your Medio account",
+            Body: "Your verification code is 123456"));
+
+        Assert.Equal(TransactionalEmailSendStatus.Sent, result.Status);
+        var request = Assert.Single(handler.Requests);
+        Assert.Equal("https://api.brevo.com/v3/smtp/email", request.RequestUri);
+
+        using var body = JsonDocument.Parse(request.Body);
+        Assert.Equal("Verify your Medio account", body.RootElement.GetProperty("subject").GetString());
+        Assert.Equal("Your verification code is 123456", body.RootElement.GetProperty("textContent").GetString());
+        Assert.False(body.RootElement.TryGetProperty("templateId", out _));
     }
 
     [Fact]
@@ -380,6 +481,16 @@ public sealed class ReminderProviderSendersTests
             NullLogger<ConfigurableReminderEmailSender>.Instance);
     }
 
+    private static ConfigurableTransactionalEmailSender CreateTransactionalSender(
+        ReminderEmailProviderSettings settings,
+        IHttpClientFactory? httpClientFactory = null)
+    {
+        return new ConfigurableTransactionalEmailSender(
+            Options.Create(settings),
+            httpClientFactory ?? new CapturingHttpClientFactory(new CapturingHttpMessageHandler()),
+            NullLogger<ConfigurableTransactionalEmailSender>.Instance);
+    }
+
     private static ConfigurableReminderSmsSender CreateSmsSender(
         ReminderSmsProviderSettings settings,
         AppointmentReminderSettings reminderSettings,
@@ -428,6 +539,20 @@ public sealed class ReminderProviderSendersTests
             SendGrid = new ReminderSendGridSettings
             {
                 ApiKey = "SG.test"
+            }
+        };
+    }
+
+    private static ReminderEmailProviderSettings BrevoEmailSettings()
+    {
+        return new ReminderEmailProviderSettings
+        {
+            Provider = ReminderEmailProviders.Brevo,
+            FromEmail = "no-reply@medio.test",
+            FromName = "Medio",
+            Brevo = new ReminderBrevoSettings
+            {
+                ApiKey = "brevo-api-key"
             }
         };
     }

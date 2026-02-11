@@ -9,6 +9,7 @@ public class ReminderEmailProviderSettings
     public string FromName { get; set; } = "Medio";
     public ReminderSmtpSettings Smtp { get; set; } = new();
     public ReminderSendGridSettings SendGrid { get; set; } = new();
+    public ReminderBrevoSettings Brevo { get; set; } = new();
 }
 
 public class ReminderSmtpSettings
@@ -25,9 +26,15 @@ public class ReminderSendGridSettings
     public string ApiKey { get; set; } = string.Empty;
 }
 
+public class ReminderBrevoSettings
+{
+    public string ApiKey { get; set; } = string.Empty;
+}
+
 public static class ReminderEmailProviders
 {
     public const string None = "None";
     public const string Smtp = "Smtp";
     public const string SendGrid = "SendGrid";
+    public const string Brevo = "Brevo";
 }

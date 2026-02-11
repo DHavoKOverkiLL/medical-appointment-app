@@ -116,7 +116,7 @@ Relevant keys:
 - `AppointmentReminders:Channels:InAppEnabled`
 - `AppointmentReminders:Channels:EmailEnabled`
 - `AppointmentReminders:Channels:SmsEnabled`
-- `ReminderProviders:Email:Provider` (`Smtp`, `SendGrid`, `None`)
+- `ReminderProviders:Email:Provider` (`Smtp`, `SendGrid`, `Brevo`, `None`)
 - `ReminderProviders:Sms:Provider` (`Twilio`, `None`)
 
 If a reminder channel is enabled but provider credentials are incomplete, startup validation throws a configuration error.
@@ -150,6 +150,15 @@ dotnet user-secrets set "ReminderProviders:Email:FromName" "Medio"
 dotnet user-secrets set "ReminderProviders:Email:SendGrid:ApiKey" "SG.xxxxx"
 ```
 
+Example Brevo API:
+
+```powershell
+dotnet user-secrets set "ReminderProviders:Email:Provider" "Brevo"
+dotnet user-secrets set "ReminderProviders:Email:FromEmail" "no-reply@yourdomain.com"
+dotnet user-secrets set "ReminderProviders:Email:FromName" "Medio"
+dotnet user-secrets set "ReminderProviders:Email:Brevo:ApiKey" "xkeysib-xxxxxx"
+```
+
 ## Email Verification Configuration
 
 New user registration now requires email verification before login access is granted.
@@ -169,6 +178,9 @@ Configuration keys:
 - `EmailVerification:ResendCooldownSeconds`
 - `EmailVerification:MaxFailedAttemptsPerCode`
 - `EmailVerification:MaxSendsPerDay`
+- `EmailVerification:BrevoTemplateId`
+- `EmailVerification:TemplateAppUrl`
+- `EmailVerification:TemplateSupportEmail`
 - `EmailVerification:HashKey`
 
 `EmailVerification:HashKey` should be set to a long random secret in user-secrets or env vars. If omitted, the API falls back to `Jwt:Key`.
@@ -183,17 +195,19 @@ $secret = -join ((1..64) | ForEach-Object { '{0:x}' -f (Get-Random -Maximum 16) 
 dotnet user-secrets set "EmailVerification:HashKey" $secret
 
 # Configure transactional email sender for verification emails
-dotnet user-secrets set "ReminderProviders:Email:Provider" "Smtp"
+dotnet user-secrets set "ReminderProviders:Email:Provider" "Brevo"
 dotnet user-secrets set "ReminderProviders:Email:FromEmail" "no-reply@yourdomain.com"
 dotnet user-secrets set "ReminderProviders:Email:FromName" "Medio"
-dotnet user-secrets set "ReminderProviders:Email:Smtp:Host" "smtp-relay.brevo.com"
-dotnet user-secrets set "ReminderProviders:Email:Smtp:Port" "587"
-dotnet user-secrets set "ReminderProviders:Email:Smtp:EnableSsl" "true"
-dotnet user-secrets set "ReminderProviders:Email:Smtp:Username" "<your-smtp-login>"
-dotnet user-secrets set "ReminderProviders:Email:Smtp:Password" "<your-smtp-key>"
+dotnet user-secrets set "ReminderProviders:Email:Brevo:ApiKey" "<your-brevo-api-key>"
+
+# Optional Brevo transactional template integration
+dotnet user-secrets set "EmailVerification:BrevoTemplateId" "2"
+dotnet user-secrets set "EmailVerification:TemplateAppUrl" "http://localhost:4200/login"
+dotnet user-secrets set "EmailVerification:TemplateSupportEmail" "support@yourdomain.com"
 ```
 
-Note: verification emails use the same configured email provider as reminder emails.
+Note: verification emails use the same configured email provider as reminder emails.  
+If `EmailVerification:BrevoTemplateId` is set (>0) and provider is `Brevo`, verification emails are sent using Brevo `templateId` + dynamic params (`code`, `ttlMinutes`, `firstName`, `appUrl`, `supportEmail`, `year`).
 
 ## Running Tests
 

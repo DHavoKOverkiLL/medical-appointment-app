@@ -198,6 +198,8 @@ public class EmailVerificationService : IEmailVerificationService
     {
         var username = string.IsNullOrWhiteSpace(user.Username) ? "there" : user.Username.Trim();
         var ttlMinutes = GetCodeTtlMinutes();
+        var templateParams = BuildTemplateParams(user, code, ttlMinutes);
+        var templateId = GetBrevoTemplateId();
 
         var subject = "Verify your Medio account";
         var body =
@@ -206,7 +208,13 @@ public class EmailVerificationService : IEmailVerificationService
             $"This code expires in {ttlMinutes} minute(s) at {expiresAtUtc:yyyy-MM-dd HH:mm:ss} UTC.{Environment.NewLine}{Environment.NewLine}" +
             $"If you did not create this account, you can ignore this message.";
 
-        return new TransactionalEmailMessage(user.Email, user.Username, subject, body);
+        return new TransactionalEmailMessage(
+            user.Email,
+            user.Username,
+            subject,
+            body,
+            templateId,
+            templateParams);
     }
 
     private static string NormalizeTrigger(string trigger)
@@ -262,5 +270,44 @@ public class EmailVerificationService : IEmailVerificationService
     private int GetMaxSendsPerDay()
     {
         return Math.Clamp(_settings.MaxSendsPerDay, 1, 1000);
+    }
+
+    private int? GetBrevoTemplateId()
+    {
+        return _settings.BrevoTemplateId > 0 ? _settings.BrevoTemplateId : null;
+    }
+
+    private IReadOnlyDictionary<string, object?> BuildTemplateParams(User user, string code, int ttlMinutes)
+    {
+        var firstName = user.Person?.FirstName;
+        if (string.IsNullOrWhiteSpace(firstName))
+        {
+            firstName = user.Username;
+        }
+
+        if (string.IsNullOrWhiteSpace(firstName))
+        {
+            firstName = "there";
+        }
+
+        var parameters = new Dictionary<string, object?>(StringComparer.Ordinal)
+        {
+            ["code"] = code,
+            ["ttlMinutes"] = ttlMinutes,
+            ["firstName"] = firstName.Trim()
+        };
+
+        if (!string.IsNullOrWhiteSpace(_settings.TemplateAppUrl))
+        {
+            parameters["appUrl"] = _settings.TemplateAppUrl.Trim();
+        }
+
+        if (!string.IsNullOrWhiteSpace(_settings.TemplateSupportEmail))
+        {
+            parameters["supportEmail"] = _settings.TemplateSupportEmail.Trim();
+        }
+
+        parameters["year"] = DateTime.UtcNow.Year;
+        return parameters;
     }
 }

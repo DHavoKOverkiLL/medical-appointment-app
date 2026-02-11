@@ -4,4 +4,6 @@ public sealed record TransactionalEmailMessage(
     string RecipientEmail,
     string? RecipientDisplayName,
     string Subject,
-    string Body);
+    string Body,
+    int? TemplateId = null,
+    IReadOnlyDictionary<string, object?>? TemplateParams = null);

@@ -68,6 +68,12 @@ public class ConfigurableReminderEmailSender : IReminderEmailSender
             return;
         }
 
+        if (provider == ReminderEmailProviders.Brevo)
+        {
+            await SendViaBrevoAsync(reminder, cancellationToken);
+            return;
+        }
+
         throw new InvalidOperationException($"Unsupported email reminder provider '{_settings.Provider}'.");
     }
 
@@ -110,6 +116,12 @@ public class ConfigurableReminderEmailSender : IReminderEmailSender
         {
             throw new InvalidOperationException(
                 "ReminderProviders:Email:SendGrid:ApiKey is required when using SendGrid email provider.");
+        }
+
+        if (provider == ReminderEmailProviders.Brevo && string.IsNullOrWhiteSpace(_settings.Brevo.ApiKey))
+        {
+            throw new InvalidOperationException(
+                "ReminderProviders:Email:Brevo:ApiKey is required when using Brevo email provider.");
         }
     }
 
@@ -188,6 +200,43 @@ public class ConfigurableReminderEmailSender : IReminderEmailSender
             $"SendGrid reminder delivery failed with status {(int)response.StatusCode}: {responseBody}");
     }
 
+    private async Task SendViaBrevoAsync(AppointmentReminderDeliveryContext reminder, CancellationToken cancellationToken)
+    {
+        var payload = new
+        {
+            sender = new
+            {
+                email = _settings.FromEmail,
+                name = _settings.FromName
+            },
+            to = new[]
+            {
+                new
+                {
+                    email = reminder.RecipientEmail,
+                    name = reminder.RecipientDisplayName
+                }
+            },
+            subject = reminder.Title,
+            textContent = reminder.Message
+        };
+
+        var request = new HttpRequestMessage(HttpMethod.Post, "https://api.brevo.com/v3/smtp/email");
+        request.Headers.TryAddWithoutValidation("api-key", _settings.Brevo.ApiKey);
+        request.Content = JsonContent.Create(payload);
+
+        var client = _httpClientFactory.CreateClient();
+        using var response = await client.SendAsync(request, cancellationToken);
+        if (response.IsSuccessStatusCode)
+        {
+            return;
+        }
+
+        var responseBody = await response.Content.ReadAsStringAsync(cancellationToken);
+        throw new InvalidOperationException(
+            $"Brevo reminder delivery failed with status {(int)response.StatusCode}: {responseBody}");
+    }
+
     private static string NormalizeProvider(string? provider)
     {
         var normalized = provider?.Trim();
@@ -204,6 +253,11 @@ public class ConfigurableReminderEmailSender : IReminderEmailSender
         if (normalized.Equals(ReminderEmailProviders.SendGrid, StringComparison.OrdinalIgnoreCase))
         {
             return ReminderEmailProviders.SendGrid;
+        }
+
+        if (normalized.Equals(ReminderEmailProviders.Brevo, StringComparison.OrdinalIgnoreCase))
+        {
+            return ReminderEmailProviders.Brevo;
         }
 
         if (normalized.Equals(ReminderEmailProviders.None, StringComparison.OrdinalIgnoreCase))
