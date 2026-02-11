@@ -2,7 +2,7 @@ import { APP_INITIALIZER, ApplicationConfig, LOCALE_ID, provideZoneChangeDetecti
 import { provideRouter } from '@angular/router';
 import { importProvidersFrom } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
-import { MAT_DATE_LOCALE } from '@angular/material/core';
+import { MAT_DATE_LOCALE, provideNativeDateAdapter } from '@angular/material/core';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TokenInterceptor } from './auth/token.interceptor';
@@ -46,6 +46,7 @@ export const appConfig: ApplicationConfig = {
       deps: [I18nService],
       multi: true
     },
+    provideNativeDateAdapter(),
     { provide: LOCALE_ID, useValue: 'ro-RO' },
     { provide: MAT_DATE_LOCALE, useValue: 'ro-RO' }
   ]
