@@ -15,6 +15,13 @@ public sealed class ApiWebApplicationFactory : WebApplicationFactory<Program>
 {
     private readonly string _databaseName = $"MedicalAppointmentIntegrationTests-{Guid.NewGuid():N}";
 
+    static ApiWebApplicationFactory()
+    {
+        Environment.SetEnvironmentVariable("Jwt__Key", "integration-tests-super-secret-key-1234567890");
+        Environment.SetEnvironmentVariable("Jwt__Issuer", "integration-tests");
+        Environment.SetEnvironmentVariable("Jwt__Audience", "integration-tests");
+    }
+
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.ConfigureAppConfiguration((_, configBuilder) =>
