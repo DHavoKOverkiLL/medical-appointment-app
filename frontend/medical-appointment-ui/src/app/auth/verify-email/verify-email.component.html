@@ -1,0 +1,83 @@
+<div class="auth-shell auth-shell--verify">
+  <div class="auth-shell__shape auth-shell__shape--a" aria-hidden="true"></div>
+  <div class="auth-shell__shape auth-shell__shape--b" aria-hidden="true"></div>
+
+  <section class="auth-shell__hero" [attr.aria-label]="'auth.verify.heroAria' | translate">
+    <div class="auth-shell__brand-mark">M</div>
+    <p class="auth-shell__eyebrow">Medio Care Network</p>
+    <h1 class="auth-shell__title">{{ 'auth.verify.heroTitle' | translate }}</h1>
+    <p class="auth-shell__copy">{{ 'auth.verify.heroCopy' | translate }}</p>
+
+    <div class="auth-shell__highlights">
+      <article class="auth-shell__highlight">
+        <span class="auth-shell__metric">6-digit</span>
+        <span class="auth-shell__label">{{ 'auth.verify.highlights.code' | translate }}</span>
+      </article>
+      <article class="auth-shell__highlight">
+        <span class="auth-shell__metric">10 min</span>
+        <span class="auth-shell__label">{{ 'auth.verify.highlights.expiry' | translate }}</span>
+      </article>
+      <article class="auth-shell__highlight">
+        <span class="auth-shell__metric">Secure</span>
+        <span class="auth-shell__label">{{ 'auth.verify.highlights.gate' | translate }}</span>
+      </article>
+    </div>
+  </section>
+
+  <section class="auth-shell__panel" [attr.aria-label]="'auth.verify.formAria' | translate">
+    <div class="auth-shell__card">
+      <p class="auth-shell__kicker">{{ 'auth.verify.kicker' | translate }}</p>
+      <h2 class="auth-shell__heading">{{ 'auth.verify.heading' | translate }}</h2>
+      <p class="auth-shell__subtitle">{{ 'auth.verify.subtitle' | translate }}</p>
+
+      <form class="auth-shell__form" [formGroup]="verifyForm" (ngSubmit)="onSubmit()">
+        <mat-form-field appearance="outline" class="auth-shell__field">
+          <mat-label>{{ 'common.email' | translate }}</mat-label>
+          <input matInput formControlName="email" type="email" autocomplete="email" required />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="auth-shell__field">
+          <mat-label>{{ 'auth.verify.codeLabel' | translate }}</mat-label>
+          <input matInput formControlName="code" type="text" maxlength="16" autocomplete="one-time-code" required />
+        </mat-form-field>
+
+        <button mat-flat-button class="auth-shell__submit" type="submit" [disabled]="verifyForm.invalid || isSubmitting">
+          @if (isSubmitting) {
+            <mat-progress-spinner mode="indeterminate" diameter="18"></mat-progress-spinner>
+          }
+          <span>{{ (isSubmitting ? 'auth.verify.verifying' : 'auth.verify.submit') | translate }}</span>
+        </button>
+
+        <button
+          mat-stroked-button
+          class="auth-shell__submit"
+          type="button"
+          [disabled]="!verifyForm.get('email')?.valid || isResending"
+          (click)="onResend()"
+          >
+          @if (isResending) {
+            <mat-progress-spinner mode="indeterminate" diameter="18"></mat-progress-spinner>
+          }
+          <span>{{ (isResending ? 'auth.verify.resending' : 'auth.verify.resend') | translate }}</span>
+        </button>
+
+        @if (infoMessage) {
+          <div class="auth-shell__info" role="status">{{ infoMessage }}</div>
+        }
+
+        @if (successMessage) {
+          <div class="auth-shell__success" role="status">{{ successMessage }}</div>
+        }
+
+        @if (errorMessage) {
+          <div class="auth-shell__error" role="alert">{{ errorMessage }}</div>
+        }
+      </form>
+
+      <p class="auth-shell__footer">
+        {{ 'auth.verify.backToLogin' | translate }}
+        <a routerLink="/login">{{ 'auth.verify.signInNow' | translate }}</a>
+      </p>
+    </div>
+  </section>
+</div>

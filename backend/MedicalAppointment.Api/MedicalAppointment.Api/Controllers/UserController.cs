@@ -23,17 +23,20 @@ public class UserController : ControllerBase
 
     private readonly AppDbContext _context;
     private readonly IJwtTokenService _jwtTokenService;
+    private readonly IEmailVerificationService _emailVerificationService;
     private readonly ISystemInfoService _systemInfoService;
     private readonly JwtSettings _jwtSettings;
 
     public UserController(
         AppDbContext context,
         IJwtTokenService jwtTokenService,
+        IEmailVerificationService emailVerificationService,
         ISystemInfoService systemInfoService,
         JwtSettings jwtSettings)
     {
         _context = context;
         _jwtTokenService = jwtTokenService;
+        _emailVerificationService = emailVerificationService;
         _systemInfoService = systemInfoService;
         _jwtSettings = jwtSettings;
     }
@@ -149,13 +152,21 @@ public class UserController : ControllerBase
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
 
+        var verificationIssueResult = await _emailVerificationService.IssueCodeAsync(
+            user,
+            EmailVerificationTriggers.Registration,
+            HttpContext.RequestAborted);
+
         var response = new RegisterResponse
         {
             UserId = user.UserId,
             Email = user.Email,
             Role = SystemRoles.Patient,
             ClinicId = clinic.ClinicId,
-            ClinicName = clinic.Name
+            ClinicName = clinic.Name,
+            RequiresEmailVerification = true,
+            VerificationEmailSent = verificationIssueResult.Status == EmailVerificationIssueStatus.Sent,
+            VerificationCodeExpiresAtUtc = verificationIssueResult.ExpiresAtUtc
         };
 
         return StatusCode(StatusCodes.Status201Created, response);
@@ -438,6 +449,23 @@ public class UserController : ControllerBase
             await _context.SaveChangesAsync();
         }
 
+        if (!user.IsEmailVerified)
+        {
+            var verificationIssueResult = await _emailVerificationService.IssueCodeAsync(
+                user,
+                EmailVerificationTriggers.LoginUnverified,
+                HttpContext.RequestAborted);
+
+            var verificationMessage = BuildVerificationRequiredMessage(verificationIssueResult);
+            return StatusCode(StatusCodes.Status403Forbidden, new EmailVerificationRequiredResponse
+            {
+                Email = user.Email,
+                VerificationEmailSent = verificationIssueResult.Status == EmailVerificationIssueStatus.Sent,
+                NextAllowedAtUtc = verificationIssueResult.NextAllowedAtUtc,
+                Message = verificationMessage
+            });
+        }
+
         var normalizedRoleName = NormalizeRoleName(user.SysRole.Name);
         var (token, expiresAtUtc) = _jwtTokenService.CreateToken(user, normalizedRoleName);
         AppendAuthCookie(token, expiresAtUtc);
@@ -451,6 +479,112 @@ public class UserController : ControllerBase
             Role = normalizedRoleName,
             ClinicId = user.ClinicId,
             ClinicName = user.Clinic.Name
+        });
+    }
+
+    [HttpPost("verify-email")]
+    [AllowAnonymous]
+    [EnableRateLimiting("AuthEmailVerification")]
+    public async Task<IActionResult> VerifyEmail([FromBody] VerifyEmailRequest request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return ValidationProblem(ModelState);
+        }
+
+        var verificationResult = await _emailVerificationService.VerifyCodeAsync(
+            request.Email,
+            request.Code,
+            HttpContext.RequestAborted);
+
+        if (verificationResult.Status == EmailVerificationCheckStatus.Success)
+        {
+            return Ok(new VerifyEmailResponse
+            {
+                EmailVerified = true,
+                Message = "Email verified successfully. You can now log in."
+            });
+        }
+
+        if (verificationResult.Status == EmailVerificationCheckStatus.UserAlreadyVerified)
+        {
+            return Ok(new VerifyEmailResponse
+            {
+                EmailVerified = true,
+                Message = "Email is already verified."
+            });
+        }
+
+        if (verificationResult.Status == EmailVerificationCheckStatus.FeatureDisabled)
+        {
+            return StatusCode(StatusCodes.Status503ServiceUnavailable, new VerifyEmailResponse
+            {
+                EmailVerified = false,
+                Message = "Email verification is currently unavailable."
+            });
+        }
+
+        return BadRequest(new VerifyEmailResponse
+        {
+            EmailVerified = false,
+            Message = "Invalid or expired verification code."
+        });
+    }
+
+    [HttpPost("resend-verification-code")]
+    [AllowAnonymous]
+    [EnableRateLimiting("AuthVerificationResend")]
+    public async Task<IActionResult> ResendVerificationCode([FromBody] ResendEmailVerificationRequest request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return ValidationProblem(ModelState);
+        }
+
+        var normalizedEmail = NormalizeEmail(request.Email);
+        var user = await _context.Users.FirstOrDefaultAsync(
+            u => u.Email.ToLower() == normalizedEmail,
+            HttpContext.RequestAborted);
+
+        if (user == null || user.IsEmailVerified)
+        {
+            return Ok(new ResendEmailVerificationResponse
+            {
+                VerificationEmailSent = false,
+                Message = "If your account exists and requires verification, a code has been sent."
+            });
+        }
+
+        var issueResult = await _emailVerificationService.IssueCodeAsync(
+            user,
+            EmailVerificationTriggers.ManualResend,
+            HttpContext.RequestAborted);
+
+        if (issueResult.Status == EmailVerificationIssueStatus.CooldownActive ||
+            issueResult.Status == EmailVerificationIssueStatus.DailyLimitReached)
+        {
+            return StatusCode(StatusCodes.Status429TooManyRequests, new ResendEmailVerificationResponse
+            {
+                VerificationEmailSent = false,
+                NextAllowedAtUtc = issueResult.NextAllowedAtUtc,
+                Message = BuildResendMessage(issueResult)
+            });
+        }
+
+        if (issueResult.Status == EmailVerificationIssueStatus.FeatureDisabled)
+        {
+            return StatusCode(StatusCodes.Status503ServiceUnavailable, new ResendEmailVerificationResponse
+            {
+                VerificationEmailSent = false,
+                Message = BuildResendMessage(issueResult)
+            });
+        }
+
+        return Ok(new ResendEmailVerificationResponse
+        {
+            VerificationEmailSent = issueResult.Status == EmailVerificationIssueStatus.Sent,
+            NextAllowedAtUtc = issueResult.NextAllowedAtUtc,
+            Message = BuildResendMessage(issueResult)
         });
     }
 
@@ -681,6 +815,81 @@ public class UserController : ControllerBase
             user.Username,
             user.Email
         });
+    }
+
+    private static string BuildVerificationRequiredMessage(EmailVerificationIssueResult issueResult)
+    {
+        if (issueResult.Status == EmailVerificationIssueStatus.Sent)
+        {
+            return "Your account is not verified yet. A new verification code has been sent to your email.";
+        }
+
+        if (issueResult.Status == EmailVerificationIssueStatus.CooldownActive)
+        {
+            return "Your account is not verified yet. A code was sent recently. Try again after the cooldown period.";
+        }
+
+        if (issueResult.Status == EmailVerificationIssueStatus.DailyLimitReached)
+        {
+            return "Your account is not verified yet. Daily verification email limit reached. Try again later.";
+        }
+
+        if (issueResult.Status == EmailVerificationIssueStatus.DeliveryNotConfigured)
+        {
+            return "Your account is not verified yet. Verification email delivery is not configured. Contact support.";
+        }
+
+        if (issueResult.Status == EmailVerificationIssueStatus.DeliveryFailed)
+        {
+            return "Your account is not verified yet. We could not deliver the verification email right now. Try again shortly.";
+        }
+
+        if (issueResult.Status == EmailVerificationIssueStatus.FeatureDisabled)
+        {
+            return "Your account is not verified yet. Email verification is currently unavailable.";
+        }
+
+        return "Your account is not verified yet. Please verify your email to continue.";
+    }
+
+    private static string BuildResendMessage(EmailVerificationIssueResult issueResult)
+    {
+        if (issueResult.Status == EmailVerificationIssueStatus.Sent)
+        {
+            return "Verification code sent.";
+        }
+
+        if (issueResult.Status == EmailVerificationIssueStatus.CooldownActive)
+        {
+            return "Verification code was sent recently. Please wait before requesting another code.";
+        }
+
+        if (issueResult.Status == EmailVerificationIssueStatus.DailyLimitReached)
+        {
+            return "Daily verification email limit reached. Try again later.";
+        }
+
+        if (issueResult.Status == EmailVerificationIssueStatus.DeliveryNotConfigured)
+        {
+            return "Email delivery is not configured.";
+        }
+
+        if (issueResult.Status == EmailVerificationIssueStatus.DeliveryFailed)
+        {
+            return "Failed to send verification code. Try again later.";
+        }
+
+        if (issueResult.Status == EmailVerificationIssueStatus.FeatureDisabled)
+        {
+            return "Email verification is currently unavailable.";
+        }
+
+        if (issueResult.Status == EmailVerificationIssueStatus.UserAlreadyVerified)
+        {
+            return "Email is already verified.";
+        }
+
+        return "Unable to process resend request.";
     }
 
     private void AppendAuthCookie(string token, DateTime expiresAtUtc)

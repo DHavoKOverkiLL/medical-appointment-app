@@ -259,6 +259,45 @@
         "conflict": "Exista deja un cont cu acest email, nume utilizator sau identificator personal.",
         "failed": "Înregistrarea a eșuat. Verifică datele și încearcă din nou."
       }
+    },
+    "verify": {
+      "heroAria": "Instrucțiuni verificare email",
+      "heroTitle": "Verifică emailul pentru a activa contul.",
+      "heroCopy": "Introdu ultimul cod primit în inbox. Dacă este nevoie, cere un cod nou.",
+      "highlights": {
+        "code": "Cod unic",
+        "expiry": "Expirare cod",
+        "gate": "Protecție acces"
+      },
+      "formAria": "Formular verificare email",
+      "kicker": "Încă un pas",
+      "heading": "Confirmă adresa de email",
+      "subtitle": "Folosește ultimul cod de verificare primit.",
+      "codeLabel": "Cod verificare",
+      "submit": "Verifică contul",
+      "verifying": "Se verifică...",
+      "resend": "Retrimite codul",
+      "resending": "Se retrimite...",
+      "backToLogin": "Ai verificat deja?",
+      "signInNow": "Autentifică-te acum",
+      "messages": {
+        "registerCodeSent": "Contul a fost creat. Verifică emailul pentru codul de activare.",
+        "registerCheckSupport": "Contul a fost creat, dar emailul de verificare nu a putut fi trimis. Încearcă din nou sau contactează suportul.",
+        "loginCodeSent": "Contul nu este verificat încă. A fost trimis un cod nou.",
+        "loginCodePending": "Contul nu este verificat încă. Așteaptă puțin și apoi cere un cod nou.",
+        "nextRetryAt": "Încearcă din nou după {{dateTime}}.",
+        "verified": "Email verificat cu succes. Te poți autentifica acum.",
+        "redirectingToLogin": "Redirecționare către autentificare în {{seconds}} secunde.",
+        "codeResent": "Un cod nou de verificare a fost trimis."
+      },
+      "errors": {
+        "emailRequiredForResend": "Introdu un email valid înainte de retrimitere.",
+        "invalidOrExpired": "Cod de verificare invalid sau expirat.",
+        "featureUnavailable": "Verificarea prin email nu este disponibilă momentan.",
+        "resendThrottled": "Așteaptă înainte de a solicita un cod nou.",
+        "resendFailed": "Codul nu a putut fi retrimis.",
+        "failed": "Verificarea a eșuat. Încearcă din nou."
+      }
     }
   },
   "profile": {

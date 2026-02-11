@@ -2,9 +2,11 @@ using System.Net;
 using System.Net.Http.Json;
 using MedicalAppointment.Api.Contracts.Auth;
 using MedicalAppointment.Api.IntegrationTests.Infrastructure;
+using MedicalAppointment.Api.Services;
 using MedicalAppointment.Domain.Constants;
 using MedicalAppointment.Domain.Models;
 using MedicalAppointment.Infrastructure;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -12,6 +14,7 @@ namespace MedicalAppointment.Api.IntegrationTests;
 
 public sealed class UserControllerIntegrationTests : IClassFixture<ApiWebApplicationFactory>
 {
+    private const string IntegrationJwtKey = "integration-tests-super-secret-key-1234567890";
     private readonly ApiWebApplicationFactory _factory;
 
     public UserControllerIntegrationTests(ApiWebApplicationFactory factory)
@@ -74,6 +77,13 @@ public sealed class UserControllerIntegrationTests : IClassFixture<ApiWebApplica
         Assert.Equal("Main Street", user.Person.Address);
         Assert.Equal("+15551234567", user.Person.PhoneNumber);
         Assert.Equal(SystemRoles.Patient, user.SysRole?.Name);
+        Assert.False(user.IsEmailVerified);
+        Assert.Null(user.EmailVerifiedAtUtc);
+
+        var verificationCode = await db.UserEmailVerificationCodes.SingleAsync(c => c.UserId == user.UserId);
+        Assert.Null(verificationCode.ConsumedAtUtc);
+        Assert.True(verificationCode.ExpiresAtUtc > verificationCode.CreatedAtUtc);
+        Assert.Equal(EmailVerificationTriggers.Registration, verificationCode.Trigger);
     }
 
     [Fact]
@@ -117,6 +127,124 @@ public sealed class UserControllerIntegrationTests : IClassFixture<ApiWebApplica
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         Assert.Equal(0, await db.Users.CountAsync());
         Assert.Equal(0, await db.Persons.CountAsync());
+    }
+
+    [Fact]
+    public async Task Login_ReturnsForbiddenAndIssuesVerificationCode_WhenUserEmailIsNotVerified()
+    {
+        var clinicId = Guid.NewGuid();
+        var patientRoleId = Guid.NewGuid();
+        var personId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
+        const string password = "Passw0rd!";
+
+        await _factory.ResetDatabaseAsync(async db =>
+        {
+            AddRequiredSystemLookups(db);
+            db.SysRoles.Add(new SysRole
+            {
+                SysRoleId = patientRoleId,
+                Name = SystemRoles.Patient,
+                Description = "Patient",
+                IsActive = true
+            });
+
+            db.Clinics.Add(CreateClinic(clinicId, "Login Clinic"));
+            db.Persons.Add(CreatePerson(personId, "Login", "User", "LOGIN001"));
+
+            var user = CreateUser(userId, patientRoleId, clinicId, personId, "login_user");
+            user.IsEmailVerified = false;
+            user.PasswordHash = new PasswordHasher<User>().HashPassword(user, password);
+            db.Users.Add(user);
+
+            await Task.CompletedTask;
+        });
+
+        using var client = _factory.CreateClient();
+        var response = await client.PostAsJsonAsync("/api/User/login", new LoginRequest
+        {
+            Email = $"login_user_{userId.ToString("N")[..8]}@example.com",
+            Password = password
+        });
+
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        var payload = await response.Content.ReadFromJsonAsync<EmailVerificationRequiredResponse>();
+        Assert.NotNull(payload);
+        Assert.True(payload!.RequiresEmailVerification);
+        Assert.Equal($"login_user_{userId.ToString("N")[..8]}@example.com", payload.Email);
+
+        await using var scope = _factory.Services.CreateAsyncScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var issuedCode = await db.UserEmailVerificationCodes
+            .OrderByDescending(c => c.CreatedAtUtc)
+            .FirstOrDefaultAsync(c => c.UserId == userId);
+
+        Assert.NotNull(issuedCode);
+        Assert.Equal(EmailVerificationTriggers.LoginUnverified, issuedCode!.Trigger);
+    }
+
+    [Fact]
+    public async Task VerifyEmail_MarksAccountVerified_WhenCodeIsValid()
+    {
+        var clinicId = Guid.NewGuid();
+        var patientRoleId = Guid.NewGuid();
+        var personId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
+        const string code = "123456";
+        var email = $"verify_{userId.ToString("N")[..8]}@example.com";
+
+        await _factory.ResetDatabaseAsync(async db =>
+        {
+            AddRequiredSystemLookups(db);
+            db.SysRoles.Add(new SysRole
+            {
+                SysRoleId = patientRoleId,
+                Name = SystemRoles.Patient,
+                Description = "Patient",
+                IsActive = true
+            });
+
+            db.Clinics.Add(CreateClinic(clinicId, "Verify Clinic"));
+            db.Persons.Add(CreatePerson(personId, "Verify", "User", "VERIFY001"));
+
+            var user = CreateUser(userId, patientRoleId, clinicId, personId, "verify_user");
+            user.Email = email;
+            user.IsEmailVerified = false;
+            db.Users.Add(user);
+
+            db.UserEmailVerificationCodes.Add(new UserEmailVerificationCode
+            {
+                UserEmailVerificationCodeId = Guid.NewGuid(),
+                UserId = userId,
+                CodeHash = EmailVerificationCodeHasher.ComputeHash(userId, code, IntegrationJwtKey),
+                CreatedAtUtc = DateTime.UtcNow,
+                ExpiresAtUtc = DateTime.UtcNow.AddMinutes(10),
+                Trigger = EmailVerificationTriggers.Registration
+            });
+
+            await Task.CompletedTask;
+        });
+
+        using var client = _factory.CreateClient();
+        var response = await client.PostAsJsonAsync("/api/User/verify-email", new VerifyEmailRequest
+        {
+            Email = email,
+            Code = code
+        });
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var payload = await response.Content.ReadFromJsonAsync<VerifyEmailResponse>();
+        Assert.NotNull(payload);
+        Assert.True(payload!.EmailVerified);
+
+        await using var scope = _factory.Services.CreateAsyncScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var user = await db.Users.SingleAsync(u => u.UserId == userId);
+        var verificationCode = await db.UserEmailVerificationCodes.SingleAsync(c => c.UserId == userId);
+
+        Assert.True(user.IsEmailVerified);
+        Assert.NotNull(user.EmailVerifiedAtUtc);
+        Assert.NotNull(verificationCode.ConsumedAtUtc);
     }
 
     [Fact]

@@ -26,7 +26,7 @@ describe('LoginComponent', () => {
           useValue: {
             snapshot: {
               queryParamMap: {
-                get: () => null
+                get: (key: string) => (key === 'email' ? 'TeSt.User@Example.com' : null)
               }
             }
           }
@@ -42,5 +42,9 @@ describe('LoginComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should prefill email from query params on init', () => {
+    expect(component.loginForm.get('email')?.value).toBe('test.user@example.com');
   });
 });

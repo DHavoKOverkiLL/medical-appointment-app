@@ -26,6 +26,7 @@ public class AppDbContext : DbContext
     public DbSet<DoctorAvailabilityOverride> DoctorAvailabilityOverrides { get; set; }
     public DbSet<Appointment> Appointments { get; set; }
     public DbSet<UserNotification> UserNotifications { get; set; }
+    public DbSet<UserEmailVerificationCode> UserEmailVerificationCodes { get; set; }
     public DbSet<AppointmentAuditEvent> AppointmentAuditEvents { get; set; }
     public DbSet<AppointmentReminderDispatch> AppointmentReminderDispatches { get; set; }
 
@@ -60,6 +61,16 @@ public class AppDbContext : DbContext
             .HasMaxLength(256);
 
         modelBuilder.Entity<User>()
+            .Property(u => u.IsEmailVerified)
+            .HasDefaultValue(false);
+
+        modelBuilder.Entity<User>()
+            .Property(u => u.EmailVerifiedAtUtc);
+
+        modelBuilder.Entity<User>()
+            .Property(u => u.VerificationEmailLastSentAtUtc);
+
+        modelBuilder.Entity<User>()
             .Property(u => u.FailedLoginAttempts)
             .HasDefaultValue(0);
 
@@ -72,6 +83,9 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<User>()
             .HasIndex(u => u.Email)
             .IsUnique();
+
+        modelBuilder.Entity<User>()
+            .HasIndex(u => u.IsEmailVerified);
 
         modelBuilder.Entity<User>()
             .HasIndex(u => u.ClinicId);
@@ -162,6 +176,25 @@ public class AppDbContext : DbContext
             .WithMany(r => r.Users)
             .HasForeignKey(u => u.SysRoleId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<UserEmailVerificationCode>(entity =>
+        {
+            entity.HasKey(c => c.UserEmailVerificationCodeId);
+            entity.Property(c => c.UserEmailVerificationCodeId).HasDefaultValueSql("NEWID()");
+            entity.Property(c => c.CodeHash).IsRequired().HasMaxLength(128);
+            entity.Property(c => c.Trigger).IsRequired().HasMaxLength(64).HasDefaultValue(string.Empty);
+            entity.Property(c => c.CreatedAtUtc).HasDefaultValueSql("GETUTCDATE()");
+            entity.Property(c => c.AttemptCount).HasDefaultValue(0);
+
+            entity.HasIndex(c => c.UserId);
+            entity.HasIndex(c => new { c.UserId, c.ConsumedAtUtc, c.ExpiresAtUtc });
+            entity.HasIndex(c => c.CreatedAtUtc);
+
+            entity.HasOne(c => c.User)
+                .WithMany()
+                .HasForeignKey(c => c.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
 
         modelBuilder.Entity<Clinic>(entity =>
         {

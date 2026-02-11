@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 import {
   ReactiveFormsModule,
@@ -15,6 +15,7 @@ import { ActivatedRoute, RouterModule } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AuthService } from '../auth.service';
 import { Router } from '@angular/router';
+import { EmailVerificationRequiredResponse } from '../../models/auth.models';
 
 @Component({
   selector: 'app-login',
@@ -31,7 +32,7 @@ import { Router } from '@angular/router';
   templateUrl: './login.component.html',
   styles: [':host { display: block; }'],
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   loginForm: FormGroup;
   errorMessage = '';
   isSubmitting = false;
@@ -49,6 +50,13 @@ export class LoginComponent {
     });
   }
 
+  ngOnInit(): void {
+    const emailFromQuery = this.route.snapshot.queryParamMap.get('email')?.trim();
+    if (emailFromQuery) {
+      this.loginForm.patchValue({ email: emailFromQuery.toLowerCase() });
+    }
+  }
+
   onSubmit(): void {
     if (this.loginForm.invalid) return;
 
@@ -62,6 +70,11 @@ export class LoginComponent {
         this.router.navigateByUrl(returnUrl);
       },
       error: err => {
+        if (this.handleVerificationRequired(err)) {
+          this.isSubmitting = false;
+          return;
+        }
+
         this.errorMessage = this.getLoginErrorMessage(err);
         this.isSubmitting = false;
       }
@@ -82,5 +95,48 @@ export class LoginComponent {
     }
 
     return error.error?.title || error.error?.message || this.translate.instant('auth.login.errors.failed');
+  }
+
+  private handleVerificationRequired(error: HttpErrorResponse): boolean {
+    if (error.status !== 403) {
+      return false;
+    }
+
+    const payload = this.parseVerificationPayload(error.error);
+    if (!payload) {
+      return false;
+    }
+
+    const queryParams: Record<string, string> = {
+      email: payload.email.trim().toLowerCase(),
+      source: 'login',
+      sent: payload.verificationEmailSent ? '1' : '0'
+    };
+
+    if (payload.nextAllowedAtUtc) {
+      queryParams['nextAllowedAtUtc'] = payload.nextAllowedAtUtc;
+    }
+
+    this.router.navigate(['/verify-email'], { queryParams });
+    return true;
+  }
+
+  private parseVerificationPayload(payload: unknown): EmailVerificationRequiredResponse | null {
+    if (!payload || typeof payload !== 'object') {
+      return null;
+    }
+
+    const candidate = payload as Partial<EmailVerificationRequiredResponse>;
+    if (candidate.requiresEmailVerification !== true || typeof candidate.email !== 'string') {
+      return null;
+    }
+
+    return {
+      requiresEmailVerification: true,
+      email: candidate.email,
+      verificationEmailSent: candidate.verificationEmailSent === true,
+      nextAllowedAtUtc: typeof candidate.nextAllowedAtUtc === 'string' ? candidate.nextAllowedAtUtc : null,
+      message: typeof candidate.message === 'string' ? candidate.message : undefined
+    };
   }
 }

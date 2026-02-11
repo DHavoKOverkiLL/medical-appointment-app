@@ -13,6 +13,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { API_BASE_URL } from '../../core/api.config';
 import { toIsoDate } from '../../core/date-time/date-time.utils';
+import { RegisterResponse } from '../../models/auth.models';
 
 interface RegisterPayload {
   username: string;
@@ -111,10 +112,22 @@ export class RegisterComponent implements OnInit {
       clinicId: value.clinicId
     };
 
-    this.http.post(this.registerEndpoint, payload).subscribe({
-      next: () => {
+    this.http.post<RegisterResponse>(this.registerEndpoint, payload).subscribe({
+      next: response => {
         this.isSubmitting = false;
-        this.router.navigate(['/login']);
+        if (response.requiresEmailVerification === false) {
+          this.router.navigate(['/login']);
+          return;
+        }
+
+        const normalizedEmail = (response.email || payload.email).trim().toLowerCase();
+        this.router.navigate(['/verify-email'], {
+          queryParams: {
+            email: normalizedEmail,
+            source: 'register',
+            sent: response.verificationEmailSent ? '1' : '0'
+          }
+        });
       },
       error: err => {
         this.errorMessage = this.getRegisterErrorMessage(err);

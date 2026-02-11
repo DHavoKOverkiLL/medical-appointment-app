@@ -1,7 +1,14 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { tap } from 'rxjs/operators';
-import { LoginRequest, LoginResponse } from '../models/auth.models';
+import {
+  LoginRequest,
+  LoginResponse,
+  ResendEmailVerificationRequest,
+  ResendEmailVerificationResponse,
+  VerifyEmailRequest,
+  VerifyEmailResponse
+} from '../models/auth.models';
 import { API_BASE_URL } from '../core/api.config';
 
 interface AuthSession {
@@ -37,6 +44,16 @@ export class AuthService {
         });
       })
     );
+  }
+
+  verifyEmail(payload: VerifyEmailRequest) {
+    return this.http.post<VerifyEmailResponse>(`${this.apiUrl}/verify-email`, payload, { withCredentials: true });
+  }
+
+  resendVerificationCode(payload: ResendEmailVerificationRequest) {
+    return this.http.post<ResendEmailVerificationResponse>(`${this.apiUrl}/resend-verification-code`, payload, {
+      withCredentials: true
+    });
   }
 
   isLoggedIn(): boolean {

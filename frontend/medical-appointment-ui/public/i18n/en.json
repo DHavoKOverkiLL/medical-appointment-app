@@ -259,6 +259,45 @@
         "conflict": "An account with this email, username, or personal identifier already exists.",
         "failed": "Registration failed. Please review your details and try again."
       }
+    },
+    "verify": {
+      "heroAria": "Email verification instructions",
+      "heroTitle": "Verify your email to activate your account.",
+      "heroCopy": "Enter the latest code from your inbox. If needed, request a new code.",
+      "highlights": {
+        "code": "One-time code",
+        "expiry": "Code expiry",
+        "gate": "Access protection"
+      },
+      "formAria": "Email verification form",
+      "kicker": "One more step",
+      "heading": "Confirm your email address",
+      "subtitle": "Use the latest verification code sent to you.",
+      "codeLabel": "Verification code",
+      "submit": "Verify account",
+      "verifying": "Verifying...",
+      "resend": "Resend code",
+      "resending": "Resending...",
+      "backToLogin": "Already verified?",
+      "signInNow": "Sign in now",
+      "messages": {
+        "registerCodeSent": "Your account was created. Check your email for the verification code.",
+        "registerCheckSupport": "Your account was created, but verification email could not be sent. Try again or contact support.",
+        "loginCodeSent": "Your account is not verified yet. A new code has been sent.",
+        "loginCodePending": "Your account is not verified yet. Wait a moment and then request another code.",
+        "nextRetryAt": "Try again after {{dateTime}}.",
+        "verified": "Email verified successfully. You can now sign in.",
+        "redirectingToLogin": "Redirecting to sign in in {{seconds}} seconds.",
+        "codeResent": "A new verification code has been sent."
+      },
+      "errors": {
+        "emailRequiredForResend": "Enter a valid email before requesting a new code.",
+        "invalidOrExpired": "Invalid or expired verification code.",
+        "featureUnavailable": "Email verification is currently unavailable.",
+        "resendThrottled": "Please wait before requesting another code.",
+        "resendFailed": "Unable to resend verification code.",
+        "failed": "Verification failed. Please try again."
+      }
     }
   },
   "profile": {

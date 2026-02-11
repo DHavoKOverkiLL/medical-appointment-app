@@ -34,8 +34,12 @@ describe('RegisterComponent', () => {
   });
 
   it('should serialize birthDate as yyyy-mm-dd when submitting', () => {
-    const postSpy = spyOn((component as any).http, 'post').and.returnValue(of({}));
-    spyOn((component as any).router, 'navigate').and.returnValue(Promise.resolve(true));
+    const postSpy = spyOn((component as any).http, 'post').and.returnValue(of({
+      requiresEmailVerification: true,
+      verificationEmailSent: true,
+      email: 'john@example.com'
+    }));
+    const navigateSpy = spyOn((component as any).router, 'navigate').and.returnValue(Promise.resolve(true));
     component.registerForm.controls['clinicId'].enable({ emitEvent: false });
 
     component.registerForm.patchValue({
@@ -56,5 +60,6 @@ describe('RegisterComponent', () => {
     expect(postSpy).toHaveBeenCalled();
     const payload = postSpy.calls.mostRecent().args[1] as { birthDate: string };
     expect(payload.birthDate).toBe('2026-02-11');
+    expect(navigateSpy).toHaveBeenCalledWith(['/verify-email'], jasmine.any(Object));
   });
 });

@@ -45,6 +45,8 @@ builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 builder.Services.AddScoped<ISystemInfoService, SystemInfoService>();
 builder.Services.Configure<AppointmentReminderSettings>(
     builder.Configuration.GetSection(AppointmentReminderSettings.SectionName));
+builder.Services.Configure<EmailVerificationSettings>(
+    builder.Configuration.GetSection(EmailVerificationSettings.SectionName));
 builder.Services.Configure<ReminderEmailProviderSettings>(
     builder.Configuration.GetSection(ReminderEmailProviderSettings.SectionName));
 builder.Services.Configure<ReminderSmsProviderSettings>(
@@ -52,6 +54,8 @@ builder.Services.Configure<ReminderSmsProviderSettings>(
 builder.Services.AddHttpClient();
 builder.Services.AddSingleton<IReminderEmailSender, ConfigurableReminderEmailSender>();
 builder.Services.AddSingleton<IReminderSmsSender, ConfigurableReminderSmsSender>();
+builder.Services.AddSingleton<ITransactionalEmailSender, ConfigurableTransactionalEmailSender>();
+builder.Services.AddScoped<IEmailVerificationService, EmailVerificationService>();
 builder.Services.AddHostedService<AppointmentReminderBackgroundService>();
 
 var keyBytes = Encoding.UTF8.GetBytes(jwtSettings.Key);
@@ -120,6 +124,34 @@ builder.Services.AddRateLimiter(options =>
             _ => new FixedWindowRateLimiterOptions
             {
                 PermitLimit = 3,
+                Window = TimeSpan.FromMinutes(5),
+                QueueLimit = 0,
+                AutoReplenishment = true
+            });
+    });
+
+    options.AddPolicy("AuthEmailVerification", httpContext =>
+    {
+        var partitionKey = httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+        return RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey,
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 8,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0,
+                AutoReplenishment = true
+            });
+    });
+
+    options.AddPolicy("AuthVerificationResend", httpContext =>
+    {
+        var partitionKey = httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+        return RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey,
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 5,
                 Window = TimeSpan.FromMinutes(5),
                 QueueLimit = 0,
                 AutoReplenishment = true

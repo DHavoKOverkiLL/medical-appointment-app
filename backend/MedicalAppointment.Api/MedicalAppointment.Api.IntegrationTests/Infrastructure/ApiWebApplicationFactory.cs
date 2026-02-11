@@ -30,7 +30,8 @@ public sealed class ApiWebApplicationFactory : WebApplicationFactory<Program>
             {
                 ["Jwt:Key"] = "integration-tests-super-secret-key-1234567890",
                 ["Jwt:Issuer"] = "integration-tests",
-                ["Jwt:Audience"] = "integration-tests"
+                ["Jwt:Audience"] = "integration-tests",
+                ["EmailVerification:HashKey"] = "integration-tests-super-secret-key-1234567890"
             });
         });
 

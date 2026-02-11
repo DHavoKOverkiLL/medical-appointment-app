@@ -8,6 +8,9 @@ namespace MedicalAppointment.Domain.Models
         public Guid UserId { get; set; }
         public string Username { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
+        public bool IsEmailVerified { get; set; }
+        public DateTime? EmailVerifiedAtUtc { get; set; }
+        public DateTime? VerificationEmailLastSentAtUtc { get; set; }
         [JsonIgnore]
         public string PasswordHash { get; set; } = string.Empty;
         public int FailedLoginAttempts { get; set; }

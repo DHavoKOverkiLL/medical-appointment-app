@@ -150,6 +150,51 @@ dotnet user-secrets set "ReminderProviders:Email:FromName" "Medio"
 dotnet user-secrets set "ReminderProviders:Email:SendGrid:ApiKey" "SG.xxxxx"
 ```
 
+## Email Verification Configuration
+
+New user registration now requires email verification before login access is granted.
+
+Flow summary:
+
+- `POST /api/User/register` creates the account and issues a verification code
+- `POST /api/User/login` returns `403` for unverified users and can trigger a new code (subject to cooldown/rate limits)
+- `POST /api/User/verify-email` validates the code and activates the account
+- `POST /api/User/resend-verification-code` sends a new code when allowed
+
+Configuration keys:
+
+- `EmailVerification:Enabled`
+- `EmailVerification:CodeLength`
+- `EmailVerification:CodeTtlMinutes`
+- `EmailVerification:ResendCooldownSeconds`
+- `EmailVerification:MaxFailedAttemptsPerCode`
+- `EmailVerification:MaxSendsPerDay`
+- `EmailVerification:HashKey`
+
+`EmailVerification:HashKey` should be set to a long random secret in user-secrets or env vars. If omitted, the API falls back to `Jwt:Key`.
+
+Example setup:
+
+```powershell
+cd backend\MedicalAppointment.Api\MedicalAppointment.Api
+
+# Generate and set a random hashing secret
+$secret = -join ((1..64) | ForEach-Object { '{0:x}' -f (Get-Random -Maximum 16) })
+dotnet user-secrets set "EmailVerification:HashKey" $secret
+
+# Configure transactional email sender for verification emails
+dotnet user-secrets set "ReminderProviders:Email:Provider" "Smtp"
+dotnet user-secrets set "ReminderProviders:Email:FromEmail" "no-reply@yourdomain.com"
+dotnet user-secrets set "ReminderProviders:Email:FromName" "Medio"
+dotnet user-secrets set "ReminderProviders:Email:Smtp:Host" "smtp-relay.brevo.com"
+dotnet user-secrets set "ReminderProviders:Email:Smtp:Port" "587"
+dotnet user-secrets set "ReminderProviders:Email:Smtp:EnableSsl" "true"
+dotnet user-secrets set "ReminderProviders:Email:Smtp:Username" "<your-smtp-login>"
+dotnet user-secrets set "ReminderProviders:Email:Smtp:Password" "<your-smtp-key>"
+```
+
+Note: verification emails use the same configured email provider as reminder emails.
+
 ## Running Tests
 
 ### Backend

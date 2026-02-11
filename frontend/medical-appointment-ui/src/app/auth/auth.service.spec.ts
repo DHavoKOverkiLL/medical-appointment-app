@@ -78,4 +78,24 @@ describe('AuthService', () => {
     expect(req.request.withCredentials).toBeTrue();
     req.flush({});
   });
+
+  it('posts verify-email payload with credentials', () => {
+    service.verifyEmail({ email: 'verify@example.com', code: '123456' }).subscribe();
+    const req = httpMock.expectOne(`${API_BASE_URL}/api/User/verify-email`);
+
+    expect(req.request.method).toBe('POST');
+    expect(req.request.withCredentials).toBeTrue();
+    expect(req.request.body).toEqual({ email: 'verify@example.com', code: '123456' });
+    req.flush({ emailVerified: true, message: 'ok' });
+  });
+
+  it('posts resend-verification payload with credentials', () => {
+    service.resendVerificationCode({ email: 'verify@example.com' }).subscribe();
+    const req = httpMock.expectOne(`${API_BASE_URL}/api/User/resend-verification-code`);
+
+    expect(req.request.method).toBe('POST');
+    expect(req.request.withCredentials).toBeTrue();
+    expect(req.request.body).toEqual({ email: 'verify@example.com' });
+    req.flush({ verificationEmailSent: true, message: 'sent' });
+  });
 });
