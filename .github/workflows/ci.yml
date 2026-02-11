@@ -32,7 +32,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 9.0.x
+          dotnet-version: 10.0.x
 
       - name: Restore
         run: dotnet restore MedicalAppointment.Api.sln
@@ -92,7 +92,7 @@ jobs:
           $rawLineRate = [math]::Round(([double]$coverageXml.coverage.'line-rate') * 100, 2)
           $rawBranchRate = [math]::Round(([double]$coverageXml.coverage.'branch-rate') * 100, 2)
 
-          $excludePattern = 'MedicalAppointment\.Infrastructure[\\/]Migrations[\\/]'
+          $excludePattern = 'MedicalAppointment\.Infrastructure[\\/]Migrations[\\/]|MedicalAppointment\.Api[\\/]obj[\\/]'
           $lineTotal = 0
           $lineCovered = 0
           $branchTotal = 0

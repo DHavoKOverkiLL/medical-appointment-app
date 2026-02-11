@@ -1,0 +1,62 @@
+<h2 mat-dialog-title>{{ 'patientDashboard.postponeRequestTitle' | translate }}</h2>
+<p class="dialog-subtitle">{{ 'patientDashboard.postponeRequestSubtitle' | translate }}</p>
+
+@if (errorMessage) {
+  <p class="dialog-error">{{ errorMessage | translate }}</p>
+}
+
+<form [formGroup]="form" (ngSubmit)="submit()">
+  <div mat-dialog-content class="dialog-content">
+    <div class="postpone-grid">
+      <mat-form-field appearance="outline">
+        <mat-label>{{ 'common.proposedDate' | translate }}</mat-label>
+        <input matInput [matDatepicker]="postponeDatePicker" formControlName="date" [min]="minDate" />
+        <mat-datepicker-toggle matSuffix [for]="postponeDatePicker"></mat-datepicker-toggle>
+        <mat-datepicker #postponeDatePicker></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>{{ 'common.proposedTimeSlot' | translate }}</mat-label>
+        <mat-select formControlName="time" [disabled]="loadingSlots || availableSlots.length === 0">
+          @for (slot of availableSlots; track $index) {
+            <mat-option [value]="slot">
+              {{ slot }}
+            </mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    @if (loadingSlots) {
+      <p class="dialog-note">{{ 'patientDashboard.messages.loadingSlots' | translate }}</p>
+    }
+
+    @if (!loadingSlots && form.value.date && availableSlots.length === 0) {
+      <p class="dialog-note">{{ 'patientDashboard.messages.noSlots' | translate }}</p>
+    }
+
+    @if (!loadingSlots && slotTimezone && availableSlots.length > 0) {
+      <p class="dialog-note">
+        {{ 'patientDashboard.messages.slotsTimezone' | translate:{ timezone: slotTimezone } }}
+      </p>
+    }
+
+    <mat-form-field appearance="outline" class="reason-field">
+      <mat-label>{{ 'common.reason' | translate }}</mat-label>
+      <textarea matInput rows="4" formControlName="reason"></textarea>
+    </mat-form-field>
+  </div>
+
+  <div mat-dialog-actions class="dialog-actions">
+    <button mat-flat-button class="button-with-spinner" type="submit" [disabled]="form.invalid || submitting">
+      @if (submitting) {
+        <mat-progress-spinner mode="indeterminate" diameter="18"></mat-progress-spinner>
+      }
+      <span>{{ 'actions.sendRequest' | translate }}</span>
+    </button>
+
+    <button mat-stroked-button type="button" [disabled]="submitting" (click)="close()">
+      {{ 'common.cancel' | translate }}
+    </button>
+  </div>
+</form>

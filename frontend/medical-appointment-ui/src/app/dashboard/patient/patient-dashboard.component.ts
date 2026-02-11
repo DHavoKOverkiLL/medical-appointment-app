@@ -1,20 +1,19 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { TranslateModule } from '@ngx-translate/core';
 import { DashboardApiService } from '../dashboard-api.service';
 import { PatientAppointment, PatientDashboardResponse } from '../dashboard.models';
-import { combineDateAndTime, toDateKey, toTimeInputValue } from '../../core/date-time/date-time.utils';
+import { toDateKey } from '../../core/date-time/date-time.utils';
+import {
+  PostponeRequestDialogComponent,
+  PostponeRequestDialogData,
+  PostponeRequestDialogResult
+} from './postpone-request-dialog.component';
 
 interface CalendarCell {
   date: Date;
@@ -29,15 +28,9 @@ interface CalendarCell {
   imports: [
     CommonModule,
     RouterModule,
-    ReactiveFormsModule,
     MatCardModule,
     MatButtonModule,
-    MatProgressSpinnerModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
+    MatDialogModule,
     TranslateModule
   ],
   templateUrl: './patient-dashboard.component.html',
@@ -66,32 +59,11 @@ export class PatientDashboardComponent implements OnInit {
     'common.daysShort.sat',
     'common.daysShort.sun'
   ];
-  readonly minDate = new Date();
-
-  activePostponeAppointmentId: string | null = null;
-  activePostponeDoctorId: string | null = null;
-  activePostponeSlotTimezone = '';
-  availablePostponeSlots: string[] = [];
-  loadingPostponeSlots = false;
-  postponeForm: FormGroup;
-  postponeSubmitting = false;
 
   constructor(
-    private dashboardApi: DashboardApiService,
-    private fb: FormBuilder
-  ) {
-    this.postponeForm = this.fb.group({
-      date: [null, Validators.required],
-      time: ['', Validators.required],
-      reason: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(500)]]
-    });
-
-    this.postponeForm.get('date')?.valueChanges.subscribe(() => {
-      if (this.activePostponeAppointmentId) {
-        this.reloadPostponeSlots();
-      }
-    });
-  }
+    private readonly dashboardApi: DashboardApiService,
+    private readonly dialog: MatDialog
+  ) {}
 
   ngOnInit(): void {
     this.loadDashboard();
@@ -112,90 +84,25 @@ export class PatientDashboardComponent implements OnInit {
   }
 
   openPostponeRequest(appointment: PatientAppointment): void {
-    this.activePostponeAppointmentId = appointment.appointmentId;
-    this.activePostponeDoctorId = appointment.doctorId;
-    this.successMessage = '';
     this.errorMessage = '';
+    this.successMessage = '';
 
-    const source = new Date(appointment.proposedDateTime || appointment.appointmentDateTime);
-    source.setDate(source.getDate() + 1);
-
-    this.postponeForm.patchValue({
-      date: source,
-      time: toTimeInputValue(source),
-      reason: appointment.postponeReason || ''
+    const dialogRef = this.dialog.open<
+      PostponeRequestDialogComponent,
+      PostponeRequestDialogData,
+      PostponeRequestDialogResult
+    >(PostponeRequestDialogComponent, {
+      width: 'min(680px, 96vw)',
+      panelClass: 'modern-admin-dialog',
+      backdropClass: 'modern-admin-backdrop',
+      disableClose: true,
+      data: { appointment }
     });
 
-    this.reloadPostponeSlots();
-  }
-
-  cancelPostponeRequest(): void {
-    this.activePostponeAppointmentId = null;
-    this.activePostponeDoctorId = null;
-    this.activePostponeSlotTimezone = '';
-    this.availablePostponeSlots = [];
-    this.loadingPostponeSlots = false;
-    this.postponeForm.reset();
-    this.postponeSubmitting = false;
-  }
-
-  submitPostponeRequest(): void {
-    if (this.postponeForm.invalid || !this.activePostponeAppointmentId) {
-      return;
-    }
-
-    const dateValue = this.postponeForm.value.date as Date;
-    const timeValue = this.postponeForm.value.time as string;
-    const reason = this.postponeForm.value.reason as string;
-    if (!this.availablePostponeSlots.includes(timeValue)) {
-      this.errorMessage = 'patientDashboard.errors.timeUnavailable';
-      return;
-    }
-
-    const proposedDateTime = combineDateAndTime(dateValue, timeValue).toISOString();
-
-    this.postponeSubmitting = true;
-    this.errorMessage = '';
-    this.successMessage = '';
-
-    this.dashboardApi.requestPostponeAppointment(this.activePostponeAppointmentId, {
-      proposedDateTime,
-      reason
-    }).subscribe({
-      next: () => {
+    dialogRef.afterClosed().subscribe(result => {
+      if (result?.sent) {
         this.successMessage = 'patientDashboard.messages.postponeSent';
-        this.postponeSubmitting = false;
-        this.cancelPostponeRequest();
         this.reloadAppointmentsOnly();
-      },
-      error: err => {
-        this.postponeSubmitting = false;
-        this.errorMessage = err?.error?.message || err?.error || 'patientDashboard.errors.postponeFailed';
-      }
-    });
-  }
-
-  private reloadPostponeSlots(): void {
-    this.postponeForm.patchValue({ time: '' }, { emitEvent: false });
-    this.availablePostponeSlots = [];
-    this.activePostponeSlotTimezone = '';
-
-    const doctorId = this.activePostponeDoctorId;
-    const date = this.postponeForm.value.date as Date | null;
-    if (!doctorId || !date) {
-      return;
-    }
-
-    this.loadingPostponeSlots = true;
-    this.dashboardApi.getAvailableSlots(doctorId, date).subscribe({
-      next: response => {
-        this.availablePostponeSlots = response.slots.map(slot => slot.localTime);
-        this.activePostponeSlotTimezone = response.timezone;
-        this.loadingPostponeSlots = false;
-      },
-      error: err => {
-        this.loadingPostponeSlots = false;
-        this.errorMessage = err?.error?.message || err?.error || 'patientDashboard.errors.loadSlots';
       }
     });
   }

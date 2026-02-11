@@ -6,7 +6,7 @@ Full-stack application for medical appointment scheduling, clinic management, us
 
 The repository contains:
 
-- `backend/MedicalAppointment.Api`: ASP.NET Core Web API (`net9.0`) with EF Core + SQL Server
+- `backend/MedicalAppointment.Api`: ASP.NET Core Web API (`net10.0`) with EF Core + SQL Server
 - `frontend/medical-appointment-ui`: Angular SPA (`v19`) with Angular Material
 - `backend/MedicalAppointment.Api/MedicalAppointment.Api.IntegrationTests`: integration test suite (xUnit)
 - `.github/workflows/ci.yml`: CI pipeline for backend + frontend build/test/coverage
@@ -22,14 +22,14 @@ Core backend areas currently implemented include:
 
 ## Tech Stack
 
-- Backend: .NET 9, ASP.NET Core, Entity Framework Core 9, SQL Server
+- Backend: .NET 10, ASP.NET Core, Entity Framework Core 10, SQL Server
 - Frontend: Angular 19, TypeScript, RxJS, Angular Material
 - Testing: xUnit (backend), Karma/Jasmine (frontend)
 - CI: GitHub Actions
 
 ## Prerequisites
 
-- .NET SDK `9.x`
+- .NET SDK `10.x`
 - Node.js `20.x` and npm
 - SQL Server instance (local or remote)
 - EF Core CLI:
@@ -177,9 +177,9 @@ npm run test:ci:coverage
 GitHub Actions workflow: `.github/workflows/ci.yml`
 
 - Backend:
-  - restore/build/test on .NET 9
+  - restore/build/test on .NET 10
   - on test failure, failed test names/messages are emitted as GitHub check annotations
-  - coverage floor (excluding `Infrastructure/Migrations`):
+  - coverage floor (excluding `Infrastructure/Migrations` and generated `obj` sources):
     - line >= `55%`
     - branch >= `40%`
 - Frontend:
