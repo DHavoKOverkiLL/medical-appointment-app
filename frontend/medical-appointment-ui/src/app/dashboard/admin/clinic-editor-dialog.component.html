@@ -1,0 +1,465 @@
+<div class="dialog-shell" [formGroup]="form">
+  <header class="dialog-header">
+    <div>
+      <p class="dialog-eyebrow">{{ 'roles.admin' | translate }}</p>
+      <h2>{{ dialogTitle | translate }}</h2>
+      <p class="dialog-subtitle">{{ 'clinicEditor.dialogSubtitle' | translate }}</p>
+    </div>
+    <button mat-stroked-button type="button" (click)="close()">{{ 'common.close' | translate }}</button>
+  </header>
+
+  <p class="dialog-error" *ngIf="errorMessage">{{ errorMessage | translate }}</p>
+
+  <mat-tab-group [(selectedIndex)]="activeTabIndex" class="dialog-tabs">
+    <mat-tab [label]="'clinicEditor.tabs.identity' | translate">
+      <div class="tab-scroll">
+        <div class="tab-grid">
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'clinicEditor.fields.clinicName' | translate }}</mat-label>
+            <input matInput formControlName="name" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'clinicEditor.fields.clinicCode' | translate }}</mat-label>
+            <input matInput formControlName="code" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'clinicEditor.fields.legalName' | translate }}</mat-label>
+            <input matInput formControlName="legalName" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'clinicEditor.fields.clinicType' | translate }}</mat-label>
+            <mat-select formControlName="sysClinicTypeId">
+              <mat-option *ngFor="let clinicType of sysClinicTypes" [value]="clinicType.sysClinicTypeId">
+                {{ getClinicTypeDisplayName(clinicType.sysClinicTypeId, clinicType.name) }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'clinicEditor.fields.ownershipType' | translate }}</mat-label>
+            <mat-select formControlName="sysOwnershipTypeId">
+              <mat-option *ngFor="let ownershipType of sysOwnershipTypes" [value]="ownershipType.sysOwnershipTypeId">
+                {{ getOwnershipTypeDisplayName(ownershipType.sysOwnershipTypeId, ownershipType.name) }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'clinicEditor.fields.foundedOn' | translate }}</mat-label>
+            <input matInput [matDatepicker]="foundedOnPicker" formControlName="foundedOn" />
+            <mat-datepicker-toggle matSuffix [for]="foundedOnPicker"></mat-datepicker-toggle>
+            <mat-datepicker #foundedOnPicker></mat-datepicker>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'clinicEditor.fields.sourceSystem' | translate }}</mat-label>
+            <mat-select formControlName="sysSourceSystemId">
+              <mat-option *ngFor="let sourceSystem of sysSourceSystems" [value]="sourceSystem.sysSourceSystemId">
+                {{ getSourceSystemDisplayName(sourceSystem.sysSourceSystemId, sourceSystem.name) }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" *ngIf="isEditMode">
+            <mat-label>{{ 'common.status' | translate }}</mat-label>
+            <mat-select formControlName="isActive">
+              <mat-option [value]="true">{{ 'statuses.active' | translate }}</mat-option>
+              <mat-option [value]="false">{{ 'statuses.inactive' | translate }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+    </mat-tab>
+
+    <mat-tab [label]="'clinicEditor.tabs.locationContact' | translate">
+      <div class="tab-scroll">
+        <div class="tab-grid">
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'clinicEditor.fields.addressLine1' | translate }}</mat-label>
+            <input matInput formControlName="addressLine1" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'clinicEditor.fields.addressLine2' | translate }}</mat-label>
+            <input matInput formControlName="addressLine2" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'common.city' | translate }}</mat-label>
+            <input matInput formControlName="city" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'clinicEditor.fields.stateRegion' | translate }}</mat-label>
+            <input matInput formControlName="state" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'common.postalCode' | translate }}</mat-label>
+            <input matInput formControlName="postalCode" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'clinicEditor.fields.countryCode' | translate }}</mat-label>
+            <input matInput formControlName="countryCode" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'clinicEditor.fields.timezone' | translate }}</mat-label>
+            <input matInput formControlName="timezone" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'clinicEditor.fields.mainPhone' | translate }}</mat-label>
+            <input matInput formControlName="mainPhone" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'common.fax' | translate }}</mat-label>
+            <input matInput formControlName="fax" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'clinicEditor.fields.mainEmail' | translate }}</mat-label>
+            <input matInput formControlName="mainEmail" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'clinicEditor.fields.websiteUrl' | translate }}</mat-label>
+            <input matInput formControlName="websiteUrl" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'clinicEditor.fields.patientPortalUrl' | translate }}</mat-label>
+            <input matInput formControlName="patientPortalUrl" />
+          </mat-form-field>
+        </div>
+      </div>
+    </mat-tab>
+
+    <mat-tab [label]="'clinicEditor.tabs.operations' | translate">
+      <div class="tab-scroll">
+        <div class="tab-grid">
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'clinicEditor.fields.bookingMethods' | translate }}</mat-label>
+            <input matInput formControlName="bookingMethodsInput" [placeholder]="'clinicEditor.placeholders.bookingMethods' | translate" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'clinicEditor.fields.avgWaitDays' | translate }}</mat-label>
+            <input matInput type="number" formControlName="avgNewPatientWaitDays" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'clinicEditor.fields.sameDayAvailability' | translate }}</mat-label>
+            <mat-select formControlName="sameDayAvailable">
+              <mat-option [value]="true">{{ 'common.yes' | translate }}</mat-option>
+              <mat-option [value]="false">{{ 'common.no' | translate }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="collection-grid">
+          <section class="collection-card">
+            <header class="collection-header">
+              <h3>{{ 'clinicEditor.collections.operatingHours' | translate }}</h3>
+              <button mat-stroked-button type="button" (click)="startAddOperatingHour()">+ {{ 'common.add' | translate }}</button>
+            </header>
+
+            <p class="collection-empty" *ngIf="operatingHoursDraft.length === 0">{{ 'clinicEditor.empty.operatingHours' | translate }}</p>
+
+            <div class="collection-list" *ngIf="operatingHoursDraft.length > 0">
+              <article class="collection-item" *ngFor="let hour of operatingHoursDraft">
+                <div>
+                  <strong>{{ getDayLabel(hour.dayOfWeek) | translate }}</strong>
+                  <span>{{ hour.isClosed ? ('statuses.closed' | translate) : (hour.open + ' - ' + hour.close) }}</span>
+                </div>
+                <div class="collection-actions">
+                  <button mat-button type="button" (click)="startEditOperatingHour(hour)">{{ 'common.edit' | translate }}</button>
+                  <button mat-button type="button" (click)="removeOperatingHour(hour.dayOfWeek)">{{ 'common.remove' | translate }}</button>
+                </div>
+              </article>
+            </div>
+          </section>
+
+          <section class="collection-card">
+            <header class="collection-header">
+              <h3>{{ 'clinicEditor.collections.services' | translate }}</h3>
+              <button mat-stroked-button type="button" [disabled]="sysOperations.length === 0" (click)="startAddService()">+ {{ 'common.add' | translate }}</button>
+            </header>
+
+            <p class="collection-empty" *ngIf="servicesDraft.length === 0">{{ 'clinicEditor.empty.services' | translate }}</p>
+            <p class="collection-empty" *ngIf="sysOperations.length === 0">{{ 'clinicEditor.empty.noOperationsConfigured' | translate }}</p>
+
+            <div class="collection-list" *ngIf="servicesDraft.length > 0">
+              <article class="collection-item" *ngFor="let service of servicesDraft">
+                <div>
+                  <strong>{{ getOperationDisplayName(service.sysOperationId, service.name) }}</strong>
+                  <span>{{ service.isTelehealthAvailable ? ('clinicEditor.telehealthAvailable' | translate) : ('clinicEditor.inPersonOnly' | translate) }}</span>
+                </div>
+                <div class="collection-actions">
+                  <button mat-button type="button" (click)="startEditService(service)">{{ 'common.edit' | translate }}</button>
+                  <button mat-button type="button" (click)="removeService(service.sysOperationId)">{{ 'common.remove' | translate }}</button>
+                </div>
+              </article>
+            </div>
+          </section>
+        </div>
+      </div>
+    </mat-tab>
+
+    <mat-tab [label]="'clinicEditor.tabs.networkCompliance' | translate">
+      <div class="tab-scroll">
+        <div class="tab-grid">
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'clinicEditor.fields.npiOrganization' | translate }}</mat-label>
+            <input matInput formControlName="npiOrganization" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'clinicEditor.fields.ein' | translate }}</mat-label>
+            <input matInput formControlName="ein" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'clinicEditor.fields.taxonomyCode' | translate }}</mat-label>
+            <input matInput formControlName="taxonomyCode" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'clinicEditor.fields.stateLicenseFacility' | translate }}</mat-label>
+            <input matInput formControlName="stateLicenseFacility" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'clinicEditor.fields.cliaNumber' | translate }}</mat-label>
+            <input matInput formControlName="cliaNumber" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'clinicEditor.fields.hipaaNoticeVersion' | translate }}</mat-label>
+            <input matInput formControlName="hipaaNoticeVersion" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'clinicEditor.fields.lastSecurityRiskAssessment' | translate }}</mat-label>
+            <input matInput [matDatepicker]="riskAssessmentPicker" formControlName="lastSecurityRiskAssessmentOn" />
+            <mat-datepicker-toggle matSuffix [for]="riskAssessmentPicker"></mat-datepicker-toggle>
+            <mat-datepicker #riskAssessmentPicker></mat-datepicker>
+          </mat-form-field>
+        </div>
+
+        <div class="collection-grid">
+          <section class="collection-card">
+            <header class="collection-header">
+              <h3>{{ 'clinicEditor.collections.insurancePlans' | translate }}</h3>
+              <button
+                mat-stroked-button
+                type="button"
+                [matTooltip]="'clinicEditor.tooltips.addInsurancePlan' | translate"
+                (click)="startAddInsurancePlan()">
+                + {{ 'common.add' | translate }}
+              </button>
+            </header>
+            <p class="collection-hint">{{ 'clinicEditor.hints.insurancePlans' | translate }}</p>
+
+            <p class="collection-empty" *ngIf="insurancePlansDraft.length === 0">{{ 'clinicEditor.empty.insurancePlans' | translate }}</p>
+            <p class="collection-empty collection-empty--hint" *ngIf="insurancePlansDraft.length === 0">{{ 'clinicEditor.hints.insurancePlansEmpty' | translate }}</p>
+
+            <div class="collection-list" *ngIf="insurancePlansDraft.length > 0">
+              <article class="collection-item" *ngFor="let plan of insurancePlansDraft">
+                <div>
+                  <strong>{{ plan.payerName }} - {{ plan.planName }}</strong>
+                  <span>{{ getInsurancePlanNetworkLabel(plan) | translate }}</span>
+                </div>
+                <div class="collection-actions">
+                  <button mat-button type="button" (click)="startEditInsurancePlan(plan)">{{ 'common.edit' | translate }}</button>
+                  <button mat-button type="button" (click)="removeInsurancePlan(plan)">{{ 'common.remove' | translate }}</button>
+                </div>
+              </article>
+            </div>
+          </section>
+
+          <section class="collection-card">
+            <header class="collection-header">
+              <h3>{{ 'clinicEditor.collections.accreditations' | translate }}</h3>
+              <button
+                mat-stroked-button
+                type="button"
+                [disabled]="sysAccreditations.length === 0"
+                [matTooltip]="'clinicEditor.tooltips.addAccreditation' | translate"
+                (click)="startAddAccreditation()">
+                + {{ 'common.add' | translate }}
+              </button>
+            </header>
+            <p class="collection-hint">{{ 'clinicEditor.hints.accreditations' | translate }}</p>
+
+            <p class="collection-empty" *ngIf="accreditationsDraft.length === 0">{{ 'clinicEditor.empty.accreditations' | translate }}</p>
+            <p class="collection-empty collection-empty--hint" *ngIf="accreditationsDraft.length === 0 && sysAccreditations.length > 0">{{ 'clinicEditor.hints.accreditationsEmpty' | translate }}</p>
+            <p class="collection-empty" *ngIf="sysAccreditations.length === 0">{{ 'clinicEditor.empty.noAccreditationsConfigured' | translate }}</p>
+
+            <div class="collection-list" *ngIf="accreditationsDraft.length > 0">
+              <article class="collection-item" *ngFor="let accreditation of accreditationsDraft">
+                <div>
+                  <strong>{{ getAccreditationDisplayName(accreditation.sysAccreditationId, accreditation.name) }}</strong>
+                  <span>{{ getAccreditationWindowText(accreditation) }}</span>
+                </div>
+                <div class="collection-actions">
+                  <button mat-button type="button" (click)="startEditAccreditation(accreditation)">{{ 'common.edit' | translate }}</button>
+                  <button mat-button type="button" (click)="removeAccreditation(accreditation.sysAccreditationId)">{{ 'common.remove' | translate }}</button>
+                </div>
+              </article>
+            </div>
+          </section>
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+
+  <div class="mini-modal-backdrop" *ngIf="showOperatingHourEditor" (click)="cancelOperatingHourEdit()"></div>
+  <section class="mini-modal" *ngIf="showOperatingHourEditor" (click)="$event.stopPropagation()">
+    <header class="mini-modal-header">
+      <h3>{{ operatingHourEditorTitle }}</h3>
+    </header>
+
+    <form class="mini-modal-form" [formGroup]="operatingHourForm">
+      <mat-form-field appearance="outline">
+        <mat-label>{{ 'common.day' | translate }}</mat-label>
+        <mat-select formControlName="dayOfWeek">
+          <mat-option *ngFor="let day of dayOptions" [value]="day.value">{{ day.labelKey | translate }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>{{ 'statuses.closed' | translate }}</mat-label>
+        <mat-select formControlName="isClosed">
+          <mat-option [value]="false">{{ 'statuses.open' | translate }}</mat-option>
+          <mat-option [value]="true">{{ 'statuses.closed' | translate }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" *ngIf="!operatingHourForm.value.isClosed">
+        <mat-label>{{ 'clinicEditor.fields.openTime' | translate }}</mat-label>
+        <input matInput type="time" formControlName="open" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" *ngIf="!operatingHourForm.value.isClosed">
+        <mat-label>{{ 'clinicEditor.fields.closeTime' | translate }}</mat-label>
+        <input matInput type="time" formControlName="close" />
+      </mat-form-field>
+    </form>
+
+    <footer class="mini-modal-actions">
+      <button mat-flat-button type="button" (click)="saveOperatingHour()">{{ 'common.save' | translate }}</button>
+      <button mat-stroked-button type="button" (click)="cancelOperatingHourEdit()">{{ 'common.cancel' | translate }}</button>
+    </footer>
+  </section>
+
+  <div class="mini-modal-backdrop" *ngIf="showServiceEditor" (click)="cancelServiceEdit()"></div>
+  <section class="mini-modal" *ngIf="showServiceEditor" (click)="$event.stopPropagation()">
+    <header class="mini-modal-header">
+      <h3>{{ serviceEditorTitle }}</h3>
+    </header>
+
+    <form class="mini-modal-form" [formGroup]="serviceForm">
+      <mat-form-field appearance="outline">
+        <mat-label>{{ 'clinicEditor.fields.serviceOperation' | translate }}</mat-label>
+        <mat-select formControlName="sysOperationId">
+          <mat-option *ngFor="let operation of sysOperations" [value]="operation.sysOperationId">
+            {{ getOperationDisplayName(operation.sysOperationId, operation.name) }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>{{ 'clinicEditor.fields.telehealth' | translate }}</mat-label>
+        <mat-select formControlName="isTelehealthAvailable">
+          <mat-option [value]="true">{{ 'common.yes' | translate }}</mat-option>
+          <mat-option [value]="false">{{ 'common.no' | translate }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </form>
+
+    <footer class="mini-modal-actions">
+      <button mat-flat-button type="button" (click)="saveService()">{{ 'common.save' | translate }}</button>
+      <button mat-stroked-button type="button" (click)="cancelServiceEdit()">{{ 'common.cancel' | translate }}</button>
+    </footer>
+  </section>
+
+  <div class="mini-modal-backdrop" *ngIf="showInsurancePlanEditor" (click)="cancelInsurancePlanEdit()"></div>
+  <section class="mini-modal mini-modal--wide" *ngIf="showInsurancePlanEditor" (click)="$event.stopPropagation()">
+    <header class="mini-modal-header">
+      <h3>{{ insurancePlanEditorTitle }}</h3>
+    </header>
+
+    <form class="mini-modal-form" [formGroup]="insurancePlanForm">
+      <mat-form-field appearance="outline">
+        <mat-label>{{ 'clinicEditor.fields.payerName' | translate }}</mat-label>
+        <input matInput formControlName="payerName" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>{{ 'clinicEditor.fields.planName' | translate }}</mat-label>
+        <input matInput formControlName="planName" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>{{ 'clinicEditor.fields.network' | translate }}</mat-label>
+        <mat-select formControlName="isInNetwork">
+          <mat-option [value]="true">{{ 'statuses.inNetwork' | translate }}</mat-option>
+          <mat-option [value]="false">{{ 'statuses.outOfNetwork' | translate }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </form>
+
+    <footer class="mini-modal-actions">
+      <button mat-flat-button type="button" (click)="saveInsurancePlan()">{{ 'common.save' | translate }}</button>
+      <button mat-stroked-button type="button" (click)="cancelInsurancePlanEdit()">{{ 'common.cancel' | translate }}</button>
+    </footer>
+  </section>
+
+  <div class="mini-modal-backdrop" *ngIf="showAccreditationEditor" (click)="cancelAccreditationEdit()"></div>
+  <section class="mini-modal mini-modal--wide" *ngIf="showAccreditationEditor" (click)="$event.stopPropagation()">
+    <header class="mini-modal-header">
+      <h3>{{ accreditationEditorTitle }}</h3>
+    </header>
+
+    <form class="mini-modal-form" [formGroup]="accreditationForm">
+      <mat-form-field appearance="outline">
+        <mat-label>{{ 'clinicEditor.fields.accreditationType' | translate }}</mat-label>
+        <mat-select formControlName="sysAccreditationId">
+          <mat-option *ngFor="let accreditation of sysAccreditations" [value]="accreditation.sysAccreditationId">
+            {{ getAccreditationDisplayName(accreditation.sysAccreditationId, accreditation.name) }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>{{ 'clinicEditor.fields.effectiveOn' | translate }}</mat-label>
+        <input matInput [matDatepicker]="accreditationEffectivePicker" formControlName="effectiveOn" />
+        <mat-datepicker-toggle matSuffix [for]="accreditationEffectivePicker"></mat-datepicker-toggle>
+        <mat-datepicker #accreditationEffectivePicker></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>{{ 'clinicEditor.fields.expiresOn' | translate }}</mat-label>
+        <input matInput [matDatepicker]="accreditationExpiresPicker" formControlName="expiresOn" />
+        <mat-datepicker-toggle matSuffix [for]="accreditationExpiresPicker"></mat-datepicker-toggle>
+        <mat-datepicker #accreditationExpiresPicker></mat-datepicker>
+      </mat-form-field>
+    </form>
+
+    <footer class="mini-modal-actions">
+      <button mat-flat-button type="button" (click)="saveAccreditation()">{{ 'common.save' | translate }}</button>
+      <button mat-stroked-button type="button" (click)="cancelAccreditationEdit()">{{ 'common.cancel' | translate }}</button>
+    </footer>
+  </section>
+
+  <footer class="dialog-footer">
+    <button mat-stroked-button type="button" (click)="close()">{{ 'common.cancel' | translate }}</button>
+    <button mat-flat-button type="button" (click)="submit()">{{ submitLabel | translate }}</button>
+  </footer>
+</div>

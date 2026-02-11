@@ -1,0 +1,129 @@
+.dashboard-shell {
+  --admin-ink: #0f2940;
+  --admin-accent: #0e8aa6;
+  --admin-accent-alt: #2f7ad8;
+  --admin-surface: #f8fcff;
+
+  padding: clamp(1rem, 2vw, 1.5rem);
+  color: var(--admin-ink);
+}
+
+.dashboard-hero {
+  border-radius: 1.15rem;
+  padding: clamp(1.1rem, 2vw, 1.7rem);
+  border: 1px solid #d4e5f4;
+  background:
+    radial-gradient(circle at 88% 15%, rgba(47, 122, 216, 0.2) 0, transparent 36%),
+    radial-gradient(circle at 12% 18%, rgba(14, 138, 166, 0.16) 0, transparent 35%),
+    #f5fbff;
+}
+
+.dashboard-eyebrow {
+  margin: 0;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  color: #4c6580;
+  font-weight: 700;
+}
+
+.dashboard-hero h1 {
+  margin: 0.45rem 0;
+  line-height: 1.2;
+  font-size: clamp(1.45rem, 2.3vw, 2rem);
+}
+
+.dashboard-hero p {
+  margin: 0;
+  max-width: 64ch;
+  color: #4c627a;
+  line-height: 1.6;
+}
+
+.dashboard-actions {
+  margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.dashboard-actions a {
+  background: linear-gradient(130deg, var(--admin-accent), var(--admin-accent-alt));
+  color: #fff;
+}
+
+.metric-grid {
+  margin-top: 1rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.75rem;
+}
+
+.metric-card {
+  background: var(--admin-surface);
+  border: 1px solid #dbe8f4;
+  box-shadow: 0 8px 22px rgba(14, 42, 65, 0.06);
+}
+
+.metric-label {
+  display: block;
+  font-size: 0.8rem;
+  color: #557089;
+}
+
+.metric-value {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 1.45rem;
+}
+
+.clinic-load {
+  margin-top: 1rem;
+  border: 1px solid #d6e4f2;
+  border-radius: 0.9rem;
+  background: #ffffff;
+}
+
+.clinic-load h2 {
+  margin: 0;
+  padding: 0.9rem 1rem 0.75rem;
+  font-size: 1.05rem;
+  border-bottom: 1px solid #e3edf6;
+}
+
+.clinic-table {
+  padding: 0.35rem 0;
+}
+
+.clinic-row {
+  display: grid;
+  grid-template-columns: 1.4fr 0.6fr 0.8fr;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  font-size: 0.92rem;
+}
+
+.clinic-row--head {
+  color: #47617a;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+}
+
+.dashboard-state,
+.dashboard-error {
+  margin: 1rem 0;
+  padding: 0.75rem 0.85rem;
+  border-radius: 0.6rem;
+}
+
+.dashboard-state {
+  background: #ecf5ff;
+  color: #31506b;
+}
+
+.dashboard-error {
+  background: #fff4f6;
+  color: #bb3f59;
+}

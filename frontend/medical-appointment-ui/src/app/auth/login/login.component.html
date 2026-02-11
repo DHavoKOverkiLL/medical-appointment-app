@@ -1,0 +1,64 @@
+<div class="auth-shell auth-shell--login">
+  <div class="auth-shell__shape auth-shell__shape--a" aria-hidden="true"></div>
+  <div class="auth-shell__shape auth-shell__shape--b" aria-hidden="true"></div>
+
+  <section class="auth-shell__hero" [attr.aria-label]="'auth.login.heroAria' | translate">
+    <div class="auth-shell__brand-mark">M</div>
+    <p class="auth-shell__eyebrow">Medio Care Network</p>
+    <h1 class="auth-shell__title">{{ 'auth.login.heroTitle' | translate }}</h1>
+    <p class="auth-shell__copy">{{ 'auth.login.heroCopy' | translate }}</p>
+
+    <div class="auth-shell__highlights">
+      <article class="auth-shell__highlight">
+        <span class="auth-shell__metric">99.9%</span>
+        <span class="auth-shell__label">{{ 'auth.login.highlights.uptime' | translate }}</span>
+      </article>
+      <article class="auth-shell__highlight">
+        <span class="auth-shell__metric">&lt;2 min</span>
+        <span class="auth-shell__label">{{ 'auth.login.highlights.bookingTime' | translate }}</span>
+      </article>
+      <article class="auth-shell__highlight">
+        <span class="auth-shell__metric">24/7</span>
+        <span class="auth-shell__label">{{ 'auth.login.highlights.secureAccess' | translate }}</span>
+      </article>
+    </div>
+  </section>
+
+  <section class="auth-shell__panel" [attr.aria-label]="'auth.login.formAria' | translate">
+    <div class="auth-shell__card">
+      <p class="auth-shell__kicker">{{ 'auth.login.kicker' | translate }}</p>
+      <h2 class="auth-shell__heading">{{ 'auth.login.heading' | translate }}</h2>
+      <p class="auth-shell__subtitle">{{ 'auth.login.subtitle' | translate }}</p>
+
+      <form class="auth-shell__form" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <mat-form-field appearance="outline" class="auth-shell__field">
+          <mat-label>{{ 'common.email' | translate }}</mat-label>
+          <input matInput formControlName="email" type="email" autocomplete="email" required />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="auth-shell__field">
+          <mat-label>{{ 'common.password' | translate }}</mat-label>
+          <input
+            matInput
+            formControlName="password"
+            type="password"
+            autocomplete="current-password"
+            required
+          />
+        </mat-form-field>
+
+        <button mat-flat-button class="auth-shell__submit" type="submit" [disabled]="loginForm.invalid || isSubmitting">
+          <mat-progress-spinner *ngIf="isSubmitting" mode="indeterminate" diameter="18"></mat-progress-spinner>
+          <span>{{ (isSubmitting ? 'auth.login.signingIn' : 'auth.login.submit') | translate }}</span>
+        </button>
+
+        <div *ngIf="errorMessage" class="auth-shell__error" role="alert">{{ errorMessage | translate }}</div>
+      </form>
+
+      <p class="auth-shell__footer">
+        {{ 'auth.login.needAccount' | translate }}
+        <a routerLink="/register">{{ 'auth.login.createAccount' | translate }}</a>
+      </p>
+    </div>
+  </section>
+</div>

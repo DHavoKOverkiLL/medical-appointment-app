@@ -1,0 +1,107 @@
+<div class="auth-shell auth-shell--register">
+  <div class="auth-shell__shape auth-shell__shape--a" aria-hidden="true"></div>
+  <div class="auth-shell__shape auth-shell__shape--b" aria-hidden="true"></div>
+
+  <section class="auth-shell__hero" [attr.aria-label]="'auth.register.heroAria' | translate">
+    <div class="auth-shell__brand-mark">M</div>
+    <p class="auth-shell__eyebrow">Medio Care Network</p>
+    <h1 class="auth-shell__title">{{ 'auth.register.heroTitle' | translate }}</h1>
+    <p class="auth-shell__copy">{{ 'auth.register.heroCopy' | translate }}</p>
+
+    <div class="auth-shell__highlights">
+      <article class="auth-shell__highlight">
+        <span class="auth-shell__metric">{{ 'auth.register.highlights.roleBasedMetric' | translate }}</span>
+        <span class="auth-shell__label">{{ 'auth.register.highlights.accessPermissions' | translate }}</span>
+      </article>
+      <article class="auth-shell__highlight">
+        <span class="auth-shell__metric">{{ 'auth.register.highlights.encryptedMetric' | translate }}</span>
+        <span class="auth-shell__label">{{ 'auth.register.highlights.authFlow' | translate }}</span>
+      </article>
+      <article class="auth-shell__highlight">
+        <span class="auth-shell__metric">{{ 'auth.register.highlights.unifiedMetric' | translate }}</span>
+        <span class="auth-shell__label">{{ 'auth.register.highlights.workflows' | translate }}</span>
+      </article>
+    </div>
+  </section>
+
+  <section class="auth-shell__panel" [attr.aria-label]="'auth.register.formAria' | translate">
+    <div class="auth-shell__card auth-shell__card--wide">
+      <p class="auth-shell__kicker">{{ 'auth.register.kicker' | translate }}</p>
+      <h2 class="auth-shell__heading">{{ 'auth.register.heading' | translate }}</h2>
+      <p class="auth-shell__subtitle">{{ 'auth.register.subtitle' | translate }}</p>
+
+      <form class="auth-shell__form" [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+        <div class="auth-shell__row">
+          <mat-form-field appearance="outline" class="auth-shell__field">
+            <mat-label>{{ 'common.username' | translate }}</mat-label>
+            <input matInput formControlName="username" required />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="auth-shell__field">
+            <mat-label>{{ 'common.email' | translate }}</mat-label>
+            <input matInput type="email" formControlName="email" required />
+          </mat-form-field>
+        </div>
+
+        <div class="auth-shell__row">
+          <mat-form-field appearance="outline" class="auth-shell__field">
+            <mat-label>{{ 'common.password' | translate }}</mat-label>
+            <input matInput type="password" formControlName="password" autocomplete="new-password" required />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="auth-shell__field">
+            <mat-label>{{ 'common.clinic' | translate }}</mat-label>
+            <mat-select formControlName="clinicId" required [disabled]="loadingClinics">
+              <mat-option *ngFor="let clinic of clinics" [value]="clinic.clinicId">
+                {{ clinic.name }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="auth-shell__field auth-shell__copy role-note">{{ 'auth.register.roleNote' | translate }}</div>
+
+        <div class="auth-shell__row">
+          <mat-form-field appearance="outline" class="auth-shell__field">
+            <mat-label>{{ 'common.firstName' | translate }}</mat-label>
+            <input matInput formControlName="firstName" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="auth-shell__field">
+            <mat-label>{{ 'common.lastName' | translate }}</mat-label>
+            <input matInput formControlName="lastName" />
+          </mat-form-field>
+        </div>
+
+        <div class="auth-shell__row">
+          <mat-form-field appearance="outline" class="auth-shell__field">
+            <mat-label>{{ 'common.personalIdentifierShort' | translate }}</mat-label>
+            <input matInput formControlName="personalIdentifier" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="auth-shell__field">
+            <mat-label>{{ 'common.birthDate' | translate }}</mat-label>
+            <input matInput type="date" formControlName="birthDate" />
+          </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline" class="auth-shell__field">
+          <mat-label>{{ 'common.address' | translate }}</mat-label>
+          <input matInput formControlName="address" />
+        </mat-form-field>
+
+        <button mat-flat-button class="auth-shell__submit button-with-spinner" type="submit" [disabled]="registerForm.invalid || isSubmitting || loadingClinics">
+          <mat-progress-spinner *ngIf="isSubmitting" mode="indeterminate" diameter="18"></mat-progress-spinner>
+          <span>{{ 'auth.register.submit' | translate }}</span>
+        </button>
+
+        <div *ngIf="errorMessage" class="auth-shell__error" role="alert">{{ errorMessage | translate }}</div>
+      </form>
+
+      <p class="auth-shell__footer">
+        {{ 'auth.register.alreadyRegistered' | translate }}
+        <a routerLink="/login">{{ 'auth.register.signInHere' | translate }}</a>
+      </p>
+    </div>
+  </section>
+</div>

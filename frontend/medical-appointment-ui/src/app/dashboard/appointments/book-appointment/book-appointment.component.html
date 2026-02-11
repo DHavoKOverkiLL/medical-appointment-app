@@ -1,0 +1,64 @@
+<section class="book-shell">
+  <header class="book-hero">
+    <p class="book-eyebrow">{{ 'bookAppointment.eyebrow' | translate }}</p>
+    <h1>{{ 'bookAppointment.title' | translate }}</h1>
+    <p>{{ 'bookAppointment.subtitle' | translate }}</p>
+  </header>
+
+  <mat-card class="book-card">
+    <h2>{{ 'bookAppointment.cardTitle' | translate }}</h2>
+    <p class="book-subtitle">{{ 'bookAppointment.cardSubtitle' | translate }}</p>
+
+    <section class="app-skeleton-list" *ngIf="loadingDoctors" aria-hidden="true">
+      <article class="app-skeleton-card" *ngFor="let _ of skeletonRows">
+        <div class="app-skeleton-line app-skeleton-line--title"></div>
+        <div class="app-skeleton-line app-skeleton-line--meta"></div>
+      </article>
+    </section>
+
+    <form [formGroup]="appointmentForm" (ngSubmit)="onSubmit()" *ngIf="!loadingDoctors">
+      <div class="book-grid">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>{{ 'common.doctor' | translate }}</mat-label>
+          <mat-select formControlName="doctorId" [disabled]="loadingDoctors || isSubmitting">
+            <mat-option *ngFor="let doctor of doctors" [value]="doctor.id">
+              {{ doctor.name }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'common.date' | translate }}</mat-label>
+          <input matInput [matDatepicker]="bookingDatePicker" formControlName="date" [min]="minDate" />
+          <mat-datepicker-toggle matSuffix [for]="bookingDatePicker"></mat-datepicker-toggle>
+          <mat-datepicker #bookingDatePicker></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'common.timeSlot30' | translate }}</mat-label>
+          <mat-select formControlName="time" [disabled]="loadingSlots || availableSlots.length === 0">
+            <mat-option *ngFor="let slot of availableSlots" [value]="slot">
+              {{ slot }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <p class="slot-state" *ngIf="loadingSlots">{{ 'bookAppointment.messages.loadingSlots' | translate }}</p>
+      <p class="slot-state" *ngIf="!loadingSlots && appointmentForm.value.doctorId && appointmentForm.value.date && availableSlots.length === 0">
+        {{ 'bookAppointment.messages.noSlots' | translate }}
+      </p>
+      <p class="slot-state" *ngIf="!loadingSlots && slotTimezone && availableSlots.length > 0">
+        {{ 'bookAppointment.messages.slotsTimezone' | translate:{ timezone: slotTimezone } }}
+      </p>
+
+      <button mat-flat-button class="book-submit button-with-spinner" type="submit" [disabled]="appointmentForm.invalid || loadingDoctors || loadingSlots || isSubmitting">
+        <mat-progress-spinner *ngIf="isSubmitting" mode="indeterminate" diameter="18"></mat-progress-spinner>
+        <span>{{ 'actions.confirmBooking' | translate }}</span>
+      </button>
+    </form>
+
+    <p *ngIf="successMessage" class="success-message">{{ successMessage | translate }}</p>
+    <p *ngIf="errorMessage" class="error-message">{{ errorMessage | translate }}</p>
+  </mat-card>
+</section>

@@ -1,0 +1,77 @@
+<section class="doctor-dashboard">
+  <header class="doctor-hero">
+    <p class="eyebrow">{{ 'doctorDashboard.eyebrow' | translate }}</p>
+    <h1>{{ 'doctorDashboard.title' | translate }}</h1>
+    <p>{{ 'doctorDashboard.subtitle' | translate:{ clinic: (summary?.clinicName || ('doctorDashboard.yourClinic' | translate)) } }}</p>
+
+    <div class="doctor-actions">
+      <a mat-flat-button routerLink="/dashboard/doctor-appointments">{{ 'actions.openConsults' | translate }}</a>
+      <a mat-stroked-button routerLink="/dashboard/doctor/availability">{{ 'actions.manageAvailability' | translate }}</a>
+      <a mat-stroked-button routerLink="/dashboard/doctor/profile">{{ 'nav.profile' | translate }}</a>
+      <a mat-stroked-button routerLink="/dashboard/doctor/settings">{{ 'nav.accountSettings' | translate }}</a>
+      <a mat-stroked-button routerLink="/dashboard">{{ 'nav.workspaceHome' | translate }}</a>
+    </div>
+  </header>
+
+  <p *ngIf="loading && summary" class="state">{{ 'state.loadingDashboard' | translate }}</p>
+  <p *ngIf="errorMessage" class="error">{{ errorMessage | translate }}</p>
+
+  <section class="app-skeleton-list" *ngIf="loading && !summary" aria-hidden="true">
+    <article class="app-skeleton-card" *ngFor="let _ of skeletonCards">
+      <div class="app-skeleton-line app-skeleton-line--title"></div>
+      <div class="app-skeleton-line app-skeleton-line--meta"></div>
+      <div class="app-skeleton-pills">
+        <span class="app-skeleton-pill"></span>
+        <span class="app-skeleton-pill"></span>
+      </div>
+    </article>
+  </section>
+
+  <ng-container *ngIf="summary as vm">
+    <section class="cards">
+      <mat-card class="metric-card">
+        <span>{{ 'metrics.appointmentsToday' | translate }}</span>
+        <strong>{{ vm.appointmentsToday }}</strong>
+      </mat-card>
+      <mat-card class="metric-card">
+        <span>{{ 'metrics.upcoming' | translate }}</span>
+        <strong>{{ vm.upcomingAppointments }}</strong>
+      </mat-card>
+      <mat-card class="metric-card">
+        <span>{{ 'metrics.patientsInQueue' | translate }}</span>
+        <strong>{{ vm.uniquePatientsUpcoming }}</strong>
+      </mat-card>
+      <mat-card class="metric-card">
+        <span>{{ 'metrics.nextAppointment' | translate }}</span>
+        <strong>{{ vm.nextAppointmentUtc ? (vm.nextAppointmentUtc | date:'dd/MM/yyyy HH:mm') : ('state.noneScheduled' | translate) }}</strong>
+      </mat-card>
+      <mat-card class="metric-card">
+        <span>{{ 'metrics.throughput' | translate }}</span>
+        <strong>{{ throughput | translate }}</strong>
+      </mat-card>
+    </section>
+
+    <section class="doctor-panel">
+      <mat-card>
+        <h2>{{ 'doctorDashboard.snapshotTitle' | translate }}</h2>
+        <p>{{ 'doctorDashboard.snapshotSubtitle' | translate }}</p>
+        <div class="chip-row">
+          <span>{{ 'doctorDashboard.snapshot.today' | translate:{ count: vm.appointmentsToday } }}</span>
+          <span>{{ 'doctorDashboard.snapshot.scheduledAhead' | translate:{ count: vm.upcomingAppointments } }}</span>
+          <span>{{ 'doctorDashboard.snapshot.uniquePatients' | translate:{ count: vm.uniquePatientsUpcoming } }}</span>
+        </div>
+      </mat-card>
+
+      <mat-card>
+        <h2>{{ 'doctorDashboard.nextConsultTitle' | translate }}</h2>
+        <p *ngIf="vm.nextAppointmentUtc">
+          {{ 'doctorDashboard.nextConsultAt' | translate:{ date: (vm.nextAppointmentUtc | date:'dd/MM/yyyy HH:mm') } }}
+        </p>
+        <p *ngIf="!vm.nextAppointmentUtc">
+          {{ 'doctorDashboard.noNextConsult' | translate }}
+        </p>
+        <a mat-flat-button routerLink="/dashboard/doctor-appointments">{{ 'actions.reviewConsultQueue' | translate }}</a>
+      </mat-card>
+    </section>
+  </ng-container>
+</section>

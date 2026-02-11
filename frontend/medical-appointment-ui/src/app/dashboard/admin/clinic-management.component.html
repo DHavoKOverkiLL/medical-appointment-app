@@ -1,0 +1,86 @@
+<section class="clinic-admin-page">
+  <header class="clinic-hero">
+    <p class="eyebrow">{{ 'roles.admin' | translate }}</p>
+    <h1>{{ 'clinicManagement.title' | translate }}</h1>
+    <p>{{ 'clinicManagement.subtitle' | translate }}</p>
+
+    <div class="hero-actions">
+      <a mat-flat-button routerLink="/dashboard/admin/users">{{ 'actions.manageUsers' | translate }}</a>
+      <a mat-stroked-button routerLink="/dashboard/appointments/all">{{ 'actions.viewAppointments' | translate }}</a>
+    </div>
+  </header>
+
+  <section class="clinic-metrics">
+    <mat-card>
+      <span>{{ 'metrics.totalClinics' | translate }}</span>
+      <strong>{{ totalClinics }}</strong>
+    </mat-card>
+    <mat-card>
+      <span>{{ 'statuses.active' | translate }}</span>
+      <strong>{{ activeClinics }}</strong>
+    </mat-card>
+    <mat-card>
+      <span>{{ 'statuses.inactive' | translate }}</span>
+      <strong>{{ inactiveClinics }}</strong>
+    </mat-card>
+    <mat-card>
+      <span>{{ 'metrics.mappedUsers' | translate }}</span>
+      <strong>{{ mappedUsersCount }}</strong>
+    </mat-card>
+  </section>
+
+  <p *ngIf="loading && clinics.length > 0" class="state">{{ 'state.working' | translate }}</p>
+  <p *ngIf="errorMessage" class="error">{{ errorMessage | translate }}</p>
+  <p *ngIf="successMessage" class="success">{{ successMessage | translate }}</p>
+
+  <section class="editor-toolbar">
+    <div class="toolbar-copy">
+      <h2>{{ 'clinicManagement.modalsTitle' | translate }}</h2>
+      <p>{{ 'clinicManagement.modalsSubtitle' | translate }}</p>
+    </div>
+    <button mat-flat-button type="button" [disabled]="loading" (click)="openCreateClinicDialog()">{{ 'actions.addClinic' | translate }}</button>
+  </section>
+
+  <mat-card class="panel directory-panel" [attr.aria-busy]="loading">
+    <h2>{{ 'clinicManagement.directoryTitle' | translate }}</h2>
+    <p class="panel-subtitle">{{ 'clinicManagement.directorySubtitle' | translate }}</p>
+
+    <section class="skeleton-cards" *ngIf="loading && clinics.length === 0" aria-hidden="true">
+      <article class="skeleton-card" *ngFor="let _ of skeletonCards">
+        <div class="skeleton-line skeleton-line--title"></div>
+        <div class="skeleton-line skeleton-line--meta"></div>
+        <div class="skeleton-pills">
+          <span class="skeleton-pill"></span>
+          <span class="skeleton-pill"></span>
+          <span class="skeleton-pill"></span>
+        </div>
+      </article>
+    </section>
+
+    <section class="empty-state" *ngIf="!loading && clinics.length === 0">
+      {{ 'clinicManagement.empty' | translate }}
+    </section>
+
+    <section class="clinic-cards" *ngIf="clinics.length > 0">
+      <article class="clinic-card" *ngFor="let clinic of clinics; trackBy: trackClinic">
+        <div class="clinic-main">
+          <div class="clinic-title">
+            <h3>{{ clinic.name }}</h3>
+            <span [class]="getStatusClass(clinic.isActive)">
+              {{ clinic.isActive ? ('statuses.active' | translate) : ('statuses.inactive' | translate) }}
+            </span>
+          </div>
+
+          <div class="clinic-meta">
+            <span>{{ 'common.code' | translate }}: {{ clinic.code }}</span>
+            <span>{{ 'clinicManagement.usersCount' | translate:{ count: clinic.usersCount } }}</span>
+            <span *ngIf="clinic.city || clinic.state">{{ clinic.city }}{{ clinic.city && clinic.state ? ', ' : '' }}{{ clinic.state }}</span>
+            <span *ngIf="clinic.sysClinicTypeId > 0">{{ getClinicTypeDisplayName(clinic) }}</span>
+          </div>
+        </div>
+
+        <button mat-stroked-button type="button" [disabled]="loading" (click)="openEditClinicDialog(clinic)">{{ 'common.edit' | translate }}</button>
+      </article>
+    </section>
+  </mat-card>
+</section>

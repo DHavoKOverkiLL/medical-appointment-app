@@ -1,0 +1,116 @@
+<section class="admin-users-page">
+  <header class="users-hero">
+    <p class="eyebrow">{{ 'roles.admin' | translate }}</p>
+    <h1>{{ 'userManagement.title' | translate }}</h1>
+    <p>{{ 'userManagement.subtitle' | translate }}</p>
+
+    <div class="hero-actions">
+      <a mat-flat-button routerLink="/dashboard/admin/clinics">{{ 'actions.manageClinics' | translate }}</a>
+      <a mat-stroked-button routerLink="/dashboard/appointments/all">{{ 'actions.viewAppointments' | translate }}</a>
+    </div>
+  </header>
+
+  <section class="users-metrics">
+    <mat-card>
+      <span>{{ 'metrics.totalUsers' | translate }}</span>
+      <strong>{{ totalUsers }}</strong>
+    </mat-card>
+    <mat-card>
+      <span>{{ 'metrics.admins' | translate }}</span>
+      <strong>{{ adminsCount }}</strong>
+    </mat-card>
+    <mat-card>
+      <span>{{ 'metrics.doctors' | translate }}</span>
+      <strong>{{ doctorsCount }}</strong>
+    </mat-card>
+    <mat-card>
+      <span>{{ 'metrics.patients' | translate }}</span>
+      <strong>{{ patientsCount }}</strong>
+    </mat-card>
+    <mat-card>
+      <span>{{ 'metrics.displayed' | translate }}</span>
+      <strong>{{ displayedUsers.length }}</strong>
+    </mat-card>
+  </section>
+
+  <p *ngIf="loading && users.length > 0" class="state">{{ 'state.working' | translate }}</p>
+  <p *ngIf="errorMessage" class="error">{{ errorMessage | translate }}</p>
+  <p *ngIf="successMessage" class="success">{{ successMessage | translate }}</p>
+
+  <section class="editor-toolbar">
+    <div class="toolbar-copy">
+      <h2>{{ 'userManagement.modalsTitle' | translate }}</h2>
+      <p>{{ 'userManagement.modalsSubtitle' | translate }}</p>
+    </div>
+    <button mat-flat-button type="button" [disabled]="loading" (click)="openCreateUserDialog()">{{ 'actions.addUser' | translate }}</button>
+  </section>
+
+  <mat-card class="panel directory-panel" [attr.aria-busy]="loading">
+    <div class="directory-header">
+      <div>
+        <h2>{{ 'userManagement.directoryTitle' | translate }}</h2>
+        <p>{{ 'userManagement.directorySubtitle' | translate:{ count: displayedUsers.length, clinic: (selectedClinicLabel | translate) } }}</p>
+      </div>
+
+      <mat-form-field appearance="outline">
+        <mat-label>{{ 'userManagement.filterByClinic' | translate }}</mat-label>
+        <mat-select [value]="selectedClinicFilter" (selectionChange)="selectedClinicFilter = $event.value">
+          <mat-option value="all">{{ 'common.allClinics' | translate }}</mat-option>
+          <mat-option *ngFor="let clinic of clinics" [value]="clinic.clinicId">{{ clinic.name }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <section class="skeleton-cards" *ngIf="loading && users.length === 0" aria-hidden="true">
+      <article class="skeleton-user-card" *ngFor="let _ of skeletonRows">
+        <div class="skeleton-line skeleton-line--title"></div>
+        <div class="skeleton-line skeleton-line--meta"></div>
+        <div class="skeleton-pills">
+          <span class="skeleton-pill"></span>
+          <span class="skeleton-pill"></span>
+          <span class="skeleton-pill"></span>
+        </div>
+      </article>
+    </section>
+
+    <section class="empty-state" *ngIf="!loading && displayedUsers.length === 0">
+      {{ 'userManagement.empty' | translate }}
+    </section>
+
+    <section class="user-cards" *ngIf="displayedUsers.length > 0">
+      <article class="user-card" *ngFor="let user of displayedUsers; trackBy: trackUser">
+        <div class="user-main">
+          <div class="user-title">
+            <h3>{{ user.firstName }} {{ user.lastName }}</h3>
+            <span [class]="getRoleBadgeClass(user.role)">{{ user.role }}</span>
+          </div>
+
+          <p class="user-email">{{ user.email }}</p>
+
+          <div class="user-meta">
+            <span>{{ user.username }}</span>
+            <span>{{ user.clinicName }}</span>
+            <span>{{ user.personalIdentifier }}</span>
+          </div>
+        </div>
+
+        <div class="user-actions">
+          <mat-form-field appearance="outline" class="role-field">
+            <mat-label>{{ 'common.role' | translate }}</mat-label>
+            <mat-select [value]="pendingRoleByUserId[user.userId]" (selectionChange)="onRoleSelectionChange(user.userId, $event.value)">
+              <mat-option *ngFor="let role of roles" [value]="role.name">{{ role.name }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <div class="action-buttons">
+            <button mat-stroked-button type="button" [disabled]="isSaveRoleDisabled(user)" (click)="saveRole(user)">
+              <mat-progress-spinner *ngIf="savingRoleUserId === user.userId" mode="indeterminate" diameter="16"></mat-progress-spinner>
+              <span>{{ 'actions.saveRole' | translate }}</span>
+            </button>
+            <button mat-stroked-button type="button" [disabled]="loading" (click)="openEditUserDialog(user)">{{ 'common.edit' | translate }}</button>
+          </div>
+        </div>
+      </article>
+    </section>
+  </mat-card>
+</section>

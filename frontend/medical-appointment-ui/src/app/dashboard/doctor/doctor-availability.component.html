@@ -1,0 +1,204 @@
+<section class="availability-shell">
+  <header class="availability-hero">
+    <p class="availability-eyebrow">{{ 'availability.eyebrow' | translate }}</p>
+    <h1>{{ 'availability.title' | translate }}</h1>
+    <p>{{ (isAdmin ? 'availability.subtitleAdmin' : 'availability.subtitleDoctor') | translate }}</p>
+
+    <div class="availability-actions">
+      <a mat-stroked-button [routerLink]="isAdmin ? '/dashboard/admin' : '/dashboard/doctor'">
+        {{ 'actions.backToDashboard' | translate }}
+      </a>
+    </div>
+  </header>
+
+  <p *ngIf="loading" class="state">{{ 'availability.messages.loading' | translate }}</p>
+  <p *ngIf="successMessage" class="success">{{ successMessage | translate }}</p>
+  <p *ngIf="errorMessage" class="error">{{ errorMessage | translate }}</p>
+
+  <mat-card class="availability-card">
+    <form [formGroup]="form" (ngSubmit)="save()">
+      <div class="admin-select" *ngIf="isAdmin">
+        <div class="admin-filters">
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'availability.fields.filterClinic' | translate }}</mat-label>
+            <mat-select [value]="selectedClinicFilter" (selectionChange)="onClinicFilterChange($event.value)">
+              <mat-option value="">{{ 'common.allClinics' | translate }}</mat-option>
+              <mat-option *ngFor="let clinicName of clinicFilters; trackBy: trackByIndex" [value]="clinicName">
+                {{ clinicName }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'availability.fields.searchDoctor' | translate }}</mat-label>
+            <input
+              matInput
+              type="text"
+              [value]="doctorSearchTerm"
+              (input)="onDoctorSearchChange($any($event.target).value)" />
+          </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'availability.fields.selectDoctor' | translate }}</mat-label>
+          <mat-select [value]="selectedDoctorId" (selectionChange)="onDoctorChange($event.value)" [disabled]="loading || saving || filteredDoctors.length === 0">
+            <mat-option *ngFor="let doctor of filteredDoctors; trackBy: trackDoctor" [value]="doctor.userId">
+              {{ doctor.lastName }} {{ doctor.firstName }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <p class="hint" *ngIf="filteredDoctors.length === 0">
+          {{ 'availability.errors.noMatchingDoctors' | translate }}
+        </p>
+      </div>
+
+      <p class="timezone" *ngIf="timezone">
+        {{ 'availability.fields.timezone' | translate:{ timezone: timezone } }}
+      </p>
+
+      <section class="group-section">
+        <div class="group-header">
+          <h2>{{ 'availability.sections.weeklyAvailability' | translate }}</h2>
+          <button mat-stroked-button type="button" (click)="addWeeklyAvailability()" [disabled]="loading || saving">
+            {{ 'availability.actions.addAvailabilityWindow' | translate }}
+          </button>
+        </div>
+
+        <p class="hint">{{ 'availability.hints.weeklyAvailability' | translate }}</p>
+
+        <p class="hint" *ngIf="weeklyAvailability.length === 0">
+          {{ 'availability.hints.emptyWeeklyAvailability' | translate }}
+        </p>
+
+        <div class="range-list" formArrayName="weeklyAvailability">
+          <div
+            class="range-row"
+            *ngFor="let group of weeklyAvailability.controls; let i = index; trackBy: trackByIndex"
+            [formGroupName]="i">
+            <mat-form-field appearance="outline">
+              <mat-label>{{ 'common.day' | translate }}</mat-label>
+              <mat-select formControlName="dayOfWeek">
+                <mat-option *ngFor="let day of dayOptions" [value]="day.value">
+                  {{ day.labelKey | translate }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>{{ 'availability.fields.startTime' | translate }}</mat-label>
+              <input matInput type="time" formControlName="start" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>{{ 'availability.fields.endTime' | translate }}</mat-label>
+              <input matInput type="time" formControlName="end" />
+            </mat-form-field>
+
+            <button mat-stroked-button type="button" (click)="removeWeeklyAvailability(i)" [disabled]="loading || saving">
+              {{ 'common.remove' | translate }}
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="group-section">
+        <div class="group-header">
+          <h2>{{ 'availability.sections.weeklyBreaks' | translate }}</h2>
+          <button mat-stroked-button type="button" (click)="addWeeklyBreak()" [disabled]="loading || saving">
+            {{ 'availability.actions.addBreak' | translate }}
+          </button>
+        </div>
+
+        <p class="hint">{{ 'availability.hints.weeklyBreaks' | translate }}</p>
+
+        <div class="range-list" formArrayName="weeklyBreaks">
+          <div
+            class="range-row"
+            *ngFor="let group of weeklyBreaks.controls; let i = index; trackBy: trackByIndex"
+            [formGroupName]="i">
+            <mat-form-field appearance="outline">
+              <mat-label>{{ 'common.day' | translate }}</mat-label>
+              <mat-select formControlName="dayOfWeek">
+                <mat-option *ngFor="let day of dayOptions" [value]="day.value">
+                  {{ day.labelKey | translate }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>{{ 'availability.fields.startTime' | translate }}</mat-label>
+              <input matInput type="time" formControlName="start" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>{{ 'availability.fields.endTime' | translate }}</mat-label>
+              <input matInput type="time" formControlName="end" />
+            </mat-form-field>
+
+            <button mat-stroked-button type="button" (click)="removeWeeklyBreak(i)" [disabled]="loading || saving">
+              {{ 'common.remove' | translate }}
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="group-section">
+        <div class="group-header">
+          <h2>{{ 'availability.sections.dateOverrides' | translate }}</h2>
+          <button mat-stroked-button type="button" (click)="addOverride()" [disabled]="loading || saving">
+            {{ 'availability.actions.addOverride' | translate }}
+          </button>
+        </div>
+
+        <p class="hint">{{ 'availability.hints.dateOverrides' | translate }}</p>
+
+        <div class="range-list" formArrayName="overrides">
+          <div
+            class="range-row override-row"
+            *ngFor="let group of overrides.controls; let i = index; trackBy: trackByIndex"
+            [formGroupName]="i">
+            <mat-form-field appearance="outline">
+              <mat-label>{{ 'common.date' | translate }}</mat-label>
+              <input matInput type="date" formControlName="date" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>{{ 'availability.fields.overrideType' | translate }}</mat-label>
+              <mat-select formControlName="isAvailable">
+                <mat-option [value]="true">{{ 'availability.override.available' | translate }}</mat-option>
+                <mat-option [value]="false">{{ 'availability.override.unavailable' | translate }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>{{ 'availability.fields.startTime' | translate }}</mat-label>
+              <input matInput type="time" formControlName="start" [disabled]="group.value.isAvailable !== true" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>{{ 'availability.fields.endTime' | translate }}</mat-label>
+              <input matInput type="time" formControlName="end" [disabled]="group.value.isAvailable !== true" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="reason-field">
+              <mat-label>{{ 'common.reason' | translate }}</mat-label>
+              <input matInput type="text" maxlength="250" formControlName="reason" />
+            </mat-form-field>
+
+            <button mat-stroked-button type="button" (click)="removeOverride(i)" [disabled]="loading || saving">
+              {{ 'common.remove' | translate }}
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <div class="submit-row">
+        <button mat-flat-button class="save-button button-with-spinner" type="submit" [disabled]="loading || saving">
+          <mat-progress-spinner *ngIf="saving" mode="indeterminate" diameter="18"></mat-progress-spinner>
+          <span>{{ 'actions.saveChanges' | translate }}</span>
+        </button>
+      </div>
+    </form>
+  </mat-card>
+</section>

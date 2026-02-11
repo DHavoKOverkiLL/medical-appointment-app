@@ -1,0 +1,30 @@
+<mat-progress-bar
+  *ngIf="loadingService.isVisible$ | async"
+  mode="indeterminate"
+  class="app-network-loader"
+  [attr.aria-label]="'state.working' | translate">
+</mat-progress-bar>
+
+<div class="app-language-switcher" role="group" [attr.aria-label]="'language.switch' | translate">
+  <button
+    type="button"
+    class="app-language-switcher__button"
+    [class.app-language-switcher__button--active]="i18n.currentLanguage === 'ro'"
+    (click)="setLanguage('ro')">
+    {{ 'language.romanian' | translate }}
+  </button>
+  <button
+    type="button"
+    class="app-language-switcher__button"
+    [class.app-language-switcher__button--active]="i18n.currentLanguage === 'en'"
+    (click)="setLanguage('en')">
+    {{ 'language.english' | translate }}
+  </button>
+</div>
+
+<div class="app-shell" [class.app-shell--guest]="!authService.isLoggedIn()">
+  <app-header *ngIf="authService.isLoggedIn()" class="app-shell__sidebar"></app-header>
+  <main class="app-shell__content">
+    <router-outlet></router-outlet>
+  </main>
+</div>

@@ -1,0 +1,86 @@
+<section class="dashboard-shell">
+  <header class="dashboard-hero">
+    <p class="dashboard-eyebrow">{{ 'adminDashboard.eyebrow' | translate }}</p>
+    <h1>{{ 'adminDashboard.title' | translate }}</h1>
+    <p>{{ 'adminDashboard.subtitle' | translate }}</p>
+    <div class="dashboard-actions">
+      <a mat-flat-button routerLink="/dashboard/admin/users">{{ 'actions.manageUsers' | translate }}</a>
+      <a mat-flat-button routerLink="/dashboard/admin/clinics">{{ 'actions.manageClinics' | translate }}</a>
+      <a mat-flat-button routerLink="/dashboard/admin/availability">{{ 'actions.manageAvailability' | translate }}</a>
+      <a mat-flat-button routerLink="/dashboard/appointments/all">{{ 'actions.viewAppointments' | translate }}</a>
+      <a mat-flat-button routerLink="/dashboard/admin/profile">{{ 'nav.profile' | translate }}</a>
+      <a mat-flat-button routerLink="/dashboard/admin/settings">{{ 'nav.accountSettings' | translate }}</a>
+    </div>
+  </header>
+
+  <p *ngIf="loading && summary" class="dashboard-state">{{ 'state.loadingDashboardData' | translate }}</p>
+  <p *ngIf="errorMessage" class="dashboard-error">{{ errorMessage | translate }}</p>
+
+  <section class="app-skeleton-list" *ngIf="loading && !summary" aria-hidden="true">
+    <article class="app-skeleton-card" *ngFor="let _ of metricSkeletons">
+      <div class="app-skeleton-line app-skeleton-line--title"></div>
+      <div class="app-skeleton-line app-skeleton-line--meta"></div>
+    </article>
+  </section>
+
+  <section class="app-skeleton-list" *ngIf="loading && !summary" aria-hidden="true">
+    <article class="app-skeleton-card" *ngFor="let _ of clinicSkeletons">
+      <div class="app-skeleton-line app-skeleton-line--title"></div>
+      <div class="app-skeleton-line app-skeleton-line--meta"></div>
+      <div class="app-skeleton-pills">
+        <span class="app-skeleton-pill"></span>
+        <span class="app-skeleton-pill"></span>
+        <span class="app-skeleton-pill"></span>
+      </div>
+    </article>
+  </section>
+
+  <ng-container *ngIf="summary as vm">
+    <section class="metric-grid">
+      <mat-card class="metric-card">
+        <span class="metric-label">{{ 'metrics.clinics' | translate }}</span>
+        <strong class="metric-value">{{ vm.clinics }}</strong>
+      </mat-card>
+      <mat-card class="metric-card">
+        <span class="metric-label">{{ 'metrics.users' | translate }}</span>
+        <strong class="metric-value">{{ vm.users }}</strong>
+      </mat-card>
+      <mat-card class="metric-card">
+        <span class="metric-label">{{ 'metrics.doctors' | translate }}</span>
+        <strong class="metric-value">{{ vm.doctors }}</strong>
+      </mat-card>
+      <mat-card class="metric-card">
+        <span class="metric-label">{{ 'metrics.patients' | translate }}</span>
+        <strong class="metric-value">{{ vm.patients }}</strong>
+      </mat-card>
+      <mat-card class="metric-card">
+        <span class="metric-label">{{ 'metrics.admins' | translate }}</span>
+        <strong class="metric-value">{{ vm.admins }}</strong>
+      </mat-card>
+      <mat-card class="metric-card">
+        <span class="metric-label">{{ 'metrics.appointmentsToday' | translate }}</span>
+        <strong class="metric-value">{{ vm.appointmentsToday }}</strong>
+      </mat-card>
+      <mat-card class="metric-card">
+        <span class="metric-label">{{ 'metrics.upcomingAppointments' | translate }}</span>
+        <strong class="metric-value">{{ vm.upcomingAppointments }}</strong>
+      </mat-card>
+    </section>
+
+    <section class="clinic-load">
+      <h2>{{ 'adminDashboard.clinicLoadTitle' | translate }}</h2>
+      <div class="clinic-table">
+        <div class="clinic-row clinic-row--head">
+          <span>{{ 'common.clinic' | translate }}</span>
+          <span>{{ 'metrics.users' | translate }}</span>
+          <span>{{ 'metrics.upcomingAppointments' | translate }}</span>
+        </div>
+        <div class="clinic-row" *ngFor="let row of vm.clinicLoad; trackBy: trackClinic">
+          <span>{{ row.clinicName }}</span>
+          <span>{{ row.users }}</span>
+          <span>{{ row.appointments }}</span>
+        </div>
+      </div>
+    </section>
+  </ng-container>
+</section>

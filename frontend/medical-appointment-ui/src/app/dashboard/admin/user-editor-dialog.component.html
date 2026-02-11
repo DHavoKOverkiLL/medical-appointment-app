@@ -1,0 +1,116 @@
+<div class="dialog-shell" [formGroup]="form">
+  <header class="dialog-header">
+    <div>
+      <p class="dialog-eyebrow">{{ 'roles.admin' | translate }}</p>
+      <h2>{{ dialogTitle | translate }}</h2>
+      <p class="dialog-subtitle">{{ 'userEditor.dialogSubtitle' | translate }}</p>
+    </div>
+    <button mat-stroked-button type="button" (click)="close()">{{ 'common.close' | translate }}</button>
+  </header>
+
+  <mat-tab-group [(selectedIndex)]="activeTabIndex" class="dialog-tabs">
+    <mat-tab [label]="'userEditor.tabs.account' | translate">
+      <div class="tab-scroll">
+        <div class="tab-grid">
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'common.username' | translate }}</mat-label>
+            <input matInput formControlName="username" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'common.email' | translate }}</mat-label>
+            <input matInput type="email" formControlName="email" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" *ngIf="!isEditMode">
+            <mat-label>{{ 'common.password' | translate }}</mat-label>
+            <input matInput type="password" formControlName="password" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" *ngIf="!isEditMode">
+            <mat-label>{{ 'common.role' | translate }}</mat-label>
+            <mat-select formControlName="roleName">
+              <mat-option *ngFor="let role of data.roles" [value]="role.name">{{ role.name }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'common.clinic' | translate }}</mat-label>
+            <mat-select formControlName="clinicId">
+              <mat-option *ngFor="let clinic of data.clinics" [value]="clinic.clinicId">{{ clinic.name }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <div class="role-pill" *ngIf="isEditMode && data.user">
+            <span>{{ 'userEditor.currentRole' | translate }}</span>
+            <strong>{{ data.user.role }}</strong>
+            <small>{{ 'userEditor.currentRoleHint' | translate }}</small>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+
+    <mat-tab [label]="'userEditor.tabs.profile' | translate">
+      <div class="tab-scroll">
+        <div class="tab-grid">
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'common.firstName' | translate }}</mat-label>
+            <input matInput formControlName="firstName" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'common.lastName' | translate }}</mat-label>
+            <input matInput formControlName="lastName" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'common.personalIdentifier' | translate }}</mat-label>
+            <input matInput formControlName="personalIdentifier" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'common.birthDate' | translate }}</mat-label>
+            <input matInput [matDatepicker]="birthDatePicker" formControlName="birthDate" />
+            <mat-datepicker-toggle matSuffix [for]="birthDatePicker"></mat-datepicker-toggle>
+            <mat-datepicker #birthDatePicker></mat-datepicker>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="field-wide">
+            <mat-label>{{ 'common.address' | translate }}</mat-label>
+            <input matInput formControlName="address" />
+          </mat-form-field>
+        </div>
+      </div>
+    </mat-tab>
+
+    <mat-tab [label]="'userEditor.tabs.review' | translate">
+      <div class="tab-scroll">
+        <div class="review-grid">
+          <article>
+            <span>{{ 'userEditor.review.identity' | translate }}</span>
+            <strong>{{ form.value.firstName || '-' }} {{ form.value.lastName || '-' }}</strong>
+            <small>{{ form.value.personalIdentifier || ('userEditor.review.noPersonalIdentifier' | translate) }}</small>
+          </article>
+
+          <article>
+            <span>{{ 'userEditor.review.account' | translate }}</span>
+            <strong>{{ form.value.username || '-' }}</strong>
+            <small>{{ form.value.email || ('userEditor.review.noEmail' | translate) }}</small>
+          </article>
+
+          <article>
+            <span>{{ 'common.clinic' | translate }}</span>
+            <strong>{{ selectedClinicName | translate }}</strong>
+            <small *ngIf="!isEditMode">{{ 'common.role' | translate }}: {{ form.value.roleName || '-' }}</small>
+            <small *ngIf="isEditMode && data.user">{{ 'common.role' | translate }}: {{ data.user.role }}</small>
+          </article>
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+
+  <footer class="dialog-footer">
+    <button mat-stroked-button type="button" (click)="close()">{{ 'common.cancel' | translate }}</button>
+    <button mat-flat-button type="button" (click)="submit()">{{ submitLabel | translate }}</button>
+  </footer>
+</div>

@@ -1,0 +1,27 @@
+# IDE/editor
+.vscode/
+**/.vs/
+*.suo
+*.user
+
+# .NET build outputs
+**/bin/
+**/obj/
+
+# Node/Angular outputs
+frontend/medical-appointment-ui/node_modules/
+frontend/medical-appointment-ui/dist/
+frontend/medical-appointment-ui/.angular/
+frontend/medical-appointment-ui/test-results/
+
+# Temporary/debug scripts and accidental files
+frontend/medical-appointment-ui/tmp-*.js
+frontend/medical-appointment-ui/CON
+backend/MedicalAppointment.Api/backend/
+frontend/medical-appointment-ui/backend/
+*.Backup.tmp
+
+# Local screenshots
+post-login-shot.png
+root-shot.png
+shot.png

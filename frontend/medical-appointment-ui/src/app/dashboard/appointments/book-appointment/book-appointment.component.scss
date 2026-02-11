@@ -1,0 +1,93 @@
+.book-shell {
+  padding: clamp(1rem, 2vw, 1.5rem);
+}
+
+.book-hero {
+  border: 1px solid #d6e5f2;
+  border-radius: 1rem;
+  padding: 1rem 1.15rem;
+  background:
+    radial-gradient(circle at 88% 18%, rgba(43, 123, 216, 0.18), transparent 38%),
+    radial-gradient(circle at 10% 86%, rgba(15, 140, 163, 0.14), transparent 42%),
+    #f4fbff;
+}
+
+.book-eyebrow {
+  margin: 0;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #4c6580;
+  font-weight: 700;
+}
+
+.book-hero h1 {
+  margin: 0.4rem 0 0.3rem;
+  line-height: 1.2;
+}
+
+.book-hero p {
+  margin: 0;
+  color: #5a7188;
+}
+
+.book-card {
+  margin-top: 0.9rem;
+  border: 1px solid #dbe7f1;
+}
+
+.book-card h2 {
+  margin: 0;
+  font-size: 1.08rem;
+}
+
+.book-subtitle {
+  margin: 0.35rem 0 0.95rem;
+  color: #56718a;
+  font-size: 0.86rem;
+}
+
+.book-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 0.65rem;
+}
+
+.full-width {
+  grid-column: span 2;
+}
+
+.book-submit {
+  margin-top: 0.55rem;
+  background: linear-gradient(130deg, #0f8ca3, #2a7cd9);
+  color: #fff;
+}
+
+.slot-state {
+  margin: 0.6rem 0 0;
+  color: #516a81;
+  font-size: 0.84rem;
+}
+
+.success-message,
+.error-message {
+  margin-top: 0.8rem;
+  border-radius: 0.65rem;
+  padding: 0.7rem 0.85rem;
+}
+
+.success-message {
+  background: #ecfaf2;
+  color: #2a6948;
+}
+
+.error-message {
+  background: #fff4f7;
+  color: #bc3e5b;
+}
+
+@media (max-width: 840px) {
+  .full-width {
+    grid-column: span 1;
+  }
+}

@@ -1,0 +1,170 @@
+.dialog-shell {
+  display: grid;
+  gap: 0.85rem;
+  height: min(82vh, 760px);
+  min-height: 560px;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.8rem;
+}
+
+.dialog-eyebrow {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #4d6580;
+}
+
+.dialog-header h2 {
+  margin: 0.32rem 0 0.25rem;
+  font-size: 1.3rem;
+  line-height: 1.2;
+}
+
+.dialog-subtitle {
+  margin: 0;
+  color: #59718a;
+  font-size: 0.86rem;
+}
+
+.dialog-tabs {
+  min-height: 0;
+  height: 100%;
+}
+
+.tab-scroll {
+  height: 100%;
+  overflow: auto;
+  padding: 0.15rem 0.15rem 0.2rem;
+  scrollbar-gutter: stable;
+  animation: tabContentFadeIn 220ms ease;
+}
+
+.tab-grid {
+  padding: 0.75rem 0.1rem 0.1rem;
+  display: grid;
+  gap: 0.65rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.field-wide {
+  grid-column: span 2;
+}
+
+.role-pill {
+  border: 1px solid #d4e5f3;
+  border-radius: 0.75rem;
+  padding: 0.75rem;
+  background: #f8fcff;
+  display: grid;
+  gap: 0.2rem;
+}
+
+.role-pill span {
+  font-size: 0.76rem;
+  color: #55718a;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.role-pill strong {
+  font-size: 1rem;
+}
+
+.role-pill small {
+  color: #5b738b;
+  line-height: 1.35;
+}
+
+.review-grid {
+  padding: 0.8rem 0.1rem 0.1rem;
+  display: grid;
+  gap: 0.65rem;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.review-grid article {
+  border: 1px solid #d7e6f2;
+  border-radius: 0.75rem;
+  background: #f9fcff;
+  padding: 0.75rem;
+  display: grid;
+  gap: 0.18rem;
+}
+
+.review-grid span {
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #4f6983;
+}
+
+.review-grid strong {
+  font-size: 0.98rem;
+}
+
+.review-grid small {
+  color: #58718a;
+  line-height: 1.35;
+}
+
+.dialog-footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.55rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid #d9e6f2;
+  background: linear-gradient(180deg, rgba(253, 254, 255, 0.2), #fdfefe 34%);
+  backdrop-filter: blur(4px);
+}
+
+.dialog-footer button[mat-flat-button] {
+  background: linear-gradient(130deg, #0f8ca3, #2a7cd8);
+  color: #fff;
+}
+
+:host ::ng-deep .dialog-tabs .mat-mdc-tab-body-wrapper {
+  height: 100%;
+}
+
+:host ::ng-deep .dialog-tabs .mat-mdc-tab-body-content {
+  height: 100%;
+  overflow: hidden;
+}
+
+@keyframes tabContentFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 900px) {
+  .dialog-shell {
+    height: min(88vh, 860px);
+    min-height: 520px;
+  }
+
+  .dialog-header {
+    flex-direction: column;
+  }
+
+  .field-wide {
+    grid-column: span 1;
+  }
+}

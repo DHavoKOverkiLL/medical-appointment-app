@@ -1,0 +1,141 @@
+.doctor-dashboard {
+  padding: clamp(1rem, 2vw, 1.5rem);
+}
+
+.doctor-hero {
+  border-radius: 1rem;
+  padding: clamp(1.1rem, 2vw, 1.35rem);
+  border: 1px solid #d6e7f3;
+  background:
+    radial-gradient(circle at 86% 20%, rgba(43, 124, 216, 0.19), transparent 36%),
+    radial-gradient(circle at 12% 84%, rgba(15, 140, 163, 0.15), transparent 40%),
+    #f5fbff;
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #4f6e79;
+  font-weight: 700;
+}
+
+.doctor-hero h1 {
+  margin: 0.4rem 0 0.3rem;
+  line-height: 1.2;
+  font-size: clamp(1.4rem, 2.2vw, 1.95rem);
+}
+
+.doctor-hero p {
+  margin: 0;
+  color: #4f6780;
+}
+
+.doctor-actions {
+  margin-top: 0.9rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.doctor-actions a[mat-flat-button] {
+  background: linear-gradient(130deg, #0f8ca3, #2a7cd8);
+  color: #fff;
+}
+
+.doctor-actions a[mat-stroked-button] {
+  border-color: #bbd3e6;
+  color: #20567d;
+}
+
+.cards {
+  margin-top: 0.95rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.75rem;
+}
+
+.metric-card {
+  border: 1px solid #dbe9ef;
+  box-shadow: 0 8px 18px rgba(14, 52, 63, 0.06);
+  background: #fbfdff;
+}
+
+.metric-card span {
+  display: block;
+  font-size: 0.8rem;
+  color: #54708a;
+}
+
+.metric-card strong {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 1.3rem;
+}
+
+.doctor-panel {
+  margin-top: 0.9rem;
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.doctor-panel mat-card {
+  border: 1px solid #dce8f2;
+  box-shadow: 0 10px 20px rgba(13, 45, 73, 0.06);
+}
+
+.doctor-panel h2 {
+  margin: 0;
+  font-size: 1.02rem;
+}
+
+.doctor-panel p {
+  margin: 0.4rem 0 0.8rem;
+  color: #566f86;
+  line-height: 1.5;
+}
+
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.chip-row span {
+  font-size: 0.78rem;
+  border: 1px solid #d6e5f1;
+  border-radius: 999px;
+  padding: 0.2rem 0.58rem;
+  background: #f7fcff;
+  color: #3f607d;
+}
+
+.doctor-panel a[mat-flat-button] {
+  background: linear-gradient(130deg, #0f8ca3, #2a7cd8);
+  color: #fff;
+}
+
+.state,
+.error {
+  margin-top: 1rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: 0.6rem;
+}
+
+.state {
+  background: #ebf7ff;
+  color: #335672;
+}
+
+.error {
+  background: #fff4f6;
+  color: #ba3e57;
+}
+
+@media (max-width: 900px) {
+  .doctor-panel {
+    grid-template-columns: 1fr;
+  }
+}
