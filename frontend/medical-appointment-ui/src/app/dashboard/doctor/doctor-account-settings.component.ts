@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
@@ -14,7 +14,6 @@ import { DashboardApiService } from '../dashboard-api.service';
   selector: 'app-doctor-account-settings',
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     RouterModule,
     MatCardModule,
@@ -23,7 +22,7 @@ import { DashboardApiService } from '../dashboard-api.service';
     MatButtonModule,
     MatProgressSpinnerModule,
     TranslateModule
-  ],
+],
   templateUrl: './doctor-account-settings.component.html',
   styleUrls: ['./doctor-account-settings.component.scss']
 })

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
@@ -18,7 +18,6 @@ import { parseIsoDate, toIsoDate } from '../../core/date-time/date-time.utils';
   selector: 'app-doctor-profile',
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     RouterModule,
     MatCardModule,
@@ -29,7 +28,7 @@ import { parseIsoDate, toIsoDate } from '../../core/date-time/date-time.utils';
     MatDatepickerModule,
     MatNativeDateModule,
     TranslateModule
-  ],
+],
   templateUrl: './doctor-profile.component.html',
   styleUrls: ['./doctor-profile.component.scss']
 })

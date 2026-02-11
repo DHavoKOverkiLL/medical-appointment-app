@@ -13,21 +13,29 @@
     </div>
   </header>
 
-  <p *ngIf="loading && summary" class="state">{{ 'state.loadingDashboard' | translate }}</p>
-  <p *ngIf="errorMessage" class="error">{{ errorMessage | translate }}</p>
+  @if (loading && summary) {
+    <p class="state">{{ 'state.loadingDashboard' | translate }}</p>
+  }
+  @if (errorMessage) {
+    <p class="error">{{ errorMessage | translate }}</p>
+  }
 
-  <section class="app-skeleton-list" *ngIf="loading && !summary" aria-hidden="true">
-    <article class="app-skeleton-card" *ngFor="let _ of skeletonCards">
-      <div class="app-skeleton-line app-skeleton-line--title"></div>
-      <div class="app-skeleton-line app-skeleton-line--meta"></div>
-      <div class="app-skeleton-pills">
-        <span class="app-skeleton-pill"></span>
-        <span class="app-skeleton-pill"></span>
-      </div>
-    </article>
-  </section>
+  @if (loading && !summary) {
+    <section class="app-skeleton-list" aria-hidden="true">
+      @for (_ of skeletonCards; track $index) {
+        <article class="app-skeleton-card">
+          <div class="app-skeleton-line app-skeleton-line--title"></div>
+          <div class="app-skeleton-line app-skeleton-line--meta"></div>
+          <div class="app-skeleton-pills">
+            <span class="app-skeleton-pill"></span>
+            <span class="app-skeleton-pill"></span>
+          </div>
+        </article>
+      }
+    </section>
+  }
 
-  <ng-container *ngIf="summary as vm">
+  @if (summary; as vm) {
     <section class="cards">
       <mat-card class="metric-card">
         <span>{{ 'metrics.appointmentsToday' | translate }}</span>
@@ -50,7 +58,6 @@
         <strong>{{ throughput | translate }}</strong>
       </mat-card>
     </section>
-
     <section class="doctor-panel">
       <mat-card>
         <h2>{{ 'doctorDashboard.snapshotTitle' | translate }}</h2>
@@ -61,17 +68,20 @@
           <span>{{ 'doctorDashboard.snapshot.uniquePatients' | translate:{ count: vm.uniquePatientsUpcoming } }}</span>
         </div>
       </mat-card>
-
       <mat-card>
         <h2>{{ 'doctorDashboard.nextConsultTitle' | translate }}</h2>
-        <p *ngIf="vm.nextAppointmentUtc">
-          {{ 'doctorDashboard.nextConsultAt' | translate:{ date: (vm.nextAppointmentUtc | date:'dd/MM/yyyy HH:mm') } }}
-        </p>
-        <p *ngIf="!vm.nextAppointmentUtc">
-          {{ 'doctorDashboard.noNextConsult' | translate }}
-        </p>
+        @if (vm.nextAppointmentUtc) {
+          <p>
+            {{ 'doctorDashboard.nextConsultAt' | translate:{ date: (vm.nextAppointmentUtc | date:'dd/MM/yyyy HH:mm') } }}
+          </p>
+        }
+        @if (!vm.nextAppointmentUtc) {
+          <p>
+            {{ 'doctorDashboard.noNextConsult' | translate }}
+          </p>
+        }
         <a mat-flat-button routerLink="/dashboard/doctor-appointments">{{ 'actions.reviewConsultQueue' | translate }}</a>
       </mat-card>
     </section>
-  </ng-container>
+  }
 </section>

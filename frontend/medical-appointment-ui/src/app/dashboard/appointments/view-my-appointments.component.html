@@ -25,101 +25,132 @@
     </mat-card>
   </section>
 
-  <p *ngIf="successMessage" class="success">{{ successMessage | translate }}</p>
-  <p *ngIf="loading && appointments.length > 0" class="state">{{ 'state.loadingAppointments' | translate }}</p>
-  <p *ngIf="errorMessage" class="error">{{ errorMessage | translate }}</p>
+  @if (successMessage) {
+    <p class="success">{{ successMessage | translate }}</p>
+  }
+  @if (loading && appointments.length > 0) {
+    <p class="state">{{ 'state.loadingAppointments' | translate }}</p>
+  }
+  @if (errorMessage) {
+    <p class="error">{{ errorMessage | translate }}</p>
+  }
 
-  <section class="app-skeleton-list" *ngIf="loading && appointments.length === 0" aria-hidden="true">
-    <article class="app-skeleton-card" *ngFor="let _ of skeletonRows">
-      <div class="app-skeleton-line app-skeleton-line--title"></div>
-      <div class="app-skeleton-line app-skeleton-line--meta"></div>
-      <div class="app-skeleton-pills">
-        <span class="app-skeleton-pill"></span>
-        <span class="app-skeleton-pill"></span>
-        <span class="app-skeleton-pill"></span>
-      </div>
-    </article>
-  </section>
+  @if (loading && appointments.length === 0) {
+    <section class="app-skeleton-list" aria-hidden="true">
+      @for (_ of skeletonRows; track $index) {
+        <article class="app-skeleton-card">
+          <div class="app-skeleton-line app-skeleton-line--title"></div>
+          <div class="app-skeleton-line app-skeleton-line--meta"></div>
+          <div class="app-skeleton-pills">
+            <span class="app-skeleton-pill"></span>
+            <span class="app-skeleton-pill"></span>
+            <span class="app-skeleton-pill"></span>
+          </div>
+        </article>
+      }
+    </section>
+  }
 
-  <section *ngIf="!loading && !errorMessage && appointments.length === 0" class="empty-state">
-    {{ 'appointmentsMy.empty' | translate }}
-  </section>
+  @if (!loading && !errorMessage && appointments.length === 0) {
+    <section class="empty-state">
+      {{ 'appointmentsMy.empty' | translate }}
+    </section>
+  }
 
-  <section class="appointments-list" *ngIf="!loading && appointments.length > 0">
-    <mat-card class="appointment-card" *ngFor="let appointment of appointments; trackBy: trackAppointment">
-      <div class="appointment-main">
-        <div class="appointment-title">
-          <h2>{{ appointment.doctorName }}</h2>
-          <span [class]="getStatusClass(appointment)">
-            {{ getStatusLabel(appointment) | translate }}
-          </span>
-        </div>
-
-        <div class="appointment-meta">
-          <span>{{ appointment.appointmentDateTime | date:'dd/MM/yyyy' }}</span>
-          <span>{{ appointment.appointmentDateTime | date:'HH:mm' }}</span>
-          <span>{{ appointment.clinicName }}</span>
-          <span [class.appointment-past]="isPast(appointment)">
-            {{ isPast(appointment) ? ('statuses.completed' | translate) : ('statuses.upcoming' | translate) }}
-          </span>
-        </div>
-
-        <p *ngIf="appointment.proposedDateTime" class="appointment-extra">
-          {{ 'common.proposed' | translate }}: {{ appointment.proposedDateTime | date:'dd/MM/yyyy HH:mm' }}
-        </p>
-        <p *ngIf="appointment.postponeReason" class="appointment-extra">
-          {{ 'common.reason' | translate }}: {{ appointment.postponeReason }}
-        </p>
-        <p *ngIf="appointment.cancellationReason" class="appointment-extra">
-          {{ 'common.cancelReason' | translate }}: {{ appointment.cancellationReason }}
-        </p>
-        <p *ngIf="appointment.doctorResponseNote && !isRejectedStatus(appointment.postponeRequestStatus)" class="appointment-extra">
-          {{ 'common.doctorNote' | translate }}: {{ appointment.doctorResponseNote }}
-        </p>
-        <section *ngIf="appointment.doctorResponseNote && isRejectedStatus(appointment.postponeRequestStatus)" class="reject-reason-box">
-          <strong>{{ 'statuses.rejectedByDoctor' | translate }}</strong>
-          <p>{{ appointment.doctorResponseNote }}</p>
-        </section>
-
-        <div class="counter-response-actions" *ngIf="canRespondToCounterProposal(appointment)">
-          <button
-            mat-flat-button
-            class="button-with-spinner"
-            type="button"
-            [disabled]="actionSubmittingAppointmentId === appointment.appointmentId"
-            (click)="respondToCounterProposal(appointment, 'Accept')">
-            <mat-progress-spinner *ngIf="actionSubmittingAppointmentId === appointment.appointmentId && actionDecision === 'Accept'" mode="indeterminate" diameter="16"></mat-progress-spinner>
-            <span>{{ 'actions.acceptCounterProposal' | translate }}</span>
-          </button>
-          <button
-            mat-stroked-button
-            class="button-with-spinner"
-            type="button"
-            [disabled]="actionSubmittingAppointmentId === appointment.appointmentId"
-            (click)="respondToCounterProposal(appointment, 'Reject')">
-            <mat-progress-spinner *ngIf="actionSubmittingAppointmentId === appointment.appointmentId && actionDecision === 'Reject'" mode="indeterminate" diameter="16"></mat-progress-spinner>
-            <span>{{ 'actions.rejectCounterProposal' | translate }}</span>
-          </button>
-        </div>
-
-        <div class="counter-response-actions" *ngIf="canCancelAppointment(appointment)">
-          <button
-            mat-stroked-button
-            class="button-with-spinner"
-            type="button"
-            [disabled]="actionSubmittingAppointmentId === appointment.appointmentId"
-            (click)="cancelAppointment(appointment)">
-            <mat-progress-spinner *ngIf="actionSubmittingAppointmentId === appointment.appointmentId && actionDecision === 'Cancel'" mode="indeterminate" diameter="16"></mat-progress-spinner>
-            <span>{{ 'actions.cancelAppointment' | translate }}</span>
-          </button>
-        </div>
-
-        <div class="counter-response-actions">
-          <a mat-button [routerLink]="['/dashboard/appointments', appointment.appointmentId, 'audit']">
-            {{ 'actions.viewAudit' | translate }}
-          </a>
-        </div>
-      </div>
-    </mat-card>
-  </section>
+  @if (!loading && appointments.length > 0) {
+    <section class="appointments-list">
+      @for (appointment of appointments; track trackAppointment($index, appointment)) {
+        <mat-card class="appointment-card">
+          <div class="appointment-main">
+            <div class="appointment-title">
+              <h2>{{ appointment.doctorName }}</h2>
+              <span [class]="getStatusClass(appointment)">
+                {{ getStatusLabel(appointment) | translate }}
+              </span>
+            </div>
+            <div class="appointment-meta">
+              <span>{{ appointment.appointmentDateTime | date:'dd/MM/yyyy' }}</span>
+              <span>{{ appointment.appointmentDateTime | date:'HH:mm' }}</span>
+              <span>{{ appointment.clinicName }}</span>
+              <span [class.appointment-past]="isPast(appointment)">
+                {{ isPast(appointment) ? ('statuses.completed' | translate) : ('statuses.upcoming' | translate) }}
+              </span>
+            </div>
+            @if (appointment.proposedDateTime) {
+              <p class="appointment-extra">
+                {{ 'common.proposed' | translate }}: {{ appointment.proposedDateTime | date:'dd/MM/yyyy HH:mm' }}
+              </p>
+            }
+            @if (appointment.postponeReason) {
+              <p class="appointment-extra">
+                {{ 'common.reason' | translate }}: {{ appointment.postponeReason }}
+              </p>
+            }
+            @if (appointment.cancellationReason) {
+              <p class="appointment-extra">
+                {{ 'common.cancelReason' | translate }}: {{ appointment.cancellationReason }}
+              </p>
+            }
+            @if (appointment.doctorResponseNote && !isRejectedStatus(appointment.postponeRequestStatus)) {
+              <p class="appointment-extra">
+                {{ 'common.doctorNote' | translate }}: {{ appointment.doctorResponseNote }}
+              </p>
+            }
+            @if (appointment.doctorResponseNote && isRejectedStatus(appointment.postponeRequestStatus)) {
+              <section class="reject-reason-box">
+                <strong>{{ 'statuses.rejectedByDoctor' | translate }}</strong>
+                <p>{{ appointment.doctorResponseNote }}</p>
+              </section>
+            }
+            @if (canRespondToCounterProposal(appointment)) {
+              <div class="counter-response-actions">
+                <button
+                  mat-flat-button
+                  class="button-with-spinner"
+                  type="button"
+                  [disabled]="actionSubmittingAppointmentId === appointment.appointmentId"
+                  (click)="respondToCounterProposal(appointment, 'Accept')">
+                  @if (actionSubmittingAppointmentId === appointment.appointmentId && actionDecision === 'Accept') {
+                    <mat-progress-spinner mode="indeterminate" diameter="16"></mat-progress-spinner>
+                  }
+                  <span>{{ 'actions.acceptCounterProposal' | translate }}</span>
+                </button>
+                <button
+                  mat-stroked-button
+                  class="button-with-spinner"
+                  type="button"
+                  [disabled]="actionSubmittingAppointmentId === appointment.appointmentId"
+                  (click)="respondToCounterProposal(appointment, 'Reject')">
+                  @if (actionSubmittingAppointmentId === appointment.appointmentId && actionDecision === 'Reject') {
+                    <mat-progress-spinner mode="indeterminate" diameter="16"></mat-progress-spinner>
+                  }
+                  <span>{{ 'actions.rejectCounterProposal' | translate }}</span>
+                </button>
+              </div>
+            }
+            @if (canCancelAppointment(appointment)) {
+              <div class="counter-response-actions">
+                <button
+                  mat-stroked-button
+                  class="button-with-spinner"
+                  type="button"
+                  [disabled]="actionSubmittingAppointmentId === appointment.appointmentId"
+                  (click)="cancelAppointment(appointment)">
+                  @if (actionSubmittingAppointmentId === appointment.appointmentId && actionDecision === 'Cancel') {
+                    <mat-progress-spinner mode="indeterminate" diameter="16"></mat-progress-spinner>
+                  }
+                  <span>{{ 'actions.cancelAppointment' | translate }}</span>
+                </button>
+              </div>
+            }
+            <div class="counter-response-actions">
+              <a mat-button [routerLink]="['/dashboard/appointments', appointment.appointmentId, 'audit']">
+                {{ 'actions.viewAudit' | translate }}
+              </a>
+            </div>
+          </div>
+        </mat-card>
+      }
+    </section>
+  }
 </section>

@@ -9,7 +9,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
-import { CommonModule } from '@angular/common';
+
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { API_BASE_URL } from '../../core/api.config';
 import { toIsoDate } from '../../core/date-time/date-time.utils';
@@ -37,7 +37,6 @@ interface ClinicOption {
   selector: 'app-register',
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     RouterModule,
     HttpClientModule,
@@ -49,7 +48,7 @@ interface ClinicOption {
     MatDatepickerModule,
     MatNativeDateModule,
     TranslateModule
-  ],
+],
   templateUrl: './register.component.html',
   styles: [':host { display: block; }']
 })

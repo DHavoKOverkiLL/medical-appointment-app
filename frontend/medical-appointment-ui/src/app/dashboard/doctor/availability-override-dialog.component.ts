@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, Inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -33,7 +33,6 @@ export interface AvailabilityOverrideDialogResult {
   selector: 'app-availability-override-dialog',
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     MatDialogModule,
     MatFormFieldModule,
@@ -44,7 +43,7 @@ export interface AvailabilityOverrideDialogResult {
     MatTimepickerModule,
     MatButtonModule,
     TranslateModule
-  ],
+],
   templateUrl: './availability-override-dialog.component.html',
   styleUrls: ['./availability-override-dialog.component.scss']
 })

@@ -4,92 +4,100 @@
     <h1>{{ 'adminProfile.title' | translate }}</h1>
     <p>{{ 'adminProfile.subtitle' | translate }}</p>
 
-    <div class="profile-actions" *ngIf="me">
-      <a mat-flat-button [routerLink]="dashboardRoute">{{ 'actions.backToDashboard' | translate }}</a>
-      <a mat-stroked-button [routerLink]="settingsRoute">{{ 'nav.accountSettings' | translate }}</a>
-    </div>
+    @if (me) {
+      <div class="profile-actions">
+        <a mat-flat-button [routerLink]="dashboardRoute">{{ 'actions.backToDashboard' | translate }}</a>
+        <a mat-stroked-button [routerLink]="settingsRoute">{{ 'nav.accountSettings' | translate }}</a>
+      </div>
+    }
   </header>
 
-  <p *ngIf="loading" class="state">{{ 'state.loadingProfile' | translate }}</p>
-  <p *ngIf="errorMessage" class="error">{{ errorMessage | translate }}</p>
-  <p *ngIf="successMessage" class="success">{{ successMessage | translate }}</p>
+  @if (loading) {
+    <p class="state">{{ 'state.loadingProfile' | translate }}</p>
+  }
+  @if (errorMessage) {
+    <p class="error">{{ errorMessage | translate }}</p>
+  }
+  @if (successMessage) {
+    <p class="success">{{ successMessage | translate }}</p>
+  }
 
-  <section class="app-skeleton-list" *ngIf="loading && !me" aria-hidden="true">
-    <article class="app-skeleton-card" *ngFor="let _ of profileSkeletons">
-      <div class="app-skeleton-line app-skeleton-line--title"></div>
-      <div class="app-skeleton-line app-skeleton-line--meta"></div>
-      <div class="app-skeleton-pills">
-        <span class="app-skeleton-pill"></span>
-        <span class="app-skeleton-pill"></span>
-      </div>
-    </article>
-  </section>
+  @if (loading && !me) {
+    <section class="app-skeleton-list" aria-hidden="true">
+      @for (_ of profileSkeletons; track $index) {
+        <article class="app-skeleton-card">
+          <div class="app-skeleton-line app-skeleton-line--title"></div>
+          <div class="app-skeleton-line app-skeleton-line--meta"></div>
+          <div class="app-skeleton-pills">
+            <span class="app-skeleton-pill"></span>
+            <span class="app-skeleton-pill"></span>
+          </div>
+        </article>
+      }
+    </section>
+  }
 
-  <div class="profile-layout" *ngIf="me">
-    <mat-card class="profile-summary-card">
-      <div class="avatar">{{ me.firstName[0] }}{{ me.lastName[0] }}</div>
-      <h2>{{ me.firstName }} {{ me.lastName }}</h2>
-      <p>{{ 'adminProfile.accountRole' | translate }}</p>
-
-      <div class="profile-summary-grid">
-        <div>
-          <span class="label">{{ 'common.clinic' | translate }}</span>
-          <strong>{{ me.clinicName }}</strong>
+  @if (me) {
+    <div class="profile-layout">
+      <mat-card class="profile-summary-card">
+        <div class="avatar">{{ me.firstName[0] }}{{ me.lastName[0] }}</div>
+        <h2>{{ me.firstName }} {{ me.lastName }}</h2>
+        <p>{{ 'adminProfile.accountRole' | translate }}</p>
+        <div class="profile-summary-grid">
+          <div>
+            <span class="label">{{ 'common.clinic' | translate }}</span>
+            <strong>{{ me.clinicName }}</strong>
+          </div>
+          <div>
+            <span class="label">{{ 'common.username' | translate }}</span>
+            <strong>{{ me.username }}</strong>
+          </div>
+          <div>
+            <span class="label">{{ 'common.personalIdentifier' | translate }}</span>
+            <strong>{{ me.personalIdentifier }}</strong>
+          </div>
+          <div>
+            <span class="label">{{ 'common.email' | translate }}</span>
+            <strong>{{ me.email }}</strong>
+          </div>
         </div>
-        <div>
-          <span class="label">{{ 'common.username' | translate }}</span>
-          <strong>{{ me.username }}</strong>
-        </div>
-        <div>
-          <span class="label">{{ 'common.personalIdentifier' | translate }}</span>
-          <strong>{{ me.personalIdentifier }}</strong>
-        </div>
-        <div>
-          <span class="label">{{ 'common.email' | translate }}</span>
-          <strong>{{ me.email }}</strong>
-        </div>
-      </div>
-    </mat-card>
-
-    <mat-card class="profile-edit-card">
-      <h3>{{ 'adminProfile.editTitle' | translate }}</h3>
-      <p class="card-subtitle">{{ 'adminProfile.editSubtitle' | translate }}</p>
-
-      <form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
-        <div class="form-grid">
-          <mat-form-field appearance="outline">
-            <mat-label>{{ 'common.firstName' | translate }}</mat-label>
-            <input matInput formControlName="firstName" />
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>{{ 'common.lastName' | translate }}</mat-label>
-            <input matInput formControlName="lastName" />
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>{{ 'common.birthDate' | translate }}</mat-label>
-            <input matInput [matDatepicker]="adminBirthDatePicker" formControlName="birthDate" />
-            <mat-datepicker-toggle matSuffix [for]="adminBirthDatePicker"></mat-datepicker-toggle>
-            <mat-datepicker #adminBirthDatePicker></mat-datepicker>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>{{ 'common.address' | translate }}</mat-label>
-            <input matInput formControlName="address" />
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>{{ 'common.phone' | translate }}</mat-label>
-            <input matInput formControlName="phoneNumber" />
-          </mat-form-field>
-        </div>
-
-        <button mat-flat-button class="button-with-spinner" type="submit" [disabled]="profileForm.invalid || saving">
-          <mat-progress-spinner *ngIf="saving" mode="indeterminate" diameter="18"></mat-progress-spinner>
-          <span>{{ 'actions.saveProfile' | translate }}</span>
-        </button>
-      </form>
-    </mat-card>
-  </div>
+      </mat-card>
+      <mat-card class="profile-edit-card">
+        <h3>{{ 'adminProfile.editTitle' | translate }}</h3>
+        <p class="card-subtitle">{{ 'adminProfile.editSubtitle' | translate }}</p>
+        <form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+          <div class="form-grid">
+            <mat-form-field appearance="outline">
+              <mat-label>{{ 'common.firstName' | translate }}</mat-label>
+              <input matInput formControlName="firstName" />
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>{{ 'common.lastName' | translate }}</mat-label>
+              <input matInput formControlName="lastName" />
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>{{ 'common.birthDate' | translate }}</mat-label>
+              <input matInput [matDatepicker]="adminBirthDatePicker" formControlName="birthDate" />
+              <mat-datepicker-toggle matSuffix [for]="adminBirthDatePicker"></mat-datepicker-toggle>
+              <mat-datepicker #adminBirthDatePicker></mat-datepicker>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>{{ 'common.address' | translate }}</mat-label>
+              <input matInput formControlName="address" />
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>{{ 'common.phone' | translate }}</mat-label>
+              <input matInput formControlName="phoneNumber" />
+            </mat-form-field>
+          </div>
+          <button mat-flat-button class="button-with-spinner" type="submit" [disabled]="profileForm.invalid || saving">
+            @if (saving) {
+              <mat-progress-spinner mode="indeterminate" diameter="18"></mat-progress-spinner>
+            }
+            <span>{{ 'actions.saveProfile' | translate }}</span>
+          </button>
+        </form>
+      </mat-card>
+    </div>
+  }
 </section>

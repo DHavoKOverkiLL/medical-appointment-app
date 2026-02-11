@@ -10,82 +10,90 @@
     </div>
   </header>
 
-  <p *ngIf="loading" class="state">{{ 'state.loadingAccountSettings' | translate }}</p>
-  <p *ngIf="errorMessage" class="error">{{ errorMessage | translate }}</p>
-  <p *ngIf="successMessage" class="success">{{ successMessage | translate }}</p>
+  @if (loading) {
+    <p class="state">{{ 'state.loadingAccountSettings' | translate }}</p>
+  }
+  @if (errorMessage) {
+    <p class="error">{{ errorMessage | translate }}</p>
+  }
+  @if (successMessage) {
+    <p class="success">{{ successMessage | translate }}</p>
+  }
 
-  <section class="app-skeleton-list" *ngIf="loading" aria-hidden="true">
-    <article class="app-skeleton-card" *ngFor="let _ of settingsSkeletons">
-      <div class="app-skeleton-line app-skeleton-line--title"></div>
-      <div class="app-skeleton-line app-skeleton-line--meta"></div>
-      <div class="app-skeleton-pills">
-        <span class="app-skeleton-pill"></span>
-        <span class="app-skeleton-pill"></span>
-      </div>
-    </article>
-  </section>
+  @if (loading) {
+    <section class="app-skeleton-list" aria-hidden="true">
+      @for (_ of settingsSkeletons; track $index) {
+        <article class="app-skeleton-card">
+          <div class="app-skeleton-line app-skeleton-line--title"></div>
+          <div class="app-skeleton-line app-skeleton-line--meta"></div>
+          <div class="app-skeleton-pills">
+            <span class="app-skeleton-pill"></span>
+            <span class="app-skeleton-pill"></span>
+          </div>
+        </article>
+      }
+    </section>
+  }
 
-  <div class="settings-layout" *ngIf="!loading">
-    <mat-card class="security-card">
-      <h2>{{ 'accountSettings.securityTitle' | translate }}</h2>
-      <p>{{ 'accountSettings.securitySubtitle' | translate }}</p>
-      <div class="security-list">
-        <div>
-          <strong>{{ 'accountSettings.security.identityTitle' | translate }}</strong>
-          <span>{{ 'accountSettings.security.identityCopy' | translate }}</span>
+  @if (!loading) {
+    <div class="settings-layout">
+      <mat-card class="security-card">
+        <h2>{{ 'accountSettings.securityTitle' | translate }}</h2>
+        <p>{{ 'accountSettings.securitySubtitle' | translate }}</p>
+        <div class="security-list">
+          <div>
+            <strong>{{ 'accountSettings.security.identityTitle' | translate }}</strong>
+            <span>{{ 'accountSettings.security.identityCopy' | translate }}</span>
+          </div>
+          <div>
+            <strong>{{ 'accountSettings.security.passwordTitle' | translate }}</strong>
+            <span>{{ 'accountSettings.security.passwordCopy' | translate }}</span>
+          </div>
+          <div>
+            <strong>{{ 'accountSettings.security.credentialsTitle' | translate }}</strong>
+            <span>{{ 'accountSettings.security.credentialsCopy' | translate }}</span>
+          </div>
         </div>
-        <div>
-          <strong>{{ 'accountSettings.security.passwordTitle' | translate }}</strong>
-          <span>{{ 'accountSettings.security.passwordCopy' | translate }}</span>
-        </div>
-        <div>
-          <strong>{{ 'accountSettings.security.credentialsTitle' | translate }}</strong>
-          <span>{{ 'accountSettings.security.credentialsCopy' | translate }}</span>
-        </div>
-      </div>
-    </mat-card>
-
-    <mat-card class="settings-card">
-      <h3>{{ 'accountSettings.editTitle' | translate }}</h3>
-      <p class="card-subtitle">{{ 'accountSettings.editSubtitle' | translate }}</p>
-
-      <form [formGroup]="settingsForm" (ngSubmit)="saveSettings()">
-        <div class="form-grid">
-          <mat-form-field appearance="outline">
-            <mat-label>{{ 'common.username' | translate }}</mat-label>
-            <input matInput formControlName="username" />
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>{{ 'common.email' | translate }}</mat-label>
-            <input matInput type="email" formControlName="email" />
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>{{ 'accountSettings.currentPassword' | translate }}</mat-label>
-            <input matInput type="password" formControlName="currentPassword" autocomplete="current-password" />
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>{{ 'accountSettings.newPasswordOptional' | translate }}</mat-label>
-            <input matInput type="password" formControlName="newPassword" autocomplete="new-password" />
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>{{ 'accountSettings.confirmNewPassword' | translate }}</mat-label>
-            <input matInput type="password" formControlName="confirmNewPassword" autocomplete="new-password" />
-          </mat-form-field>
-        </div>
-
-        <p class="validation-error" *ngIf="settingsForm.errors?.['passwordsMismatch']">
-          {{ 'accountSettings.passwordMismatch' | translate }}
-        </p>
-
-        <button mat-flat-button class="button-with-spinner" type="submit" [disabled]="settingsForm.invalid || saving">
-          <mat-progress-spinner *ngIf="saving" mode="indeterminate" diameter="18"></mat-progress-spinner>
-          <span>{{ 'actions.saveAccountSettings' | translate }}</span>
-        </button>
-      </form>
-    </mat-card>
-  </div>
+      </mat-card>
+      <mat-card class="settings-card">
+        <h3>{{ 'accountSettings.editTitle' | translate }}</h3>
+        <p class="card-subtitle">{{ 'accountSettings.editSubtitle' | translate }}</p>
+        <form [formGroup]="settingsForm" (ngSubmit)="saveSettings()">
+          <div class="form-grid">
+            <mat-form-field appearance="outline">
+              <mat-label>{{ 'common.username' | translate }}</mat-label>
+              <input matInput formControlName="username" />
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>{{ 'common.email' | translate }}</mat-label>
+              <input matInput type="email" formControlName="email" />
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>{{ 'accountSettings.currentPassword' | translate }}</mat-label>
+              <input matInput type="password" formControlName="currentPassword" autocomplete="current-password" />
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>{{ 'accountSettings.newPasswordOptional' | translate }}</mat-label>
+              <input matInput type="password" formControlName="newPassword" autocomplete="new-password" />
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>{{ 'accountSettings.confirmNewPassword' | translate }}</mat-label>
+              <input matInput type="password" formControlName="confirmNewPassword" autocomplete="new-password" />
+            </mat-form-field>
+          </div>
+          @if (settingsForm.errors?.['passwordsMismatch']) {
+            <p class="validation-error">
+              {{ 'accountSettings.passwordMismatch' | translate }}
+            </p>
+          }
+          <button mat-flat-button class="button-with-spinner" type="submit" [disabled]="settingsForm.invalid || saving">
+            @if (saving) {
+              <mat-progress-spinner mode="indeterminate" diameter="18"></mat-progress-spinner>
+            }
+            <span>{{ 'actions.saveAccountSettings' | translate }}</span>
+          </button>
+        </form>
+      </mat-card>
+    </div>
+  }
 </section>

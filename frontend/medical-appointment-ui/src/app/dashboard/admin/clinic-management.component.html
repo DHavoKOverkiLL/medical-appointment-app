@@ -29,9 +29,15 @@
     </mat-card>
   </section>
 
-  <p *ngIf="loading && clinics.length > 0" class="state">{{ 'state.working' | translate }}</p>
-  <p *ngIf="errorMessage" class="error">{{ errorMessage | translate }}</p>
-  <p *ngIf="successMessage" class="success">{{ successMessage | translate }}</p>
+  @if (loading && clinics.length > 0) {
+    <p class="state">{{ 'state.working' | translate }}</p>
+  }
+  @if (errorMessage) {
+    <p class="error">{{ errorMessage | translate }}</p>
+  }
+  @if (successMessage) {
+    <p class="success">{{ successMessage | translate }}</p>
+  }
 
   <section class="editor-toolbar">
     <div class="toolbar-copy">
@@ -45,42 +51,54 @@
     <h2>{{ 'clinicManagement.directoryTitle' | translate }}</h2>
     <p class="panel-subtitle">{{ 'clinicManagement.directorySubtitle' | translate }}</p>
 
-    <section class="skeleton-cards" *ngIf="loading && clinics.length === 0" aria-hidden="true">
-      <article class="skeleton-card" *ngFor="let _ of skeletonCards">
-        <div class="skeleton-line skeleton-line--title"></div>
-        <div class="skeleton-line skeleton-line--meta"></div>
-        <div class="skeleton-pills">
-          <span class="skeleton-pill"></span>
-          <span class="skeleton-pill"></span>
-          <span class="skeleton-pill"></span>
-        </div>
-      </article>
-    </section>
+    @if (loading && clinics.length === 0) {
+      <section class="skeleton-cards" aria-hidden="true">
+        @for (_ of skeletonCards; track $index) {
+          <article class="skeleton-card">
+            <div class="skeleton-line skeleton-line--title"></div>
+            <div class="skeleton-line skeleton-line--meta"></div>
+            <div class="skeleton-pills">
+              <span class="skeleton-pill"></span>
+              <span class="skeleton-pill"></span>
+              <span class="skeleton-pill"></span>
+            </div>
+          </article>
+        }
+      </section>
+    }
 
-    <section class="empty-state" *ngIf="!loading && clinics.length === 0">
-      {{ 'clinicManagement.empty' | translate }}
-    </section>
+    @if (!loading && clinics.length === 0) {
+      <section class="empty-state">
+        {{ 'clinicManagement.empty' | translate }}
+      </section>
+    }
 
-    <section class="clinic-cards" *ngIf="clinics.length > 0">
-      <article class="clinic-card" *ngFor="let clinic of clinics; trackBy: trackClinic">
-        <div class="clinic-main">
-          <div class="clinic-title">
-            <h3>{{ clinic.name }}</h3>
-            <span [class]="getStatusClass(clinic.isActive)">
-              {{ clinic.isActive ? ('statuses.active' | translate) : ('statuses.inactive' | translate) }}
-            </span>
-          </div>
-
-          <div class="clinic-meta">
-            <span>{{ 'common.code' | translate }}: {{ clinic.code }}</span>
-            <span>{{ 'clinicManagement.usersCount' | translate:{ count: clinic.usersCount } }}</span>
-            <span *ngIf="clinic.city || clinic.state">{{ clinic.city }}{{ clinic.city && clinic.state ? ', ' : '' }}{{ clinic.state }}</span>
-            <span *ngIf="clinic.sysClinicTypeId > 0">{{ getClinicTypeDisplayName(clinic) }}</span>
-          </div>
-        </div>
-
-        <button mat-stroked-button type="button" [disabled]="loading" (click)="openEditClinicDialog(clinic)">{{ 'common.edit' | translate }}</button>
-      </article>
-    </section>
+    @if (clinics.length > 0) {
+      <section class="clinic-cards">
+        @for (clinic of clinics; track trackClinic($index, clinic)) {
+          <article class="clinic-card">
+            <div class="clinic-main">
+              <div class="clinic-title">
+                <h3>{{ clinic.name }}</h3>
+                <span [class]="getStatusClass(clinic.isActive)">
+                  {{ clinic.isActive ? ('statuses.active' | translate) : ('statuses.inactive' | translate) }}
+                </span>
+              </div>
+              <div class="clinic-meta">
+                <span>{{ 'common.code' | translate }}: {{ clinic.code }}</span>
+                <span>{{ 'clinicManagement.usersCount' | translate:{ count: clinic.usersCount } }}</span>
+                @if (clinic.city || clinic.state) {
+                  <span>{{ clinic.city }}{{ clinic.city && clinic.state ? ', ' : '' }}{{ clinic.state }}</span>
+                }
+                @if (clinic.sysClinicTypeId > 0) {
+                  <span>{{ getClinicTypeDisplayName(clinic) }}</span>
+                }
+              </div>
+            </div>
+            <button mat-stroked-button type="button" [disabled]="loading" (click)="openEditClinicDialog(clinic)">{{ 'common.edit' | translate }}</button>
+          </article>
+        }
+      </section>
+    }
   </mat-card>
 </section>

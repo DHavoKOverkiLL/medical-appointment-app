@@ -44,15 +44,19 @@
             type="password"
             autocomplete="current-password"
             required
-          />
+            />
         </mat-form-field>
 
         <button mat-flat-button class="auth-shell__submit" type="submit" [disabled]="loginForm.invalid || isSubmitting">
-          <mat-progress-spinner *ngIf="isSubmitting" mode="indeterminate" diameter="18"></mat-progress-spinner>
+          @if (isSubmitting) {
+            <mat-progress-spinner mode="indeterminate" diameter="18"></mat-progress-spinner>
+          }
           <span>{{ (isSubmitting ? 'auth.login.signingIn' : 'auth.login.submit') | translate }}</span>
         </button>
 
-        <div *ngIf="errorMessage" class="auth-shell__error" role="alert">{{ errorMessage | translate }}</div>
+        @if (errorMessage) {
+          <div class="auth-shell__error" role="alert">{{ errorMessage | translate }}</div>
+        }
       </form>
 
       <p class="auth-shell__footer">

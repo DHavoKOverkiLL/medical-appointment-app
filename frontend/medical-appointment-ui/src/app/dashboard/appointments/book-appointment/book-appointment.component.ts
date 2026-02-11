@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { RouterModule, Router } from '@angular/router';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -25,7 +25,6 @@ interface DoctorOption {
   selector: 'app-book-appointment',
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     HttpClientModule,
     RouterModule,
@@ -38,7 +37,7 @@ interface DoctorOption {
     MatDatepickerModule,
     MatNativeDateModule,
     TranslateModule
-  ],
+],
   templateUrl: './book-appointment.component.html',
   styleUrls: ['./book-appointment.component.scss'],
 })

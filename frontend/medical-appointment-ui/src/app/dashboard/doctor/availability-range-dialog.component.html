@@ -12,9 +12,11 @@
     <mat-form-field appearance="outline">
       <mat-label>{{ 'common.day' | translate }}</mat-label>
       <mat-select formControlName="dayOfWeek">
-        <mat-option *ngFor="let day of data.dayOptions" [value]="day.value">
-          {{ day.labelKey | translate }}
-        </mat-option>
+        @for (day of data.dayOptions; track day) {
+          <mat-option [value]="day.value">
+            {{ day.labelKey | translate }}
+          </mat-option>
+        }
       </mat-select>
     </mat-form-field>
 

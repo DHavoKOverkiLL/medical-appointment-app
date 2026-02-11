@@ -16,7 +16,9 @@
       type="button"
       [disabled]="loading || markingAll || unreadCount === 0"
       (click)="markAllAsRead()">
-      <mat-progress-spinner *ngIf="markingAll" diameter="16" mode="indeterminate"></mat-progress-spinner>
+      @if (markingAll) {
+        <mat-progress-spinner diameter="16" mode="indeterminate"></mat-progress-spinner>
+      }
       <span>{{ 'actions.markAllAsRead' | translate }}</span>
     </button>
   </mat-card>
@@ -46,49 +48,62 @@
     </button>
   </mat-card>
 
-  <p *ngIf="loading" class="state">{{ 'notifications.loading' | translate }}</p>
-  <p *ngIf="successMessage" class="success">{{ successMessage | translate }}</p>
-  <p *ngIf="errorMessage" class="error">{{ errorMessage | translate }}</p>
+  @if (loading) {
+    <p class="state">{{ 'notifications.loading' | translate }}</p>
+  }
+  @if (successMessage) {
+    <p class="success">{{ successMessage | translate }}</p>
+  }
+  @if (errorMessage) {
+    <p class="error">{{ errorMessage | translate }}</p>
+  }
 
-  <section *ngIf="!loading && !errorMessage && notifications.length === 0" class="empty-state">
-    {{ 'notifications.empty' | translate }}
-  </section>
+  @if (!loading && !errorMessage && notifications.length === 0) {
+    <section class="empty-state">
+      {{ 'notifications.empty' | translate }}
+    </section>
+  }
 
-  <section *ngIf="!loading && notifications.length > 0" class="notifications-list">
-    <mat-card
-      class="notification-card"
-      [class.notification-card--read]="notification.isRead"
-      *ngFor="let notification of notifications; trackBy: trackNotification">
-      <div class="notification-card__head">
-        <div>
-          <h3>{{ notification.title }}</h3>
-          <p>{{ notification.createdAtUtc | date:'dd/MM/yyyy HH:mm' }}</p>
-        </div>
-        <span class="status-chip" [class.status-chip--read]="notification.isRead">
-          {{ (notification.isRead ? 'notifications.read' : 'notifications.unread') | translate }}
-        </span>
-      </div>
-
-      <p class="notification-card__message">{{ notification.message }}</p>
-
-      <div class="notification-card__actions">
-        <a
-          mat-button
-          *ngIf="notification.appointmentId"
-          [routerLink]="['/dashboard/appointments', notification.appointmentId, 'audit']">
-          {{ 'actions.viewAudit' | translate }}
-        </a>
-
-        <button
-          mat-stroked-button
-          type="button"
-          *ngIf="!notification.isRead"
-          [disabled]="markingAll || markingNotificationId === notification.userNotificationId"
-          (click)="markNotificationAsRead(notification)">
-          <mat-progress-spinner *ngIf="markingNotificationId === notification.userNotificationId" diameter="16" mode="indeterminate"></mat-progress-spinner>
-          <span>{{ 'actions.markAsRead' | translate }}</span>
-        </button>
-      </div>
-    </mat-card>
-  </section>
+  @if (!loading && notifications.length > 0) {
+    <section class="notifications-list">
+      @for (notification of notifications; track trackNotification($index, notification)) {
+        <mat-card
+          class="notification-card"
+          [class.notification-card--read]="notification.isRead"
+          >
+          <div class="notification-card__head">
+            <div>
+              <h3>{{ notification.title }}</h3>
+              <p>{{ notification.createdAtUtc | date:'dd/MM/yyyy HH:mm' }}</p>
+            </div>
+            <span class="status-chip" [class.status-chip--read]="notification.isRead">
+              {{ (notification.isRead ? 'notifications.read' : 'notifications.unread') | translate }}
+            </span>
+          </div>
+          <p class="notification-card__message">{{ notification.message }}</p>
+          <div class="notification-card__actions">
+            @if (notification.appointmentId) {
+              <a
+                mat-button
+                [routerLink]="['/dashboard/appointments', notification.appointmentId, 'audit']">
+                {{ 'actions.viewAudit' | translate }}
+              </a>
+            }
+            @if (!notification.isRead) {
+              <button
+                mat-stroked-button
+                type="button"
+                [disabled]="markingAll || markingNotificationId === notification.userNotificationId"
+                (click)="markNotificationAsRead(notification)">
+                @if (markingNotificationId === notification.userNotificationId) {
+                  <mat-progress-spinner diameter="16" mode="indeterminate"></mat-progress-spinner>
+                }
+                <span>{{ 'actions.markAsRead' | translate }}</span>
+              </button>
+            }
+          </div>
+        </mat-card>
+      }
+    </section>
+  }
 </section>

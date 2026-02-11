@@ -1,5 +1,9 @@
 <section class="home-redirect">
   <h2>{{ 'home.loadingDashboard' | translate }}</h2>
-  <p *ngIf="role">{{ 'home.redirectingWorkspace' | translate:{ role: role } }}</p>
-  <p *ngIf="!role">{{ 'home.resolvingRole' | translate }}</p>
+  @if (role) {
+    <p>{{ 'home.redirectingWorkspace' | translate:{ role: role } }}</p>
+  }
+  @if (!role) {
+    <p>{{ 'home.resolvingRole' | translate }}</p>
+  }
 </section>
