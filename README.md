@@ -1,52 +1,131 @@
-# medical-appointment-app
+# Medical Appointment App
 
-Web app for scheduling medical appointments and managing consult requests.
+Full-stack application for medical appointment scheduling, clinic management, user administration, and reminder delivery.
 
-## Secure local setup
+## Overview
 
-### 1. Configure backend secrets (required)
+The repository contains:
+
+- `backend/MedicalAppointment.Api`: ASP.NET Core Web API (`net9.0`) with EF Core + SQL Server
+- `frontend/medical-appointment-ui`: Angular SPA (`v19`) with Angular Material
+- `backend/MedicalAppointment.Api/MedicalAppointment.Api.IntegrationTests`: integration test suite (xUnit)
+- `.github/workflows/ci.yml`: CI pipeline for backend + frontend build/test/coverage
+
+Core backend areas currently implemented include:
+
+- JWT authentication and role-based authorization
+- Clinic tenancy and admin user flows
+- Appointment lifecycle + postpone/counter-proposal flows
+- Doctor availability and slot generation
+- In-app notifications
+- Reminder dispatch engine (in-app/email/SMS provider model)
+
+## Tech Stack
+
+- Backend: .NET 9, ASP.NET Core, Entity Framework Core 9, SQL Server
+- Frontend: Angular 19, TypeScript, RxJS, Angular Material
+- Testing: xUnit (backend), Karma/Jasmine (frontend)
+- CI: GitHub Actions
+
+## Prerequisites
+
+- .NET SDK `9.x`
+- Node.js `20.x` and npm
+- SQL Server instance (local or remote)
+- EF Core CLI:
+
+```powershell
+dotnet tool install --global dotnet-ef
+```
+
+Recommended for local HTTPS:
+
+```powershell
+dotnet dev-certs https --trust
+```
+
+## Quick Start (Local)
+
+### 1) Configure backend secrets
+
+The API intentionally fails startup if `Jwt:Key` is missing or still set to `CHANGE_ME...`.
 
 ```powershell
 cd backend\MedicalAppointment.Api\MedicalAppointment.Api
 dotnet user-secrets init
 dotnet user-secrets set "Jwt:Key" "REPLACE_WITH_A_LONG_RANDOM_SECRET_AT_LEAST_32_CHARS"
+dotnet user-secrets set "Jwt:Issuer" "MedicalAppointmentApi"
+dotnet user-secrets set "Jwt:Audience" "MedicalAppointmentUi"
 ```
 
-Optional (if you want to override connection string from config):
+Optional connection string override:
 
 ```powershell
 dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=YOUR_SERVER;Database=MedicalAppointmentDb;Trusted_Connection=True;TrustServerCertificate=True;"
 ```
 
-### 2. Apply database migrations
+### 2) Apply database migrations
+
+From repository root:
 
 ```powershell
-cd c:\Medio
 dotnet ef database update --project backend\MedicalAppointment.Api\MedicalAppointment.Infrastructure --startup-project backend\MedicalAppointment.Api\MedicalAppointment.Api --context AppDbContext
 ```
 
-### Reminder engine configuration (Phase 2)
+The API also checks for pending migrations on startup and will fail fast if schema is out of date.
 
-`AppointmentReminders` settings are in `appsettings.json` / `appsettings.Development.json`:
+### 3) Run backend
 
-- `Enabled`: turn scheduler on/off
-- `PollIntervalSeconds`: how often due reminders are scanned
-- `DispatchWindowMinutes`: max delay accepted for sending a due reminder
-- `Channels.InAppEnabled`: create in-app reminder notifications
-- `Channels.EmailEnabled`: send reminders through configured real provider (`Smtp` or `SendGrid`)
-- `Channels.SmsEnabled`: send reminders through configured real provider (`Twilio`)
+```powershell
+cd backend\MedicalAppointment.Api
+dotnet run --project MedicalAppointment.Api --launch-profile https
+```
 
-Provider settings live under `ReminderProviders`:
+Default backend URLs:
 
-- `ReminderProviders:Email:Provider` = `Smtp` | `SendGrid` | `None`
-- `ReminderProviders:Sms:Provider` = `Twilio` | `None`
+- `https://localhost:7074`
+- `http://localhost:5169`
 
-If a channel is enabled but provider credentials are missing, API startup will fail with a clear configuration error.
+### 4) Run frontend
 
-Example user-secrets for SMTP + Twilio:
+```powershell
+cd frontend\medical-appointment-ui
+npm ci
+npm start
+```
+
+Frontend URL:
+
+- `http://localhost:4200`
+
+The SPA currently points to `https://localhost:7074` in `frontend/medical-appointment-ui/src/app/core/api.config.ts`.
+
+### 5) Access API docs
+
+- Swagger UI: `https://localhost:7074/swagger`
+
+## Reminder Configuration
+
+Reminder behavior is configured under `AppointmentReminders` and provider settings under `ReminderProviders` (`appsettings.json` / user-secrets / env vars).
+
+Relevant keys:
+
+- `AppointmentReminders:Enabled`
+- `AppointmentReminders:PollIntervalSeconds`
+- `AppointmentReminders:DispatchWindowMinutes`
+- `AppointmentReminders:Channels:InAppEnabled`
+- `AppointmentReminders:Channels:EmailEnabled`
+- `AppointmentReminders:Channels:SmsEnabled`
+- `ReminderProviders:Email:Provider` (`Smtp`, `SendGrid`, `None`)
+- `ReminderProviders:Sms:Provider` (`Twilio`, `None`)
+
+If a reminder channel is enabled but provider credentials are incomplete, startup validation throws a configuration error.
+
+Example SMTP + Twilio user-secrets:
 
 ```powershell
 cd backend\MedicalAppointment.Api\MedicalAppointment.Api
+
 dotnet user-secrets set "ReminderProviders:Email:Provider" "Smtp"
 dotnet user-secrets set "ReminderProviders:Email:FromEmail" "no-reply@yourdomain.com"
 dotnet user-secrets set "ReminderProviders:Email:FromName" "Medio"
@@ -62,7 +141,7 @@ dotnet user-secrets set "ReminderProviders:Sms:Twilio:AuthToken" "your-twilio-au
 dotnet user-secrets set "ReminderProviders:Sms:Twilio:FromNumber" "+15551234567"
 ```
 
-Optional SendGrid instead of SMTP:
+Example SendGrid:
 
 ```powershell
 dotnet user-secrets set "ReminderProviders:Email:Provider" "SendGrid"
@@ -71,24 +150,57 @@ dotnet user-secrets set "ReminderProviders:Email:FromName" "Medio"
 dotnet user-secrets set "ReminderProviders:Email:SendGrid:ApiKey" "SG.xxxxx"
 ```
 
-SMS reminders require a patient phone number (`PhoneNumber`) on profile data. The API now supports this field in registration/admin user create/update/profile update flows.
+## Running Tests
 
-### 3. Start backend
+### Backend
 
 ```powershell
 cd backend\MedicalAppointment.Api
-dotnet run --project MedicalAppointment.Api --launch-profile https
+dotnet test MedicalAppointment.Api.sln --configuration Release --collect:"XPlat Code Coverage" --results-directory TestResults --logger "trx;LogFileName=test-results.trx"
 ```
 
-### 4. Start frontend
+### Frontend
 
 ```powershell
 cd frontend\medical-appointment-ui
-npm install
-npm start
+npm test
 ```
 
-Open:
+CI-style frontend coverage run:
 
-- UI: `http://localhost:4200`
-- API Swagger: `https://localhost:7074/swagger`
+```powershell
+npm run test:ci:coverage
+```
+
+## CI Quality Gates
+
+GitHub Actions workflow: `.github/workflows/ci.yml`
+
+- Backend:
+  - restore/build/test on .NET 9
+  - on test failure, failed test names/messages are emitted as GitHub check annotations
+  - coverage floor (excluding `Infrastructure/Migrations`):
+    - line >= `55%`
+    - branch >= `40%`
+- Frontend:
+  - install/build/test with headless Chrome
+  - coverage artifacts uploaded
+
+## Security Notes
+
+- JWT signing key is mandatory and must not be a placeholder.
+- JWT validation enforces issuer, audience, signature, and expiry.
+- API reads bearer token from auth header and optional secure cookie name (`Jwt:CookieName`, default `medio_access_token`).
+- Rate limiting is applied to auth routes (login/register policies).
+- CORS is currently restricted to `http://localhost:4200` for local development; update policy before deploying to other origins.
+
+## Troubleshooting
+
+- `Jwt:Key is missing or still set to placeholder`:
+  - configure `Jwt:Key` via user-secrets or environment variables.
+- `Database has pending migrations`:
+  - run the `dotnet ef database update` command shown above.
+- Frontend cannot reach API:
+  - verify backend is running on `https://localhost:7074`
+  - verify `API_BASE_URL` in `frontend/medical-appointment-ui/src/app/core/api.config.ts`
+  - ensure local dev certificate is trusted.
