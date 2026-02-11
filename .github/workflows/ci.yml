@@ -41,7 +41,44 @@ jobs:
         run: dotnet build MedicalAppointment.Api.sln --configuration Release --no-restore
 
       - name: Test
-        run: dotnet test MedicalAppointment.Api.sln --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage" --results-directory TestResults --logger "trx;LogFileName=test-results.trx"
+        shell: pwsh
+        run: |
+          dotnet test MedicalAppointment.Api.sln --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage" --results-directory TestResults --logger "trx;LogFileName=test-results.trx"
+          $testExitCode = $LASTEXITCODE
+
+          if ($testExitCode -ne 0) {
+            $trx = Get-ChildItem -Path TestResults -Recurse -Filter test-results.trx | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+            if ($trx) {
+              [xml]$trxXml = Get-Content -Path $trx.FullName
+              $failedResults = @($trxXml.TestRun.Results.UnitTestResult | Where-Object { $_.outcome -eq "Failed" })
+              $testDefinitions = @($trxXml.TestRun.TestDefinitions.UnitTest)
+
+              foreach ($failed in $failedResults) {
+                $definition = $testDefinitions | Where-Object { $_.id -eq $failed.testId } | Select-Object -First 1
+                $testName = if ($definition -and $definition.TestMethod) {
+                  "$($definition.TestMethod.className).$($definition.TestMethod.name)"
+                } else {
+                  [string]$failed.testName
+                }
+
+                $message = [string]$failed.Output.ErrorInfo.Message
+                if ([string]::IsNullOrWhiteSpace($message)) {
+                  $message = "Test failed. See backend-test-results artifact for details."
+                }
+
+                $singleLineMessage = $message.Replace("`r", " ").Replace("`n", " ")
+                if ($singleLineMessage.Length -gt 300) {
+                  $singleLineMessage = $singleLineMessage.Substring(0, 300) + "..."
+                }
+
+                Write-Host "::error title=Failed test::$testName - $singleLineMessage"
+              }
+            } else {
+              Write-Host "::error::dotnet test failed and test-results.trx was not found."
+            }
+          }
+
+          exit $testExitCode
 
       - name: Enforce backend coverage floor
         shell: pwsh
