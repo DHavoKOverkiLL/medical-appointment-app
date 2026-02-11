@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, Inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -53,7 +53,6 @@ interface DayOption {
   selector: 'app-clinic-editor-dialog',
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     MatDialogModule,
     MatTabsModule,
@@ -66,7 +65,7 @@ interface DayOption {
     MatTooltipModule,
     MatButtonModule,
     TranslateModule
-  ],
+],
   templateUrl: './clinic-editor-dialog.component.html',
   styleUrls: ['./clinic-editor-dialog.component.scss']
 })

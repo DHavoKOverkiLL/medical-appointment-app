@@ -249,7 +249,7 @@ body {
 }
 
 .auth-shell__submit .mat-mdc-progress-spinner {
-  --mdc-circular-progress-active-indicator-color: #ffffff;
+  --mat-progress-spinner-active-indicator-color: #ffffff;
 }
 
 .button-with-spinner {
@@ -260,7 +260,7 @@ body {
 }
 
 .button-with-spinner .mat-mdc-progress-spinner {
-  --mdc-circular-progress-active-indicator-color: currentColor;
+  --mat-progress-spinner-active-indicator-color: currentColor;
 }
 
 .app-skeleton-list {
@@ -367,9 +367,9 @@ body {
 }
 
 .modern-admin-dialog .mat-mdc-tab-group {
-  --mdc-tab-indicator-active-indicator-color: #2a7cd8;
-  --mat-tab-header-active-label-text-color: #1f567d;
-  --mat-tab-header-active-ripple-color: #2a7cd8;
+  --mat-tab-active-indicator-color: #2a7cd8;
+  --mat-tab-active-label-text-color: #1f567d;
+  --mat-tab-active-ripple-color: #2a7cd8;
 }
 
 .modern-admin-dialog .mat-mdc-tab-body-content {

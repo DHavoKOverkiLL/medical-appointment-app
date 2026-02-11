@@ -13,29 +13,41 @@
     </div>
   </header>
 
-  <p *ngIf="loading && summary" class="dashboard-state">{{ 'state.loadingDashboardData' | translate }}</p>
-  <p *ngIf="errorMessage" class="dashboard-error">{{ errorMessage | translate }}</p>
+  @if (loading && summary) {
+    <p class="dashboard-state">{{ 'state.loadingDashboardData' | translate }}</p>
+  }
+  @if (errorMessage) {
+    <p class="dashboard-error">{{ errorMessage | translate }}</p>
+  }
 
-  <section class="app-skeleton-list" *ngIf="loading && !summary" aria-hidden="true">
-    <article class="app-skeleton-card" *ngFor="let _ of metricSkeletons">
-      <div class="app-skeleton-line app-skeleton-line--title"></div>
-      <div class="app-skeleton-line app-skeleton-line--meta"></div>
-    </article>
-  </section>
+  @if (loading && !summary) {
+    <section class="app-skeleton-list" aria-hidden="true">
+      @for (_ of metricSkeletons; track $index) {
+        <article class="app-skeleton-card">
+          <div class="app-skeleton-line app-skeleton-line--title"></div>
+          <div class="app-skeleton-line app-skeleton-line--meta"></div>
+        </article>
+      }
+    </section>
+  }
 
-  <section class="app-skeleton-list" *ngIf="loading && !summary" aria-hidden="true">
-    <article class="app-skeleton-card" *ngFor="let _ of clinicSkeletons">
-      <div class="app-skeleton-line app-skeleton-line--title"></div>
-      <div class="app-skeleton-line app-skeleton-line--meta"></div>
-      <div class="app-skeleton-pills">
-        <span class="app-skeleton-pill"></span>
-        <span class="app-skeleton-pill"></span>
-        <span class="app-skeleton-pill"></span>
-      </div>
-    </article>
-  </section>
+  @if (loading && !summary) {
+    <section class="app-skeleton-list" aria-hidden="true">
+      @for (_ of clinicSkeletons; track $index) {
+        <article class="app-skeleton-card">
+          <div class="app-skeleton-line app-skeleton-line--title"></div>
+          <div class="app-skeleton-line app-skeleton-line--meta"></div>
+          <div class="app-skeleton-pills">
+            <span class="app-skeleton-pill"></span>
+            <span class="app-skeleton-pill"></span>
+            <span class="app-skeleton-pill"></span>
+          </div>
+        </article>
+      }
+    </section>
+  }
 
-  <ng-container *ngIf="summary as vm">
+  @if (summary; as vm) {
     <section class="metric-grid">
       <mat-card class="metric-card">
         <span class="metric-label">{{ 'metrics.clinics' | translate }}</span>
@@ -66,7 +78,6 @@
         <strong class="metric-value">{{ vm.upcomingAppointments }}</strong>
       </mat-card>
     </section>
-
     <section class="clinic-load">
       <h2>{{ 'adminDashboard.clinicLoadTitle' | translate }}</h2>
       <div class="clinic-table">
@@ -75,12 +86,14 @@
           <span>{{ 'metrics.users' | translate }}</span>
           <span>{{ 'metrics.upcomingAppointments' | translate }}</span>
         </div>
-        <div class="clinic-row" *ngFor="let row of vm.clinicLoad; trackBy: trackClinic">
-          <span>{{ row.clinicName }}</span>
-          <span>{{ row.users }}</span>
-          <span>{{ row.appointments }}</span>
-        </div>
+        @for (row of vm.clinicLoad; track trackClinic($index, row)) {
+          <div class="clinic-row">
+            <span>{{ row.clinicName }}</span>
+            <span>{{ row.users }}</span>
+            <span>{{ row.appointments }}</span>
+          </div>
+        }
       </div>
     </section>
-  </ng-container>
+  }
 </section>

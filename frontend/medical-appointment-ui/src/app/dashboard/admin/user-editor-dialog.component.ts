@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, Inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -55,7 +55,6 @@ export interface UserEditorDialogResult {
   selector: 'app-user-editor-dialog',
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     MatDialogModule,
     MatTabsModule,
@@ -66,7 +65,7 @@ export interface UserEditorDialogResult {
     MatNativeDateModule,
     MatButtonModule,
     TranslateModule
-  ],
+],
   templateUrl: './user-editor-dialog.component.html',
   styleUrls: ['./user-editor-dialog.component.scss']
 })

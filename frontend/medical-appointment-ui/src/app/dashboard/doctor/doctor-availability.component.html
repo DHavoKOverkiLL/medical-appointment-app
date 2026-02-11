@@ -11,51 +11,64 @@
     </div>
   </header>
 
-  <p *ngIf="loading" class="state">{{ 'availability.messages.loading' | translate }}</p>
-  <p *ngIf="successMessage" class="success">{{ successMessage | translate }}</p>
-  <p *ngIf="errorMessage" class="error">{{ errorMessage | translate }}</p>
+  @if (loading) {
+    <p class="state">{{ 'availability.messages.loading' | translate }}</p>
+  }
+  @if (successMessage) {
+    <p class="success">{{ successMessage | translate }}</p>
+  }
+  @if (errorMessage) {
+    <p class="error">{{ errorMessage | translate }}</p>
+  }
 
   <mat-card class="availability-card">
     <form [formGroup]="form" (ngSubmit)="save()">
-      <div class="admin-select" *ngIf="isAdmin">
-        <div class="admin-filters">
+      @if (isAdmin) {
+        <div class="admin-select">
+          <div class="admin-filters">
+            <mat-form-field appearance="outline">
+              <mat-label>{{ 'availability.fields.filterClinic' | translate }}</mat-label>
+              <mat-select [value]="selectedClinicFilter" (selectionChange)="onClinicFilterChange($event.value)">
+                <mat-option value="">{{ 'common.allClinics' | translate }}</mat-option>
+                @for (clinicName of clinicFilters; track $index) {
+                  <mat-option [value]="clinicName">
+                    {{ clinicName }}
+                  </mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>{{ 'availability.fields.searchDoctor' | translate }}</mat-label>
+              <input
+                matInput
+                type="text"
+                [value]="doctorSearchTerm"
+                (input)="onDoctorSearchChange($any($event.target).value)" />
+            </mat-form-field>
+          </div>
           <mat-form-field appearance="outline">
-            <mat-label>{{ 'availability.fields.filterClinic' | translate }}</mat-label>
-            <mat-select [value]="selectedClinicFilter" (selectionChange)="onClinicFilterChange($event.value)">
-              <mat-option value="">{{ 'common.allClinics' | translate }}</mat-option>
-              <mat-option *ngFor="let clinicName of clinicFilters; trackBy: trackByIndex" [value]="clinicName">
-                {{ clinicName }}
-              </mat-option>
+            <mat-label>{{ 'availability.fields.selectDoctor' | translate }}</mat-label>
+            <mat-select [value]="selectedDoctorId" (selectionChange)="onDoctorChange($event.value)" [disabled]="loading || saving || filteredDoctors.length === 0">
+              @for (doctor of filteredDoctors; track trackDoctor($index, doctor)) {
+                <mat-option [value]="doctor.userId">
+                  {{ doctor.lastName }} {{ doctor.firstName }}
+                </mat-option>
+              }
             </mat-select>
           </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>{{ 'availability.fields.searchDoctor' | translate }}</mat-label>
-            <input
-              matInput
-              type="text"
-              [value]="doctorSearchTerm"
-              (input)="onDoctorSearchChange($any($event.target).value)" />
-          </mat-form-field>
+          @if (filteredDoctors.length === 0) {
+            <p class="hint">
+              {{ 'availability.errors.noMatchingDoctors' | translate }}
+            </p>
+          }
         </div>
+      }
 
-        <mat-form-field appearance="outline">
-          <mat-label>{{ 'availability.fields.selectDoctor' | translate }}</mat-label>
-          <mat-select [value]="selectedDoctorId" (selectionChange)="onDoctorChange($event.value)" [disabled]="loading || saving || filteredDoctors.length === 0">
-            <mat-option *ngFor="let doctor of filteredDoctors; trackBy: trackDoctor" [value]="doctor.userId">
-              {{ doctor.lastName }} {{ doctor.firstName }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-
-        <p class="hint" *ngIf="filteredDoctors.length === 0">
-          {{ 'availability.errors.noMatchingDoctors' | translate }}
+      @if (timezone) {
+        <p class="timezone">
+          {{ 'availability.fields.timezone' | translate:{ timezone: timezone } }}
         </p>
-      </div>
-
-      <p class="timezone" *ngIf="timezone">
-        {{ 'availability.fields.timezone' | translate:{ timezone: timezone } }}
-      </p>
+      }
 
       <section class="group-section">
         <div class="group-header">
@@ -67,28 +80,31 @@
 
         <p class="hint">{{ 'availability.hints.weeklyAvailability' | translate }}</p>
 
-        <p class="hint" *ngIf="weeklyAvailability.length === 0">
-          {{ 'availability.hints.emptyWeeklyAvailability' | translate }}
-        </p>
+        @if (weeklyAvailability.length === 0) {
+          <p class="hint">
+            {{ 'availability.hints.emptyWeeklyAvailability' | translate }}
+          </p>
+        }
 
         <div class="range-list">
-          <article
-            class="entry-card"
-            *ngFor="let group of weeklyAvailability.controls; let i = index; trackBy: trackByIndex">
-            <div class="entry-content">
-              <p class="entry-title">{{ getDayLabelKey(group.value.dayOfWeek) | translate }}</p>
-              <p class="entry-subtitle">{{ group.value.start }} - {{ group.value.end }}</p>
-            </div>
-
-            <div class="entry-actions">
-              <button mat-stroked-button type="button" (click)="editWeeklyAvailability(i)" [disabled]="loading || saving">
-                {{ 'common.edit' | translate }}
-              </button>
-              <button mat-stroked-button type="button" (click)="removeWeeklyAvailability(i)" [disabled]="loading || saving">
-                {{ 'common.remove' | translate }}
-              </button>
-            </div>
-          </article>
+          @for (group of weeklyAvailability.controls; track $index; let i = $index) {
+            <article
+              class="entry-card"
+              >
+              <div class="entry-content">
+                <p class="entry-title">{{ getDayLabelKey(group.value.dayOfWeek) | translate }}</p>
+                <p class="entry-subtitle">{{ group.value.start }} - {{ group.value.end }}</p>
+              </div>
+              <div class="entry-actions">
+                <button mat-stroked-button type="button" (click)="editWeeklyAvailability(i)" [disabled]="loading || saving">
+                  {{ 'common.edit' | translate }}
+                </button>
+                <button mat-stroked-button type="button" (click)="removeWeeklyAvailability(i)" [disabled]="loading || saving">
+                  {{ 'common.remove' | translate }}
+                </button>
+              </div>
+            </article>
+          }
         </div>
       </section>
 
@@ -103,23 +119,24 @@
         <p class="hint">{{ 'availability.hints.weeklyBreaks' | translate }}</p>
 
         <div class="range-list">
-          <article
-            class="entry-card"
-            *ngFor="let group of weeklyBreaks.controls; let i = index; trackBy: trackByIndex">
-            <div class="entry-content">
-              <p class="entry-title">{{ getDayLabelKey(group.value.dayOfWeek) | translate }}</p>
-              <p class="entry-subtitle">{{ group.value.start }} - {{ group.value.end }}</p>
-            </div>
-
-            <div class="entry-actions">
-              <button mat-stroked-button type="button" (click)="editWeeklyBreak(i)" [disabled]="loading || saving">
-                {{ 'common.edit' | translate }}
-              </button>
-              <button mat-stroked-button type="button" (click)="removeWeeklyBreak(i)" [disabled]="loading || saving">
-                {{ 'common.remove' | translate }}
-              </button>
-            </div>
-          </article>
+          @for (group of weeklyBreaks.controls; track $index; let i = $index) {
+            <article
+              class="entry-card"
+              >
+              <div class="entry-content">
+                <p class="entry-title">{{ getDayLabelKey(group.value.dayOfWeek) | translate }}</p>
+                <p class="entry-subtitle">{{ group.value.start }} - {{ group.value.end }}</p>
+              </div>
+              <div class="entry-actions">
+                <button mat-stroked-button type="button" (click)="editWeeklyBreak(i)" [disabled]="loading || saving">
+                  {{ 'common.edit' | translate }}
+                </button>
+                <button mat-stroked-button type="button" (click)="removeWeeklyBreak(i)" [disabled]="loading || saving">
+                  {{ 'common.remove' | translate }}
+                </button>
+              </div>
+            </article>
+          }
         </div>
       </section>
 
@@ -134,42 +151,48 @@
         <p class="hint">{{ 'availability.hints.dateOverrides' | translate }}</p>
 
         <div class="range-list">
-          <article
-            class="entry-card override-entry"
-            *ngFor="let group of overrides.controls; let i = index; trackBy: trackByIndex">
-            <div class="entry-content">
-              <p class="entry-title">
-                {{ normalizeDateValue(group.value.date) | date:'dd/MM/yyyy' }}
-              </p>
-              <p class="entry-subtitle">
-                {{ (group.value.isAvailable === true ? 'availability.override.available' : 'availability.override.unavailable') | translate }}
-              </p>
-              <p class="entry-subtitle" *ngIf="hasOverrideTimeRange(group); else fullDayOverride">
-                {{ group.value.start }} - {{ group.value.end }}
-              </p>
-              <ng-template #fullDayOverride>
-                <p class="entry-subtitle">{{ 'availability.override.fullDay' | translate }}</p>
-              </ng-template>
-              <p class="entry-note" *ngIf="group.value.reason">
-                {{ group.value.reason }}
-              </p>
-            </div>
-
-            <div class="entry-actions">
-              <button mat-stroked-button type="button" (click)="editOverride(i)" [disabled]="loading || saving">
-                {{ 'common.edit' | translate }}
-              </button>
-              <button mat-stroked-button type="button" (click)="removeOverride(i)" [disabled]="loading || saving">
-                {{ 'common.remove' | translate }}
-              </button>
-            </div>
-          </article>
+          @for (group of overrides.controls; track $index; let i = $index) {
+            <article
+              class="entry-card override-entry"
+              >
+              <div class="entry-content">
+                <p class="entry-title">
+                  {{ normalizeDateValue(group.value.date) | date:'dd/MM/yyyy' }}
+                </p>
+                <p class="entry-subtitle">
+                  {{ (group.value.isAvailable === true ? 'availability.override.available' : 'availability.override.unavailable') | translate }}
+                </p>
+                @if (hasOverrideTimeRange(group)) {
+                  <p class="entry-subtitle">
+                    {{ group.value.start }} - {{ group.value.end }}
+                  </p>
+                } @else {
+                  <p class="entry-subtitle">{{ 'availability.override.fullDay' | translate }}</p>
+                }
+                @if (group.value.reason) {
+                  <p class="entry-note">
+                    {{ group.value.reason }}
+                  </p>
+                }
+              </div>
+              <div class="entry-actions">
+                <button mat-stroked-button type="button" (click)="editOverride(i)" [disabled]="loading || saving">
+                  {{ 'common.edit' | translate }}
+                </button>
+                <button mat-stroked-button type="button" (click)="removeOverride(i)" [disabled]="loading || saving">
+                  {{ 'common.remove' | translate }}
+                </button>
+              </div>
+            </article>
+          }
         </div>
       </section>
 
       <div class="submit-row">
         <button mat-flat-button class="save-button button-with-spinner" type="submit" [disabled]="loading || saving">
-          <mat-progress-spinner *ngIf="saving" mode="indeterminate" diameter="18"></mat-progress-spinner>
+          @if (saving) {
+            <mat-progress-spinner mode="indeterminate" diameter="18"></mat-progress-spinner>
+          }
           <span>{{ 'actions.saveChanges' | translate }}</span>
         </button>
       </div>

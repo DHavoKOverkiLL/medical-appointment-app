@@ -22,30 +22,40 @@
             <input matInput type="email" formControlName="email" />
           </mat-form-field>
 
-          <mat-form-field appearance="outline" *ngIf="!isEditMode">
-            <mat-label>{{ 'common.password' | translate }}</mat-label>
-            <input matInput type="password" formControlName="password" />
-          </mat-form-field>
+          @if (!isEditMode) {
+            <mat-form-field appearance="outline">
+              <mat-label>{{ 'common.password' | translate }}</mat-label>
+              <input matInput type="password" formControlName="password" />
+            </mat-form-field>
+          }
 
-          <mat-form-field appearance="outline" *ngIf="!isEditMode">
-            <mat-label>{{ 'common.role' | translate }}</mat-label>
-            <mat-select formControlName="roleName">
-              <mat-option *ngFor="let role of data.roles" [value]="role.name">{{ role.name }}</mat-option>
-            </mat-select>
-          </mat-form-field>
+          @if (!isEditMode) {
+            <mat-form-field appearance="outline">
+              <mat-label>{{ 'common.role' | translate }}</mat-label>
+              <mat-select formControlName="roleName">
+                @for (role of data.roles; track role) {
+                  <mat-option [value]="role.name">{{ role.name }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          }
 
           <mat-form-field appearance="outline">
             <mat-label>{{ 'common.clinic' | translate }}</mat-label>
             <mat-select formControlName="clinicId">
-              <mat-option *ngFor="let clinic of data.clinics" [value]="clinic.clinicId">{{ clinic.name }}</mat-option>
+              @for (clinic of data.clinics; track clinic) {
+                <mat-option [value]="clinic.clinicId">{{ clinic.name }}</mat-option>
+              }
             </mat-select>
           </mat-form-field>
 
-          <div class="role-pill" *ngIf="isEditMode && data.user">
-            <span>{{ 'userEditor.currentRole' | translate }}</span>
-            <strong>{{ data.user.role }}</strong>
-            <small>{{ 'userEditor.currentRoleHint' | translate }}</small>
-          </div>
+          @if (isEditMode && data.user) {
+            <div class="role-pill">
+              <span>{{ 'userEditor.currentRole' | translate }}</span>
+              <strong>{{ data.user.role }}</strong>
+              <small>{{ 'userEditor.currentRoleHint' | translate }}</small>
+            </div>
+          }
         </div>
       </div>
     </mat-tab>
@@ -106,8 +116,12 @@
           <article>
             <span>{{ 'common.clinic' | translate }}</span>
             <strong>{{ selectedClinicName | translate }}</strong>
-            <small *ngIf="!isEditMode">{{ 'common.role' | translate }}: {{ form.value.roleName || '-' }}</small>
-            <small *ngIf="isEditMode && data.user">{{ 'common.role' | translate }}: {{ data.user.role }}</small>
+            @if (!isEditMode) {
+              <small>{{ 'common.role' | translate }}: {{ form.value.roleName || '-' }}</small>
+            }
+            @if (isEditMode && data.user) {
+              <small>{{ 'common.role' | translate }}: {{ data.user.role }}</small>
+            }
           </article>
         </div>
       </div>

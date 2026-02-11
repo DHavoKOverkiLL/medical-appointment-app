@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import {
   ReactiveFormsModule,
   FormBuilder,
@@ -20,7 +20,6 @@ import { Router } from '@angular/router';
   selector: 'app-login',
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
@@ -28,7 +27,7 @@ import { Router } from '@angular/router';
     MatProgressSpinnerModule,
     RouterModule,
     TranslateModule
-  ],
+],
   templateUrl: './login.component.html',
   styles: [':host { display: block; }'],
 })

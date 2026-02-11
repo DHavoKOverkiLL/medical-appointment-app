@@ -11,157 +11,184 @@
     </div>
   </header>
 
-  <p *ngIf="loading && summary" class="patient-state">{{ 'state.loadingDashboard' | translate }}</p>
-  <p *ngIf="errorMessage" class="patient-error">{{ errorMessage | translate }}</p>
-  <p *ngIf="successMessage" class="patient-success">{{ successMessage | translate }}</p>
+  @if (loading && summary) {
+    <p class="patient-state">{{ 'state.loadingDashboard' | translate }}</p>
+  }
+  @if (errorMessage) {
+    <p class="patient-error">{{ errorMessage | translate }}</p>
+  }
+  @if (successMessage) {
+    <p class="patient-success">{{ successMessage | translate }}</p>
+  }
 
-  <section class="app-skeleton-list" *ngIf="loading && !summary" aria-hidden="true">
-    <article class="app-skeleton-card" *ngFor="let _ of metricSkeletons">
-      <div class="app-skeleton-line app-skeleton-line--title"></div>
-      <div class="app-skeleton-line app-skeleton-line--meta"></div>
-      <div class="app-skeleton-pills">
-        <span class="app-skeleton-pill"></span>
-        <span class="app-skeleton-pill"></span>
-      </div>
-    </article>
-  </section>
+  @if (loading && !summary) {
+    <section class="app-skeleton-list" aria-hidden="true">
+      @for (_ of metricSkeletons; track $index) {
+        <article class="app-skeleton-card">
+          <div class="app-skeleton-line app-skeleton-line--title"></div>
+          <div class="app-skeleton-line app-skeleton-line--meta"></div>
+          <div class="app-skeleton-pills">
+            <span class="app-skeleton-pill"></span>
+            <span class="app-skeleton-pill"></span>
+          </div>
+        </article>
+      }
+    </section>
+  }
 
-  <ng-container *ngIf="summary as vm">
+  @if (summary; as vm) {
     <section class="patient-metrics">
       <mat-card class="metric-card">
         <span>{{ 'common.clinic' | translate }}</span>
         <strong>{{ vm.clinicName }}</strong>
       </mat-card>
-
       <mat-card class="metric-card">
         <span>{{ 'metrics.upcomingAppointments' | translate }}</span>
         <strong>{{ vm.upcomingAppointments }}</strong>
       </mat-card>
-
       <mat-card class="metric-card">
         <span>{{ 'metrics.nextAppointment' | translate }}</span>
         <strong>{{ vm.nextAppointmentUtc ? (vm.nextAppointmentUtc | date:'dd/MM/yyyy HH:mm') : ('state.notScheduled' | translate) }}</strong>
       </mat-card>
-
       <mat-card class="metric-card">
         <span>{{ 'metrics.doctorsInClinic' | translate }}</span>
         <strong>{{ vm.doctorsInClinic }}</strong>
       </mat-card>
     </section>
-  </ng-container>
+  }
 
-  <section class="patient-content" *ngIf="!loading">
-    <mat-card class="calendar-card">
-      <div class="calendar-header">
-        <button mat-stroked-button type="button" (click)="changeMonth(-1)">{{ 'common.previous' | translate }}</button>
-        <h2>{{ currentMonth | date:'MMMM y' }}</h2>
-        <button mat-stroked-button type="button" (click)="changeMonth(1)">{{ 'common.next' | translate }}</button>
-      </div>
-
-      <div class="calendar-weekdays">
-        <span *ngFor="let day of weekDays">{{ day | translate }}</span>
-      </div>
-
-      <div class="calendar-grid">
-        <button
-          type="button"
-          class="calendar-cell"
-          *ngFor="let cell of calendarCells; trackBy: trackCalendar"
-          [class.calendar-cell--outside]="!cell.inCurrentMonth"
-          [class.calendar-cell--today]="cell.isToday"
-          [class.calendar-cell--selected]="(selectedDate | date:'yyyy-MM-dd') === (cell.date | date:'yyyy-MM-dd')"
-          (click)="selectDate(cell.date)">
-          <span class="calendar-day">{{ cell.date.getDate() }}</span>
-          <span class="calendar-count" *ngIf="cell.appointments.length">{{ cell.appointments.length }}</span>
-        </button>
-      </div>
-    </mat-card>
-
-    <mat-card class="day-card">
-      <h3>{{ selectedDate | date:'dd/MM/yyyy' }}</h3>
-      <p class="day-subtitle">{{ 'patientDashboard.daySubtitle' | translate }}</p>
-
-      <div *ngIf="selectedDayAppointments.length === 0" class="empty-state">
-        {{ 'patientDashboard.emptySelectedDay' | translate }}
-      </div>
-
-      <article class="appointment-row" *ngFor="let appointment of selectedDayAppointments; trackBy: trackAppointment">
-        <div class="appointment-main">
-          <strong>{{ appointment.doctorName }}</strong>
-          <span>{{ appointment.appointmentDateTime | date:'HH:mm' }} | {{ appointment.clinicName }}</span>
-          <span class="appointment-status">
-            {{ 'patientDashboard.postponeStatus' | translate }}: {{ getStatusLabel(appointment.postponeRequestStatus, appointment.status) | translate }}
-          </span>
-          <span *ngIf="appointment.proposedDateTime" class="appointment-proposed">
-            {{ 'common.proposed' | translate }}: {{ appointment.proposedDateTime | date:'dd/MM/yyyy HH:mm' }}
-          </span>
-          <span *ngIf="appointment.doctorResponseNote && !isRejectedStatus(appointment.postponeRequestStatus)" class="appointment-proposed">
-            {{ 'common.doctorNote' | translate }}: {{ appointment.doctorResponseNote }}
-          </span>
-          <section *ngIf="appointment.doctorResponseNote && isRejectedStatus(appointment.postponeRequestStatus)" class="reject-reason-box">
-            <strong>{{ 'statuses.rejectedByDoctor' | translate }}</strong>
-            <p>{{ appointment.doctorResponseNote }}</p>
-          </section>
-          <span *ngIf="isCounterProposed(appointment)" class="appointment-proposed">
-            {{ 'patientDashboard.reviewCounterProposal' | translate }}
-            <a routerLink="/dashboard/appointments/my">{{ 'nav.myAppointments' | translate }}</a>.
-          </span>
+  @if (!loading) {
+    <section class="patient-content">
+      <mat-card class="calendar-card">
+        <div class="calendar-header">
+          <button mat-stroked-button type="button" (click)="changeMonth(-1)">{{ 'common.previous' | translate }}</button>
+          <h2>{{ currentMonth | date:'MMMM y' }}</h2>
+          <button mat-stroked-button type="button" (click)="changeMonth(1)">{{ 'common.next' | translate }}</button>
         </div>
+        <div class="calendar-weekdays">
+          @for (day of weekDays; track day) {
+            <span>{{ day | translate }}</span>
+          }
+        </div>
+        <div class="calendar-grid">
+          @for (cell of calendarCells; track trackCalendar($index, cell)) {
+            <button
+              type="button"
+              class="calendar-cell"
+              [class.calendar-cell--outside]="!cell.inCurrentMonth"
+              [class.calendar-cell--today]="cell.isToday"
+              [class.calendar-cell--selected]="(selectedDate | date:'yyyy-MM-dd') === (cell.date | date:'yyyy-MM-dd')"
+              (click)="selectDate(cell.date)">
+              <span class="calendar-day">{{ cell.date.getDate() }}</span>
+              @if (cell.appointments.length) {
+                <span class="calendar-count">{{ cell.appointments.length }}</span>
+              }
+            </button>
+          }
+        </div>
+      </mat-card>
+      <mat-card class="day-card">
+        <h3>{{ selectedDate | date:'dd/MM/yyyy' }}</h3>
+        <p class="day-subtitle">{{ 'patientDashboard.daySubtitle' | translate }}</p>
+        @if (selectedDayAppointments.length === 0) {
+          <div class="empty-state">
+            {{ 'patientDashboard.emptySelectedDay' | translate }}
+          </div>
+        }
+        @for (appointment of selectedDayAppointments; track trackAppointment($index, appointment)) {
+          <article class="appointment-row">
+            <div class="appointment-main">
+              <strong>{{ appointment.doctorName }}</strong>
+              <span>{{ appointment.appointmentDateTime | date:'HH:mm' }} | {{ appointment.clinicName }}</span>
+              <span class="appointment-status">
+                {{ 'patientDashboard.postponeStatus' | translate }}: {{ getStatusLabel(appointment.postponeRequestStatus, appointment.status) | translate }}
+              </span>
+              @if (appointment.proposedDateTime) {
+                <span class="appointment-proposed">
+                  {{ 'common.proposed' | translate }}: {{ appointment.proposedDateTime | date:'dd/MM/yyyy HH:mm' }}
+                </span>
+              }
+              @if (appointment.doctorResponseNote && !isRejectedStatus(appointment.postponeRequestStatus)) {
+                <span class="appointment-proposed">
+                  {{ 'common.doctorNote' | translate }}: {{ appointment.doctorResponseNote }}
+                </span>
+              }
+              @if (appointment.doctorResponseNote && isRejectedStatus(appointment.postponeRequestStatus)) {
+                <section class="reject-reason-box">
+                  <strong>{{ 'statuses.rejectedByDoctor' | translate }}</strong>
+                  <p>{{ appointment.doctorResponseNote }}</p>
+                </section>
+              }
+              @if (isCounterProposed(appointment)) {
+                <span class="appointment-proposed">
+                  {{ 'patientDashboard.reviewCounterProposal' | translate }}
+                  <a routerLink="/dashboard/appointments/my">{{ 'nav.myAppointments' | translate }}</a>.
+                </span>
+              }
+            </div>
+            <button
+              mat-stroked-button
+              type="button"
+              (click)="openPostponeRequest(appointment)"
+              [disabled]="!canRequestPostpone(appointment) || postponeSubmitting">
+              {{ 'actions.requestPostpone' | translate }}
+            </button>
+          </article>
+        }
+      </mat-card>
+    </section>
+  }
 
-        <button
-          mat-stroked-button
-          type="button"
-          (click)="openPostponeRequest(appointment)"
-          [disabled]="!canRequestPostpone(appointment) || postponeSubmitting">
-          {{ 'actions.requestPostpone' | translate }}
-        </button>
-      </article>
+  @if (activePostponeAppointmentId && !loading) {
+    <mat-card class="postpone-card">
+      <h3>{{ 'patientDashboard.postponeRequestTitle' | translate }}</h3>
+      <p>{{ 'patientDashboard.postponeRequestSubtitle' | translate }}</p>
+      <form [formGroup]="postponeForm" (ngSubmit)="submitPostponeRequest()">
+        <div class="postpone-grid">
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'common.proposedDate' | translate }}</mat-label>
+            <input matInput [matDatepicker]="postponeDatePicker" formControlName="date" [min]="minDate" />
+            <mat-datepicker-toggle matSuffix [for]="postponeDatePicker"></mat-datepicker-toggle>
+            <mat-datepicker #postponeDatePicker></mat-datepicker>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'common.proposedTimeSlot' | translate }}</mat-label>
+            <mat-select formControlName="time" [disabled]="loadingPostponeSlots || availablePostponeSlots.length === 0">
+              @for (slot of availablePostponeSlots; track slot) {
+                <mat-option [value]="slot">
+                  {{ slot }}
+                </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </div>
+        @if (loadingPostponeSlots) {
+          <p class="appointment-proposed">{{ 'patientDashboard.messages.loadingSlots' | translate }}</p>
+        }
+        @if (!loadingPostponeSlots && postponeForm.value.date && availablePostponeSlots.length === 0) {
+          <p class="appointment-proposed">
+            {{ 'patientDashboard.messages.noSlots' | translate }}
+          </p>
+        }
+        @if (!loadingPostponeSlots && activePostponeSlotTimezone && availablePostponeSlots.length > 0) {
+          <p class="appointment-proposed">
+            {{ 'patientDashboard.messages.slotsTimezone' | translate:{ timezone: activePostponeSlotTimezone } }}
+          </p>
+        }
+        <mat-form-field appearance="outline" class="reason-field">
+          <mat-label>{{ 'common.reason' | translate }}</mat-label>
+          <textarea matInput rows="4" formControlName="reason"></textarea>
+        </mat-form-field>
+        <div class="postpone-actions">
+          <button mat-flat-button class="button-with-spinner" type="submit" [disabled]="postponeForm.invalid || postponeSubmitting">
+            @if (postponeSubmitting) {
+              <mat-progress-spinner mode="indeterminate" diameter="18"></mat-progress-spinner>
+            }
+            <span>{{ 'actions.sendRequest' | translate }}</span>
+          </button>
+          <button mat-stroked-button type="button" [disabled]="postponeSubmitting" (click)="cancelPostponeRequest()">{{ 'common.cancel' | translate }}</button>
+        </div>
+      </form>
     </mat-card>
-  </section>
-
-  <mat-card class="postpone-card" *ngIf="activePostponeAppointmentId && !loading">
-    <h3>{{ 'patientDashboard.postponeRequestTitle' | translate }}</h3>
-    <p>{{ 'patientDashboard.postponeRequestSubtitle' | translate }}</p>
-
-    <form [formGroup]="postponeForm" (ngSubmit)="submitPostponeRequest()">
-      <div class="postpone-grid">
-        <mat-form-field appearance="outline">
-          <mat-label>{{ 'common.proposedDate' | translate }}</mat-label>
-          <input matInput [matDatepicker]="postponeDatePicker" formControlName="date" [min]="minDate" />
-          <mat-datepicker-toggle matSuffix [for]="postponeDatePicker"></mat-datepicker-toggle>
-          <mat-datepicker #postponeDatePicker></mat-datepicker>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>{{ 'common.proposedTimeSlot' | translate }}</mat-label>
-          <mat-select formControlName="time" [disabled]="loadingPostponeSlots || availablePostponeSlots.length === 0">
-            <mat-option *ngFor="let slot of availablePostponeSlots" [value]="slot">
-              {{ slot }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-      </div>
-
-      <p class="appointment-proposed" *ngIf="loadingPostponeSlots">{{ 'patientDashboard.messages.loadingSlots' | translate }}</p>
-      <p class="appointment-proposed" *ngIf="!loadingPostponeSlots && postponeForm.value.date && availablePostponeSlots.length === 0">
-        {{ 'patientDashboard.messages.noSlots' | translate }}
-      </p>
-      <p class="appointment-proposed" *ngIf="!loadingPostponeSlots && activePostponeSlotTimezone && availablePostponeSlots.length > 0">
-        {{ 'patientDashboard.messages.slotsTimezone' | translate:{ timezone: activePostponeSlotTimezone } }}
-      </p>
-
-      <mat-form-field appearance="outline" class="reason-field">
-        <mat-label>{{ 'common.reason' | translate }}</mat-label>
-        <textarea matInput rows="4" formControlName="reason"></textarea>
-      </mat-form-field>
-
-      <div class="postpone-actions">
-        <button mat-flat-button class="button-with-spinner" type="submit" [disabled]="postponeForm.invalid || postponeSubmitting">
-          <mat-progress-spinner *ngIf="postponeSubmitting" mode="indeterminate" diameter="18"></mat-progress-spinner>
-          <span>{{ 'actions.sendRequest' | translate }}</span>
-        </button>
-        <button mat-stroked-button type="button" [disabled]="postponeSubmitting" (click)="cancelPostponeRequest()">{{ 'common.cancel' | translate }}</button>
-      </div>
-    </form>
-  </mat-card>
+  }
 </section>

@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, Inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -32,7 +32,6 @@ export interface AvailabilityRangeDialogResult {
   selector: 'app-availability-range-dialog',
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     MatDialogModule,
     MatFormFieldModule,
@@ -42,7 +41,7 @@ export interface AvailabilityRangeDialogResult {
     MatTimepickerModule,
     MatButtonModule,
     TranslateModule
-  ],
+],
   templateUrl: './availability-range-dialog.component.html',
   styleUrls: ['./availability-range-dialog.component.scss']
 })

@@ -9,56 +9,74 @@
     <h2>{{ 'bookAppointment.cardTitle' | translate }}</h2>
     <p class="book-subtitle">{{ 'bookAppointment.cardSubtitle' | translate }}</p>
 
-    <section class="app-skeleton-list" *ngIf="loadingDoctors" aria-hidden="true">
-      <article class="app-skeleton-card" *ngFor="let _ of skeletonRows">
-        <div class="app-skeleton-line app-skeleton-line--title"></div>
-        <div class="app-skeleton-line app-skeleton-line--meta"></div>
-      </article>
-    </section>
+    @if (loadingDoctors) {
+      <section class="app-skeleton-list" aria-hidden="true">
+        @for (_ of skeletonRows; track $index) {
+          <article class="app-skeleton-card">
+            <div class="app-skeleton-line app-skeleton-line--title"></div>
+            <div class="app-skeleton-line app-skeleton-line--meta"></div>
+          </article>
+        }
+      </section>
+    }
 
-    <form [formGroup]="appointmentForm" (ngSubmit)="onSubmit()" *ngIf="!loadingDoctors">
-      <div class="book-grid">
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>{{ 'common.doctor' | translate }}</mat-label>
-          <mat-select formControlName="doctorId">
-            <mat-option *ngFor="let doctor of doctors" [value]="doctor.id">
-              {{ doctor.name }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
+    @if (!loadingDoctors) {
+      <form [formGroup]="appointmentForm" (ngSubmit)="onSubmit()">
+        <div class="book-grid">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>{{ 'common.doctor' | translate }}</mat-label>
+            <mat-select formControlName="doctorId">
+              @for (doctor of doctors; track doctor) {
+                <mat-option [value]="doctor.id">
+                  {{ doctor.name }}
+                </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'common.date' | translate }}</mat-label>
+            <input matInput [matDatepicker]="bookingDatePicker" formControlName="date" [min]="minDate" />
+            <mat-datepicker-toggle matSuffix [for]="bookingDatePicker"></mat-datepicker-toggle>
+            <mat-datepicker #bookingDatePicker></mat-datepicker>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'common.timeSlot30' | translate }}</mat-label>
+            <mat-select formControlName="time">
+              @for (slot of availableSlots; track slot) {
+                <mat-option [value]="slot">
+                  {{ slot }}
+                </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </div>
+        @if (loadingSlots) {
+          <p class="slot-state">{{ 'bookAppointment.messages.loadingSlots' | translate }}</p>
+        }
+        @if (!loadingSlots && appointmentForm.value.doctorId && appointmentForm.value.date && availableSlots.length === 0) {
+          <p class="slot-state">
+            {{ 'bookAppointment.messages.noSlots' | translate }}
+          </p>
+        }
+        @if (!loadingSlots && slotTimezone && availableSlots.length > 0) {
+          <p class="slot-state">
+            {{ 'bookAppointment.messages.slotsTimezone' | translate:{ timezone: slotTimezone } }}
+          </p>
+        }
+        <button mat-flat-button class="book-submit button-with-spinner" type="submit" [disabled]="appointmentForm.invalid || loadingDoctors || loadingSlots || isSubmitting">
+          @if (isSubmitting) {
+            <mat-progress-spinner mode="indeterminate" diameter="18"></mat-progress-spinner>
+          }
+          <span>{{ 'actions.confirmBooking' | translate }}</span>
+        </button>
+      </form>
+    }
 
-        <mat-form-field appearance="outline">
-          <mat-label>{{ 'common.date' | translate }}</mat-label>
-          <input matInput [matDatepicker]="bookingDatePicker" formControlName="date" [min]="minDate" />
-          <mat-datepicker-toggle matSuffix [for]="bookingDatePicker"></mat-datepicker-toggle>
-          <mat-datepicker #bookingDatePicker></mat-datepicker>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>{{ 'common.timeSlot30' | translate }}</mat-label>
-          <mat-select formControlName="time">
-            <mat-option *ngFor="let slot of availableSlots" [value]="slot">
-              {{ slot }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-      </div>
-
-      <p class="slot-state" *ngIf="loadingSlots">{{ 'bookAppointment.messages.loadingSlots' | translate }}</p>
-      <p class="slot-state" *ngIf="!loadingSlots && appointmentForm.value.doctorId && appointmentForm.value.date && availableSlots.length === 0">
-        {{ 'bookAppointment.messages.noSlots' | translate }}
-      </p>
-      <p class="slot-state" *ngIf="!loadingSlots && slotTimezone && availableSlots.length > 0">
-        {{ 'bookAppointment.messages.slotsTimezone' | translate:{ timezone: slotTimezone } }}
-      </p>
-
-      <button mat-flat-button class="book-submit button-with-spinner" type="submit" [disabled]="appointmentForm.invalid || loadingDoctors || loadingSlots || isSubmitting">
-        <mat-progress-spinner *ngIf="isSubmitting" mode="indeterminate" diameter="18"></mat-progress-spinner>
-        <span>{{ 'actions.confirmBooking' | translate }}</span>
-      </button>
-    </form>
-
-    <p *ngIf="successMessage" class="success-message">{{ successMessage | translate }}</p>
-    <p *ngIf="errorMessage" class="error-message">{{ errorMessage | translate }}</p>
+    @if (successMessage) {
+      <p class="success-message">{{ successMessage | translate }}</p>
+    }
+    @if (errorMessage) {
+      <p class="error-message">{{ errorMessage | translate }}</p>
+    }
   </mat-card>
 </section>

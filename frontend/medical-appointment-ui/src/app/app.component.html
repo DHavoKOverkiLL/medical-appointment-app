@@ -1,10 +1,11 @@
-<div
-  *ngIf="loadingService.isVisible$ | async"
-  class="app-network-loader"
-  role="status"
-  [attr.aria-label]="'state.working' | translate">
-  <span class="app-network-loader__bar"></span>
-</div>
+@if (loadingService.isVisible$ | async) {
+  <div
+    class="app-network-loader"
+    role="status"
+    [attr.aria-label]="'state.working' | translate">
+    <span class="app-network-loader__bar"></span>
+  </div>
+}
 
 <div class="app-language-switcher" role="group" [attr.aria-label]="'language.switch' | translate">
   <button
@@ -24,7 +25,9 @@
 </div>
 
 <div class="app-shell" [class.app-shell--guest]="!authService.isLoggedIn()">
-  <app-header *ngIf="authService.isLoggedIn()" class="app-shell__sidebar"></app-header>
+  @if (authService.isLoggedIn()) {
+    <app-header class="app-shell__sidebar"></app-header>
+  }
   <main class="app-shell__content">
     <router-outlet></router-outlet>
   </main>

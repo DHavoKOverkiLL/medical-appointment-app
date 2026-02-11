@@ -7,27 +7,39 @@
     <a mat-stroked-button [routerLink]="backRoute">{{ 'actions.backToAppointments' | translate }}</a>
   </header>
 
-  <p *ngIf="loading" class="state">{{ 'appointmentAudit.loading' | translate }}</p>
-  <p *ngIf="errorMessage" class="error">{{ errorMessage | translate }}</p>
+  @if (loading) {
+    <p class="state">{{ 'appointmentAudit.loading' | translate }}</p>
+  }
+  @if (errorMessage) {
+    <p class="error">{{ errorMessage | translate }}</p>
+  }
 
-  <section *ngIf="!loading && !errorMessage && auditEvents.length === 0" class="empty-state">
-    {{ 'appointmentAudit.empty' | translate }}
-  </section>
+  @if (!loading && !errorMessage && auditEvents.length === 0) {
+    <section class="empty-state">
+      {{ 'appointmentAudit.empty' | translate }}
+    </section>
+  }
 
-  <section *ngIf="!loading && auditEvents.length > 0" class="audit-list">
-    <mat-card class="audit-card" *ngFor="let event of auditEvents; trackBy: trackAuditEvent">
-      <div class="audit-card__head">
-        <strong>{{ eventTypeLabel(event.eventType) | translate }}</strong>
-        <span>{{ event.occurredAtUtc | date:'dd/MM/yyyy HH:mm' }}</span>
-      </div>
-
-      <p class="audit-card__details">{{ event.details }}</p>
-
-      <p class="audit-card__actor" *ngIf="event.actorName || event.actorRole">
-        {{ 'appointmentAudit.actor' | translate }}:
-        {{ event.actorName || ('roles.user' | translate) }}
-        <span *ngIf="event.actorRole">({{ event.actorRole }})</span>
-      </p>
-    </mat-card>
-  </section>
+  @if (!loading && auditEvents.length > 0) {
+    <section class="audit-list">
+      @for (event of auditEvents; track trackAuditEvent($index, event)) {
+        <mat-card class="audit-card">
+          <div class="audit-card__head">
+            <strong>{{ eventTypeLabel(event.eventType) | translate }}</strong>
+            <span>{{ event.occurredAtUtc | date:'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+          <p class="audit-card__details">{{ event.details }}</p>
+          @if (event.actorName || event.actorRole) {
+            <p class="audit-card__actor">
+              {{ 'appointmentAudit.actor' | translate }}:
+              {{ event.actorName || ('roles.user' | translate) }}
+              @if (event.actorRole) {
+                <span>({{ event.actorRole }})</span>
+              }
+            </p>
+          }
+        </mat-card>
+      }
+    </section>
+  }
 </section>

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { RouterModule } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { finalize } from 'rxjs/operators';
@@ -23,7 +23,6 @@ import {
   selector: 'app-user-management',
   standalone: true,
   imports: [
-    CommonModule,
     RouterModule,
     MatFormFieldModule,
     MatButtonModule,
@@ -32,7 +31,7 @@ import {
     MatProgressSpinnerModule,
     MatDialogModule,
     TranslateModule
-  ],
+],
   templateUrl: './user-management.component.html',
   styleUrls: ['./user-management.component.scss']
 })
