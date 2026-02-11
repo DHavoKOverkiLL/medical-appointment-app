@@ -130,65 +130,12 @@
               mat-stroked-button
               type="button"
               (click)="openPostponeRequest(appointment)"
-              [disabled]="!canRequestPostpone(appointment) || postponeSubmitting">
+              [disabled]="!canRequestPostpone(appointment)">
               {{ 'actions.requestPostpone' | translate }}
             </button>
           </article>
         }
       </mat-card>
     </section>
-  }
-
-  @if (activePostponeAppointmentId && !loading) {
-    <mat-card class="postpone-card">
-      <h3>{{ 'patientDashboard.postponeRequestTitle' | translate }}</h3>
-      <p>{{ 'patientDashboard.postponeRequestSubtitle' | translate }}</p>
-      <form [formGroup]="postponeForm" (ngSubmit)="submitPostponeRequest()">
-        <div class="postpone-grid">
-          <mat-form-field appearance="outline">
-            <mat-label>{{ 'common.proposedDate' | translate }}</mat-label>
-            <input matInput [matDatepicker]="postponeDatePicker" formControlName="date" [min]="minDate" />
-            <mat-datepicker-toggle matSuffix [for]="postponeDatePicker"></mat-datepicker-toggle>
-            <mat-datepicker #postponeDatePicker></mat-datepicker>
-          </mat-form-field>
-          <mat-form-field appearance="outline">
-            <mat-label>{{ 'common.proposedTimeSlot' | translate }}</mat-label>
-            <mat-select formControlName="time" [disabled]="loadingPostponeSlots || availablePostponeSlots.length === 0">
-              @for (slot of availablePostponeSlots; track slot) {
-                <mat-option [value]="slot">
-                  {{ slot }}
-                </mat-option>
-              }
-            </mat-select>
-          </mat-form-field>
-        </div>
-        @if (loadingPostponeSlots) {
-          <p class="appointment-proposed">{{ 'patientDashboard.messages.loadingSlots' | translate }}</p>
-        }
-        @if (!loadingPostponeSlots && postponeForm.value.date && availablePostponeSlots.length === 0) {
-          <p class="appointment-proposed">
-            {{ 'patientDashboard.messages.noSlots' | translate }}
-          </p>
-        }
-        @if (!loadingPostponeSlots && activePostponeSlotTimezone && availablePostponeSlots.length > 0) {
-          <p class="appointment-proposed">
-            {{ 'patientDashboard.messages.slotsTimezone' | translate:{ timezone: activePostponeSlotTimezone } }}
-          </p>
-        }
-        <mat-form-field appearance="outline" class="reason-field">
-          <mat-label>{{ 'common.reason' | translate }}</mat-label>
-          <textarea matInput rows="4" formControlName="reason"></textarea>
-        </mat-form-field>
-        <div class="postpone-actions">
-          <button mat-flat-button class="button-with-spinner" type="submit" [disabled]="postponeForm.invalid || postponeSubmitting">
-            @if (postponeSubmitting) {
-              <mat-progress-spinner mode="indeterminate" diameter="18"></mat-progress-spinner>
-            }
-            <span>{{ 'actions.sendRequest' | translate }}</span>
-          </button>
-          <button mat-stroked-button type="button" [disabled]="postponeSubmitting" (click)="cancelPostponeRequest()">{{ 'common.cancel' | translate }}</button>
-        </div>
-      </form>
-    </mat-card>
   }
 </section>
