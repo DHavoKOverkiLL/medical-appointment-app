@@ -1,0 +1,156 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend (.NET)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend/MedicalAppointment.Api
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Restore
+        run: dotnet restore MedicalAppointment.Api.sln
+
+      - name: Build
+        run: dotnet build MedicalAppointment.Api.sln --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test MedicalAppointment.Api.sln --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage" --results-directory TestResults --logger "trx;LogFileName=test-results.trx"
+
+      - name: Enforce backend coverage floor
+        shell: pwsh
+        run: |
+          $coverageFile = Get-ChildItem -Path TestResults -Recurse -Filter coverage.cobertura.xml | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+          if (-not $coverageFile) {
+            throw "Coverage file not found under TestResults."
+          }
+
+          [xml]$coverageXml = Get-Content -Path $coverageFile.FullName
+          $rawLineRate = [math]::Round(([double]$coverageXml.coverage.'line-rate') * 100, 2)
+          $rawBranchRate = [math]::Round(([double]$coverageXml.coverage.'branch-rate') * 100, 2)
+
+          $excludePattern = 'MedicalAppointment\.Infrastructure[\\/]Migrations[\\/]'
+          $lineTotal = 0
+          $lineCovered = 0
+          $branchTotal = 0
+          $branchCovered = 0
+
+          foreach ($package in @($coverageXml.coverage.packages.package)) {
+            foreach ($class in @($package.classes.class)) {
+              $filename = [string]$class.filename
+              if ($filename -match $excludePattern) {
+                continue
+              }
+
+              foreach ($line in @($class.lines.line)) {
+                $lineTotal++
+                if ([int]$line.hits -gt 0) {
+                  $lineCovered++
+                }
+
+                if ([string]$line.branch -eq 'true') {
+                  $conditionCoverage = [string]$line.'condition-coverage'
+                  if ($conditionCoverage -match '\((\d+)/(\d+)\)') {
+                    $branchCovered += [int]$matches[1]
+                    $branchTotal += [int]$matches[2]
+                  }
+                }
+              }
+            }
+          }
+
+          if ($lineTotal -eq 0) {
+            throw "Filtered coverage produced zero executable lines."
+          }
+
+          $lineRate = [math]::Round(($lineCovered * 100.0) / $lineTotal, 2)
+          $branchRate = if ($branchTotal -gt 0) {
+            [math]::Round(($branchCovered * 100.0) / $branchTotal, 2)
+          } else {
+            0
+          }
+
+          $minLineRate = 55
+          $minBranchRate = 40
+
+          Write-Host "Backend raw coverage line-rate: $rawLineRate%"
+          Write-Host "Backend raw coverage branch-rate: $rawBranchRate%"
+          Write-Host "Backend non-migration coverage line-rate: $lineRate% ($lineCovered/$lineTotal)"
+          Write-Host "Backend non-migration coverage branch-rate: $branchRate% ($branchCovered/$branchTotal)"
+
+          if ($lineRate -lt $minLineRate -or $branchRate -lt $minBranchRate) {
+            throw "Backend non-migration coverage below floor (line: $lineRate/$minLineRate, branch: $branchRate/$minBranchRate)."
+          }
+
+      - name: Upload backend test and coverage artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-test-results
+          path: backend/MedicalAppointment.Api/TestResults
+          if-no-files-found: warn
+
+  frontend:
+    name: Frontend (Angular)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend/medical-appointment-ui
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: frontend/medical-appointment-ui/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Setup Chrome
+        id: setup-chrome
+        uses: browser-actions/setup-chrome@v1
+
+      - name: Export Chrome path
+        run: echo "CHROME_BIN=${{ steps.setup-chrome.outputs.chrome-path }}" >> $GITHUB_ENV
+
+      - name: Test
+        run: npm run test:ci:coverage
+
+      - name: Upload frontend coverage artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-coverage
+          path: frontend/medical-appointment-ui/coverage
+          if-no-files-found: warn
