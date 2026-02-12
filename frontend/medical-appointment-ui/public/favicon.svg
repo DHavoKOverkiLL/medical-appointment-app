@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Medio favicon">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1295A4"/>
+      <stop offset="100%" stop-color="#0B6B77"/>
+    </linearGradient>
+  </defs>
+  <rect x="4" y="4" width="56" height="56" rx="14" fill="url(#bg)"/>
+  <path
+    fill="#FFFFFF"
+    d="M15 46V18H23L32 32L41 18H49V46H42V30L32 44L22 30V46Z"/>
+  <circle cx="48" cy="16" r="9" fill="#22C6D3"/>
+  <path fill="#FFFFFF" d="M47 11H49V15H53V17H49V21H47V17H43V15H47Z"/>
+</svg>
