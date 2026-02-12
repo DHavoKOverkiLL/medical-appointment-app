@@ -260,9 +260,11 @@ GitHub Actions workflow: `.github/workflows/ci.yml`
 Example production CORS env vars:
 
 ```powershell
-Cors__AllowedOrigins__0=http://localhost:4200
-Cors__AllowedOrigins__1=https://<your-static-web-app>.azurestaticapps.net
+Cors__AllowedOrigins__0=https://app.mediohealth.ro
+Cors__AllowedOrigins__1=http://localhost:4200
 ```
+
+Important: configure origins as scheme + host (+ optional port), without trailing slash.
 
 ## Troubleshooting
 
@@ -274,3 +276,5 @@ Cors__AllowedOrigins__1=https://<your-static-web-app>.azurestaticapps.net
   - verify backend is running on `https://localhost:7074`
   - verify `API_BASE_URL` in `frontend/medical-appointment-ui/src/app/core/api.config.ts`
   - ensure local dev certificate is trusted.
+- Azure Static Web Apps returns `404` on refresh/deep links (`/login`, `/dashboard/...`):
+  - ensure `frontend/medical-appointment-ui/public/staticwebapp.config.json` is present in deployed artifacts.

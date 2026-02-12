@@ -20,15 +20,17 @@ var corsOriginArray = builder.Configuration.GetSection("Cors:AllowedOrigins").Ge
 if (corsOriginArray is not null)
 {
     configuredCorsOrigins.AddRange(corsOriginArray
-        .Where(origin => !string.IsNullOrWhiteSpace(origin))
-        .Select(origin => origin!.Trim()));
+        .Select(NormalizeCorsOrigin)
+        .OfType<string>());
 }
 
 var corsOriginCsv = builder.Configuration["Cors:AllowedOrigins"];
 if (!string.IsNullOrWhiteSpace(corsOriginCsv))
 {
     configuredCorsOrigins.AddRange(
-        corsOriginCsv.Split(new[] { ',', ';' }, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries));
+        corsOriginCsv.Split(new[] { ',', ';' }, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+            .Select(NormalizeCorsOrigin)
+            .OfType<string>());
 }
 
 var allowedCorsOrigins = configuredCorsOrigins
@@ -37,7 +39,11 @@ var allowedCorsOrigins = configuredCorsOrigins
 
 if (allowedCorsOrigins.Length == 0)
 {
-    allowedCorsOrigins = ["http://localhost:4200"];
+    allowedCorsOrigins =
+    [
+        "http://localhost:4200",
+        "https://app.mediohealth.ro"
+    ];
 }
 
 // Add CORS policy
@@ -247,5 +253,27 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+static string? NormalizeCorsOrigin(string? origin)
+{
+    if (string.IsNullOrWhiteSpace(origin))
+    {
+        return null;
+    }
+
+    var trimmed = origin.Trim();
+    if (!Uri.TryCreate(trimmed, UriKind.Absolute, out var parsedUri))
+    {
+        return null;
+    }
+
+    if (!string.Equals(parsedUri.Scheme, Uri.UriSchemeHttp, StringComparison.OrdinalIgnoreCase) &&
+        !string.Equals(parsedUri.Scheme, Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase))
+    {
+        return null;
+    }
+
+    return parsedUri.GetLeftPart(UriPartial.Authority);
+}
 
 public partial class Program;
