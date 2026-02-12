@@ -27,7 +27,7 @@ describe('AuthService', () => {
 
     expect(req.request.withCredentials).toBeTrue();
     req.flush({
-      token: '',
+      token: 'jwt-token-value',
       expiresAtUtc: '2099-01-01T00:00:00Z',
       userId: '11111111-1111-1111-1111-111111111111',
       email: 'test@example.com',
@@ -39,6 +39,7 @@ describe('AuthService', () => {
     expect(service.isLoggedIn()).toBeTrue();
     expect(service.getUserRole()).toBe('Patient');
     expect(service.getUserEmail()).toBe('test@example.com');
+    expect(service.getToken()).toBe('jwt-token-value');
   });
 
   it('returns false and clears session for expired auth state', () => {

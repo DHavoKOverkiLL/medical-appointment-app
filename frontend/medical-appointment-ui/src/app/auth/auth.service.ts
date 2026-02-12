@@ -12,6 +12,7 @@ import {
 import { API_BASE_URL } from '../core/api.config';
 
 interface AuthSession {
+  token?: string;
   userId: string;
   email: string;
   role: string;
@@ -35,6 +36,7 @@ export class AuthService {
       .pipe(
       tap(response => {
         this.saveSession({
+          token: response.token,
           userId: response.userId,
           email: response.email || credentials.email.trim().toLowerCase(),
           role: response.role,
@@ -108,7 +110,12 @@ export class AuthService {
   }
 
   getToken(): string | null {
-    return null;
+    const token = this.getSession()?.token;
+    if (!token || !token.trim()) {
+      return null;
+    }
+
+    return token;
   }
 
   private getSession(): AuthSession | null {
@@ -134,6 +141,7 @@ export class AuthService {
       }
 
       return {
+        token: typeof parsed.token === 'string' ? parsed.token : undefined,
         userId: parsed.userId,
         email: parsed.email,
         role: parsed.role,

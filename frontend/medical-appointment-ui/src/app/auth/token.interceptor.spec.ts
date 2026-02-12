@@ -13,7 +13,8 @@ describe('TokenInterceptor', () => {
   let router: jasmine.SpyObj<Router>;
 
   beforeEach(() => {
-    authService = jasmine.createSpyObj<AuthService>('AuthService', ['logout']);
+    authService = jasmine.createSpyObj<AuthService>('AuthService', ['logout', 'getToken']);
+    authService.getToken.and.returnValue(null);
     router = jasmine.createSpyObj<Router>('Router', ['navigate']);
 
     TestBed.configureTestingModule({
@@ -42,6 +43,18 @@ describe('TokenInterceptor', () => {
     const req = httpMock.expectOne(`${API_BASE_URL}/api/User/secure`);
 
     expect(req.request.withCredentials).toBeTrue();
+    expect(req.request.headers.has('Authorization')).toBeFalse();
+    req.flush({});
+  });
+
+  it('adds bearer token on API requests when session token is available', () => {
+    authService.getToken.and.returnValue('test-jwt-token');
+
+    http.get(`${API_BASE_URL}/api/User/secure`).subscribe();
+    const req = httpMock.expectOne(`${API_BASE_URL}/api/User/secure`);
+
+    expect(req.request.withCredentials).toBeTrue();
+    expect(req.request.headers.get('Authorization')).toBe('Bearer test-jwt-token');
     req.flush({});
   });
 
