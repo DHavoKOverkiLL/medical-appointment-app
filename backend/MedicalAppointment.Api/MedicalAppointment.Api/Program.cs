@@ -15,12 +15,37 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+var configuredCorsOrigins = new List<string>();
+var corsOriginArray = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
+if (corsOriginArray is not null)
+{
+    configuredCorsOrigins.AddRange(corsOriginArray
+        .Where(origin => !string.IsNullOrWhiteSpace(origin))
+        .Select(origin => origin!.Trim()));
+}
+
+var corsOriginCsv = builder.Configuration["Cors:AllowedOrigins"];
+if (!string.IsNullOrWhiteSpace(corsOriginCsv))
+{
+    configuredCorsOrigins.AddRange(
+        corsOriginCsv.Split(new[] { ',', ';' }, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries));
+}
+
+var allowedCorsOrigins = configuredCorsOrigins
+    .Distinct(StringComparer.OrdinalIgnoreCase)
+    .ToArray();
+
+if (allowedCorsOrigins.Length == 0)
+{
+    allowedCorsOrigins = ["http://localhost:4200"];
+}
+
 // Add CORS policy
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngular", policy =>
     {
-        policy.WithOrigins("http://localhost:4200")
+        policy.WithOrigins(allowedCorsOrigins)
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();

@@ -98,7 +98,10 @@ Frontend URL:
 
 - `http://localhost:4200`
 
-The SPA currently points to `https://localhost:7074` in `frontend/medical-appointment-ui/src/app/core/api.config.ts`.
+The SPA auto-selects API base URL in `frontend/medical-appointment-ui/src/app/core/api.config.ts`:
+
+- localhost frontend -> `https://localhost:7074`
+- non-localhost frontend -> `https://medio-api.greenriver-343eb6db.westeurope.azurecontainerapps.io`
 
 ### 5) Access API docs
 
@@ -251,7 +254,15 @@ GitHub Actions workflow: `.github/workflows/ci.yml`
 - JWT validation enforces issuer, audience, signature, and expiry.
 - API reads bearer token from auth header and optional secure cookie name (`Jwt:CookieName`, default `medio_access_token`).
 - Rate limiting is applied to auth routes (login/register policies).
-- CORS is currently restricted to `http://localhost:4200` for local development; update policy before deploying to other origins.
+- CORS allowed origins are configured via `Cors:AllowedOrigins` (array) or `Cors:AllowedOrigins` (comma/semicolon separated string).
+- Default CORS origin fallback is `http://localhost:4200` when no origins are configured.
+
+Example production CORS env vars:
+
+```powershell
+Cors__AllowedOrigins__0=http://localhost:4200
+Cors__AllowedOrigins__1=https://<your-static-web-app>.azurestaticapps.net
+```
 
 ## Troubleshooting
 
