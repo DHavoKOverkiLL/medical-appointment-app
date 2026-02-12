@@ -1,2 +1,1 @@
-export const API_BASE_URL = 'https://localhost:7074';
-
+export const API_BASE_URL = 'medio-api.greenriver-343eb6db.westeurope.azurecontainerapps.io';
